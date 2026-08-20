@@ -1,0 +1,294 @@
+﻿import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { supabase } from "../lib/supabase";
+
+export const SIHContext = createContext(null);
+
+const load = (key, fallback) => {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch { return fallback; }
+};
+
+export function SIHProvider({ children }) {
+  const [college, setCollegeState] = useState(() => load("sih_college", null));
+  const [teams, setTeams] = useState([]);
+  const [seekers, setSeekers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [toasts, setToasts] = useState([]);
+  const [theme, setTheme] = useState(() => load("sih_theme", "light"));
+
+  const [session, setSession] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  const [myTeam, setMyTeam] = useState(null);
+  const [mySeekerProfile, setMySeekerProfile] = useState(null);
+  const [myRequests, setMyRequests] = useState([]);
+  const [myAcceptedRequests, setMyAcceptedRequests] = useState([]);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthLoading(false);
+      setSession(session);
+      setUser(session?.user || null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthLoading(false);
+      setSession(session);
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Apply theme class
+  useEffect(() => { 
+    localStorage.setItem("sih_theme", JSON.stringify(theme)); 
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+  
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => prev === "light" ? "dark" : "light");
+  }, []);
+
+  const setCollege = useCallback((c) => {
+    setCollegeState(c);
+    localStorage.setItem("sih_college", JSON.stringify(c));
+  }, []);
+
+  const fetchSupabaseData = async () => {
+    try {
+      const [teamsRes, seekersRes] = await Promise.all([
+        supabase.from('teams').select('*').order('createdAt', { ascending: false }),
+        supabase.from('seekers').select('*').order('createdAt', { ascending: false })
+      ]);
+      
+      if (teamsRes.data) {
+        setTeams(teamsRes.data);
+      }
+      if (seekersRes.data) {
+        setSeekers(seekersRes.data);
+      }
+    } catch (e) {
+      console.error(e);
+      addToast("Failed to fetch data from server", "err");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSupabaseData();
+  }, []);
+
+  // Fetch role data when user changes
+  useEffect(() => {
+    if (!user) {
+      setMyTeam(null);
+      setMySeekerProfile(null);
+      setMyRequests([]);
+      return;
+    }
+
+    const fetchRoles = async () => {
+      const [tRes, sRes] = await Promise.all([
+        supabase.from('teams').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('seekers').select('*').eq('user_id', user.id).maybeSingle()
+      ]);
+      
+      if (tRes.data) {
+        setMyTeam(tRes.data);
+        // fetch incoming requests for this team
+        const rRes = await supabase.from('join_requests').select('*, seekers(*)').eq('team_id', tRes.data.id).eq('status', 'pending');
+        if (rRes.data) setMyRequests(rRes.data);
+      }
+      if (sRes.data) setMySeekerProfile(sRes.data);
+    };
+    fetchRoles();
+  }, [user]);
+
+  const addTeam = useCallback(async (team) => {
+    try {
+      if (!user) throw new Error("Not logged in");
+      const { data, error } = await supabase.from('teams').insert([{ ...team, user_id: user.id }]).select();
+      if (error) throw error;
+      if (data) {
+        setTeams((prev) => [data[0], ...prev]);
+        setMyTeam(data[0]);
+      }
+      return data[0];
+    } catch (err) {
+      console.error(err);
+      addToast("Error creating team", "err");
+      throw err;
+    }
+  }, [user]);
+
+  const updateTeam = useCallback(async (id, data) => {
+    try {
+      const { error } = await supabase.from('teams').update(data).eq('id', id);
+      if (error) throw error;
+      setTeams((prev) => prev.map((t) => (t.id === id ? { ...t, ...data } : t)));
+      if (myTeam && myTeam.id === id) setMyTeam((prev) => ({ ...prev, ...data }));
+    } catch (err) {
+      console.error(err);
+      addToast("Error updating team", "err");
+    }
+  }, [myTeam]);
+
+  const deleteTeam = useCallback(async (id) => {
+    try {
+      const { error } = await supabase.from('teams').delete().eq('id', id);
+      if (error) throw error;
+      setTeams((prev) => prev.filter((t) => t.id !== id));
+      if (myTeam && myTeam.id === id) {
+        setMyTeam(null);
+        setMyRequests([]);
+      }
+    } catch (err) {
+      console.error(err);
+      addToast("Error deleting team", "err");
+    }
+  }, [myTeam]);
+
+  const addSeeker = useCallback(async (seeker) => {
+    try {
+      if (!user) throw new Error("Not logged in");
+      const { data, error } = await supabase.from('seekers').insert([{ ...seeker, listed: true, user_id: user.id }]).select();
+      if (error) throw error;
+      if (data) {
+        setSeekers((prev) => [data[0], ...prev]);
+        setMySeekerProfile(data[0]);
+      }
+    } catch (err) {
+      console.error(err);
+      addToast("Error listing yourself", "err");
+      throw err;
+    }
+  }, [user]);
+
+  const updateSeeker = useCallback(async (id, data) => {
+    try {
+      const { error } = await supabase.from('seekers').update(data).eq('id', id);
+      if (error) throw error;
+      setSeekers((prev) => prev.map((s) => (s.id === id ? { ...s, ...data } : s)));
+      if (mySeekerProfile && mySeekerProfile.id === id) setMySeekerProfile((prev) => ({ ...prev, ...data }));
+    } catch (err) {
+      console.error(err);
+      addToast("Error updating profile", "err");
+    }
+  }, [mySeekerProfile]);
+
+  const deleteSeeker = useCallback(async (id) => {
+    try {
+      const { error } = await supabase.from('seekers').delete().eq('id', id);
+      if (error) throw error;
+      setSeekers((prev) => prev.filter((s) => s.id !== id));
+      if (mySeekerProfile && mySeekerProfile.id === id) setMySeekerProfile(null);
+    } catch (err) {
+      console.error(err);
+      addToast("Error deleting profile", "err");
+    }
+  }, [mySeekerProfile]);
+
+  const requestToJoin = useCallback(async (teamId) => {
+    try {
+      if (!user) throw new Error("Not logged in");
+      if (!mySeekerProfile) throw new Error("You must list yourself as a seeker first!");
+      
+      const { error } = await supabase.from('join_requests').insert([{
+        team_id: teamId,
+        user_id: user.id,
+        seeker_id: mySeekerProfile.id,
+        status: 'pending'
+      }]);
+      if (error) {
+        if (error.code === '23505') throw new Error("You have already requested to join this team.");
+        throw error;
+      }
+      addToast("Request sent to Team Leader!", "ok");
+    } catch (err) {
+      console.error(err);
+      addToast(err.message || "Error sending request", "err");
+      throw err;
+    }
+  }, [user, mySeekerProfile]);
+
+  const acceptRequest = useCallback(async (requestId, seekerProfile) => {
+    try {
+      if (!myTeam) return;
+      // Accept request
+      const { error: rError } = await supabase.from('join_requests').update({ status: 'accepted' }).eq('id', requestId);
+      if (rError) throw rError;
+
+      // Update team seats and members
+      const newMembers = [...(myTeam.members || []), { 
+        name: seekerProfile.name, 
+        dept: seekerProfile.dept, 
+        year: seekerProfile.year, 
+        gender: seekerProfile.gender, 
+        skills: seekerProfile.skills?.join(', ') 
+      }];
+      const newSeatsOpen = Math.max(0, myTeam.seatsOpen - 1);
+      
+      await updateTeam(myTeam.id, { members: newMembers, seatsOpen: newSeatsOpen });
+      
+      setMyRequests((prev) => prev.filter(r => r.id !== requestId));
+      addToast("Student accepted into team!", "ok");
+    } catch (err) {
+      console.error(err);
+      addToast("Error accepting student", "err");
+    }
+  }, [myTeam, updateTeam]);
+
+  const rejectRequest = useCallback(async (requestId) => {
+    try {
+      const { error } = await supabase.from('join_requests').update({ status: 'rejected' }).eq('id', requestId);
+      if (error) throw error;
+      setMyRequests((prev) => prev.filter(r => r.id !== requestId));
+      addToast("Request rejected.", "ok");
+    } catch (err) {
+      console.error(err);
+      addToast("Error rejecting request", "err");
+    }
+  }, []);
+
+  const addToast = useCallback((msg, kind = "ok") => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, msg, kind }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4500);
+  }, []);
+
+  const value = {
+    college, setCollege,
+    teams, addTeam, updateTeam, deleteTeam,
+    seekers, addSeeker, updateSeeker, deleteSeeker,
+    toasts, addToast,
+    theme, toggleTheme,
+    stats: {
+      teams: teams.length,
+      seats: teams.reduce((acc, t) => acc + Math.max(0, 6 - (t.members || []).length), 0),
+      seekers: seekers.filter((s) => s.listed).length,
+    },
+    isLoading,
+    session, user, isAuthLoading,
+    signOut: () => supabase.auth.signOut(),
+    myTeam, mySeekerProfile, myRequests, myAcceptedRequests,
+    requestToJoin, acceptRequest, rejectRequest
+  };
+
+  return <SIHContext.Provider value={value}>{children}</SIHContext.Provider>;
+}
+
+export function useSIH() {
+  const context = useContext(SIHContext);
+  if (!context) throw new Error("useSIH must be used within SIHProvider");
+  return context;
+}
+
+
+
+
+
