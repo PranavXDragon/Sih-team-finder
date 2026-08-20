@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from "react";
+﻿import './components/modals/Modals.css';
+import { useState, useEffect } from "react";
 import { useSIH } from "./hooks/useSIH";
 import LandingScreen from "./pages/LandingScreen";
 import BoardScreen from "./pages/BoardScreen";
@@ -63,4 +64,5 @@ export default function App() {
     </>
   );
 }
+
 

@@ -1,4 +1,5 @@
-﻿import { useState } from "react";
+﻿import './LandingScreen.css';
+import { useState } from "react";
 import { useSIH } from "../hooks/useSIH";
 import AuthModal from "../components/modals/AuthModal";
 
@@ -112,5 +113,6 @@ export default function LandingScreen({ onEnter }) {
     </div>
   );
 }
+
 
 

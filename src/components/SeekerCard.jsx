@@ -1,4 +1,5 @@
-﻿function timeAgo(ts) {
+﻿import './Cards.css';
+function timeAgo(ts) {
   const diff = Date.now() - new Date(ts).getTime();
   const m = Math.floor(diff / 60000);
   if (m < 1) return "just now";
@@ -42,5 +43,6 @@ export default function SeekerCard({ seeker, onInvite }) {
     </div>
   );
 }
+
 
 

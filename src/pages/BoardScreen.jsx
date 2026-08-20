@@ -1,4 +1,5 @@
-﻿import { useState, useMemo, useEffect } from "react";
+﻿import './BoardScreen.css';
+import { useState, useMemo, useEffect } from "react";
 import { useSIH } from "../hooks/useSIH";
 import { SIH_THEMES, SKILLS } from "../data/constants";
 import TeamCard from "../components/TeamCard";
@@ -199,6 +200,7 @@ export default function BoardScreen({ initialAction, onBack }) {
     </>
   );
 }
+
 
 
 

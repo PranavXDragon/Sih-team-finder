@@ -1,0 +1,50 @@
+/* Header */
+.top {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px clamp(14px, 4vw, 34px);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+    background: transparent;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    white-space: nowrap;
+}
+.brand {
+    color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: "Sora", "Space Grotesk", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: 15px;
+}
+.brand img { width: 28px; height: 28px; }
+.brand b { color: var(--accent-2); font-weight: 800; }
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  color: var(--accent-2);
+  background: rgba(255, 171, 61, 0.07);
+  white-space: nowrap;
+}
+.top .sp { flex: 1; }
+
+/* Navbar Branding Enhancements */
+.nav-top { gap: 16px; }
+.nav-logos { display: flex; align-items: center; gap: 8px; flex-direction: row; }
+.nav-logos img { height: 44px; width: auto; object-fit: contain; }
+.nav-brand-text { display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+.college-name { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text);  letter-spacing: 0.5px; line-height: 1; white-space: nowrap; }
+.brand-sih-row { display: flex; align-items: center; gap: 12px; }
+.profile-btn { margin-right: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+

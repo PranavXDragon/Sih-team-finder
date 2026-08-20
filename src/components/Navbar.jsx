@@ -1,4 +1,5 @@
-﻿import { useState } from "react";
+﻿import './Navbar.css';
+import { useState } from "react";
 import { useSIH } from "../hooks/useSIH";
 import ProfileModal from "./modals/ProfileModal";
 
@@ -49,3 +50,4 @@ export default function Navbar() {
     </>
   );
 }
+

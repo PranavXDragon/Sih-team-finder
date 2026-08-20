@@ -1,4 +1,5 @@
-﻿import { useSIH } from "../hooks/useSIH";
+﻿import './Cards.css';
+import { useSIH } from "../hooks/useSIH";
 
 function timeAgo(ts) {
   const diff = Date.now() - new Date(ts).getTime();
@@ -88,6 +89,7 @@ export default function TeamCard({ team, onEdit }) {
     </div>
   );
 }
+
 
 
 
