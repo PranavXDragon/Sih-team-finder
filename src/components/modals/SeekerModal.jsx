@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSIH } from "../../hooks/useSIH";
 import { SKILLS, DEPARTMENTS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 import CustomSelect from "../CustomSelect";
@@ -10,7 +10,7 @@ const GENDER_OPTIONS = [
 ];
 
 export default function SeekerModal({ initialData, onClose, onSuccess }) {
-  const { addSeeker, updateSeeker, college, addToast } = useSIH();
+  const { addSeeker, updateSeeker, college, addToast, user } = useSIH();
   const [submitting, setSubmitting] = useState(false);
 
   let initPhone = "";
@@ -35,6 +35,16 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
     college: initialData?.college || college || "Suryodaya College of Engineering and Technology",
   });
   const [errs, setErrs] = useState({});
+
+  useEffect(() => {
+    if (!initialData && user) {
+      setForm(p => ({
+        ...p,
+        name: p.name || user.user_metadata?.full_name || "",
+        email: p.email || user.email || "",
+      }));
+    }
+  }, [user, initialData]);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
