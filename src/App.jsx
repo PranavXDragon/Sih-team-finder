@@ -14,7 +14,7 @@ import RequestsModal from "./components/modals/RequestsModal";
 
 export default function App() {
   const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile, addToast, requestToJoin } = useSIH();
-  
+
   const [screen, setScreenState] = useState(() => {
     const hash = window.location.hash;
     if (hash.startsWith("#board")) return "board";
@@ -28,12 +28,12 @@ export default function App() {
   const [globalPostTeam, setGlobalPostTeam] = useState(false);
   const [globalListSeeker, setGlobalListSeeker] = useState(false);
   const [globalShowRequests, setGlobalShowRequests] = useState(false);
-  
+
   useEffect(() => {
     if (session?.user && !isLoading) {
       if (session.user.email === "admin@sih2026.com") return; // Admin skips all onboarding
       const intent = localStorage.getItem('sih_intent');
-      
+
       // Always process intent if present, regardless of whether they are a new user
       if (intent) {
         localStorage.removeItem('sih_intent');
@@ -66,7 +66,7 @@ export default function App() {
       }
     }
   }, [session, isLoading, myTeam, mySeekerProfile]);
-  
+
   useEffect(() => {
     const handleAuthEvent = (e) => {
       setAuthDefaultSignUp(e.detail === 'signup');
@@ -104,7 +104,7 @@ export default function App() {
     <>
       <div className="sheet" aria-hidden="true" />
       <Navbar />
-      
+
       {screen === "landing" && (
         <LandingScreen onEnter={(act) => {
           if (act === "post-team") {
@@ -117,7 +117,7 @@ export default function App() {
           }
         }} />
       )}
-      
+
       {screen === "board" && (
         isAuthLoading ? (
           <div style={{ padding: "100px", textAlign: "center", minHeight: "80vh" }}>
@@ -127,24 +127,24 @@ export default function App() {
           <BoardScreen initialAction={boardAction} onBack={() => { setBoardAction(null); setScreen("landing"); }} />
         )
       )}
-      
+
       {screen === "admin" && (
         <AdminScreen />
       )}
-      
+
       <Footer />
-      
+
       {showAuth && (
-        <AuthModal 
-          onClose={() => setShowAuth(false)} 
+        <AuthModal
+          onClose={() => setShowAuth(false)}
           defaultIsSignUp={authDefaultSignUp}
           onSuccess={(isSignUp) => {
             setShowAuth(false);
             // Onboarding is automatically handled by the useEffect for new users
-          }} 
+          }}
         />
       )}
-      
+
       {showOnboarding && (
         <OnboardingModal
           onSelect={(act) => {
@@ -162,8 +162,8 @@ export default function App() {
       )}
 
       {globalPostTeam && (
-        <TeamModal 
-          onClose={() => setGlobalPostTeam(false)} 
+        <TeamModal
+          onClose={() => setGlobalPostTeam(false)}
           onSuccess={() => {
             setGlobalPostTeam(false);
             setScreen("board");
@@ -172,12 +172,12 @@ export default function App() {
       )}
 
       {globalListSeeker && (
-        <SeekerModal 
-          onClose={() => setGlobalListSeeker(false)} 
+        <SeekerModal
+          onClose={() => setGlobalListSeeker(false)}
           onSuccess={async () => {
             setGlobalListSeeker(false);
             setScreen("board");
-            
+
             // Check if there was an intent to join a specific team
             const joinTeamId = localStorage.getItem("sih_join_team_id");
             if (joinTeamId) {
@@ -189,14 +189,14 @@ export default function App() {
                 console.error(e);
               }
             }
-          }} 
+          }}
         />
       )}
 
       {globalShowRequests && (
         <RequestsModal onClose={() => setGlobalShowRequests(false)} />
       )}
-      
+
       <div className="toasts" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id} className="toast" data-k={t.kind}>

@@ -11,7 +11,7 @@ export default function InviteModal({ seeker, onClose }) {
 
   const send = async () => {
     if (msg.trim().length < 10) { setErr(true); return; }
-    
+
     setLoading(true);
     try {
       await sendTeamInvite(seeker, msg);

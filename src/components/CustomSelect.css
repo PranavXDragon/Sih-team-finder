@@ -3,6 +3,7 @@
   width: 100%;
   min-width: 0;
 }
+
 .cs-trigger {
   width: 100%;
   display: flex;
@@ -21,6 +22,7 @@
   transition: border-color 0.16s, box-shadow 0.16s;
   min-width: 0;
 }
+
 .cs-trigger span {
   flex: 1;
   overflow: hidden;
@@ -28,12 +30,16 @@
   white-space: nowrap;
   margin-right: 6px;
 }
+
 .cs-trigger svg {
   flex-shrink: 0;
 }
-.cs-trigger:focus, .cs-trigger[data-open="true"] {
+
+.cs-trigger:focus,
+.cs-trigger[data-open="true"] {
   border-color: var(--accent-2);
 }
+
 .cs-pop {
   position: absolute;
   top: calc(100% + 6px);
@@ -49,10 +55,19 @@
   padding: 6px;
   animation: cs-fade 0.12s ease-out;
 }
-@keyframes cs-fade { 
-  from { opacity: 0; transform: translateY(-4px); } 
-  to { opacity: 1; transform: translateY(0); } 
+
+@keyframes cs-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 .cs-opt {
   display: block;
   width: 100%;
@@ -67,13 +82,16 @@
   font-size: 14.5px;
   transition: background 0.12s;
 }
+
 .cs-opt:hover {
   background: var(--bg);
 }
+
 .cs-opt.selected {
   color: var(--accent-2);
   font-weight: 600;
 }
+
 .cs-placeholder {
   color: var(--dim);
 }

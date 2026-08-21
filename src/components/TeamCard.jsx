@@ -25,7 +25,7 @@ export default function TeamCard({ team, onEdit }) {
 
   const handleJoin = async () => {
     if (isJoining) return;
-    
+
     if (!user) {
       localStorage.setItem('sih_intent', 'list-seeker');
       localStorage.setItem('sih_join_team_id', team.id);
@@ -37,7 +37,7 @@ export default function TeamCard({ team, onEdit }) {
       addToast("You lead a team! You cannot join another.", "err");
       return;
     }
-    
+
     setIsJoining(true);
     try {
       await requestToJoin(team.id);
@@ -78,7 +78,7 @@ export default function TeamCard({ team, onEdit }) {
       {team.wantsSkills?.length > 0 && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
           {team.wantsSkills.map((s) => (
-             <span key={s} className="chip mini" style={{ cursor: "default" }}>{s}</span>
+            <span key={s} className="chip mini" style={{ cursor: "default" }}>{s}</span>
           ))}
         </div>
       )}
@@ -100,7 +100,7 @@ export default function TeamCard({ team, onEdit }) {
       <div className="cfoot">
         <span className="ago">{timeAgo(team.createdAt)}</span>
         <span className="sp" />
-        
+
         <button className="iconbtn" type="button" onClick={handleShare} style={{ marginRight: 8, width: 32, height: 32 }} title="Copy link to team">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
         </button>

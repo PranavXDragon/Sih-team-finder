@@ -8,8 +8,19 @@
   color: var(--dim);
   font-size: 11px;
 }
-.foot a { color: var(--accent-2); text-decoration: underline; }
-.foot .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
+
+.foot a {
+  color: var(--accent-2);
+  text-decoration: underline;
+}
+
+.foot .links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 6px;
+}
 
 .dev-credit {
   margin-top: 12px;
@@ -23,4 +34,3 @@
   color: var(--accent);
   font-weight: 600;
 }
-

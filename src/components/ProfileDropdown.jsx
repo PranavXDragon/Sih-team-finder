@@ -33,9 +33,9 @@ export default function ProfileDropdown() {
 
   return (
     <div style={{ position: "relative" }} ref={ref}>
-      <button 
-        className="btn sm profile-btn" 
-        type="button" 
+      <button
+        className="btn sm profile-btn"
+        type="button"
         onClick={() => setOpen(!open)}
         style={{ margin: 0 }}
       >
@@ -74,7 +74,7 @@ export default function ProfileDropdown() {
                 </button>
               </>
             )}
-            
+
             {mySeekerProfile && (
               <>
                 <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')}>Edit Seeker Profile</button>
@@ -90,9 +90,9 @@ export default function ProfileDropdown() {
                 No active profiles
               </div>
             )}
-            
+
             <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
-            
+
             <button type="button" className="cs-opt" onClick={handleSignOut} style={{ color: "var(--stop)" }}>
               Sign Out
             </button>

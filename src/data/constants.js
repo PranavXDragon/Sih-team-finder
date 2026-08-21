@@ -21,9 +21,9 @@ export const SIH_THEMES = [
 ];
 
 export const SKILLS = [
-  "Python","Machine Learning","Computer Vision","Web Dev","App Dev",
-  "Embedded / Firmware","PCB Design","CAD / 3D Modelling","Data Science",
-  "Blockchain","UI / UX","IoT","Cloud / DevOps","Robotics","Signal Processing","3D Printing", "Other (Custom)"
+  "Python", "Machine Learning", "Computer Vision", "Web Dev", "App Dev",
+  "Embedded / Firmware", "PCB Design", "CAD / 3D Modelling", "Data Science",
+  "Blockchain", "UI / UX", "IoT", "Cloud / DevOps", "Robotics", "Signal Processing", "3D Printing", "Other (Custom)"
 ];
 
 export const PROGRAMS_DATA = {

@@ -41,11 +41,11 @@ export function SIHProvider({ children }) {
   }, []);
 
   // Apply theme class
-  useEffect(() => { 
-    localStorage.setItem("sih_theme", JSON.stringify(theme)); 
+  useEffect(() => {
+    localStorage.setItem("sih_theme", JSON.stringify(theme));
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
-  
+
   const toggleTheme = useCallback(() => {
     setTheme(prev => prev === "light" ? "dark" : "light");
   }, []);
@@ -69,7 +69,7 @@ export function SIHProvider({ children }) {
         supabase.from('teams').select('*').order('createdAt', { ascending: false }),
         supabase.from('seekers').select('*').order('createdAt', { ascending: false })
       ]);
-      
+
       if (teamsRes.data) {
         setTeams(teamsRes.data);
       }
@@ -99,7 +99,7 @@ export function SIHProvider({ children }) {
         supabase.from('teams').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('seekers').select('*').eq('user_id', user.id).maybeSingle()
       ]);
-      
+
       if (tRes.data) {
         setMyTeam(tRes.data);
         // fetch incoming requests for this team
@@ -171,7 +171,7 @@ export function SIHProvider({ children }) {
       if (data) {
         setTeams((prev) => [data[0], ...prev]);
         setMyTeam(data[0]);
-        
+
         supabase.functions.invoke('send-email', {
           body: {
             to: user.email,
@@ -182,7 +182,7 @@ export function SIHProvider({ children }) {
             }
           }
         }).catch(err => console.error("Failed to send team created email", err));
-        
+
         // Sync to Google Sheets if configured
         if (import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK) {
           fetch(import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK, {
@@ -218,7 +218,7 @@ export function SIHProvider({ children }) {
       const { data, error } = await supabase.from('teams').delete().eq('id', id).select();
       if (error) throw error;
       if (!data || data.length === 0) throw new Error("Permission denied. Could not delete from Supabase (Check RLS Policies).");
-      
+
       setTeams((prev) => prev.filter((t) => t.id !== id));
       if (myTeam && myTeam.id === id) {
         setMyTeam(null);
@@ -238,7 +238,7 @@ export function SIHProvider({ children }) {
       if (data) {
         setSeekers((prev) => [data[0], ...prev]);
         setMySeekerProfile(data[0]);
-        
+
         // Send Welcome Email
         const email = data[0].whatsapp?.split('|')[1]?.trim();
         if (email) {
@@ -287,7 +287,7 @@ export function SIHProvider({ children }) {
       const { data, error } = await supabase.from('seekers').delete().eq('id', id).select();
       if (error) throw error;
       if (!data || data.length === 0) throw new Error("Permission denied. Could not delete from Supabase (Check RLS Policies).");
-      
+
       setSeekers((prev) => prev.filter((s) => s.id !== id));
       if (mySeekerProfile && mySeekerProfile.id === id) setMySeekerProfile(null);
     } catch (err) {
@@ -300,7 +300,7 @@ export function SIHProvider({ children }) {
     try {
       if (!user) throw new Error("Not logged in");
       if (!mySeekerProfile) throw new Error("You must list yourself as a seeker first!");
-      
+
       // Check if user is already accepted into a team
       const { data: acceptedData } = await supabase
         .from('join_requests')
@@ -308,7 +308,7 @@ export function SIHProvider({ children }) {
         .eq('user_id', user.id)
         .eq('status', 'accepted')
         .maybeSingle();
-        
+
       if (acceptedData) {
         throw new Error("You are already in a team. You can only join one team.");
       }
@@ -336,10 +336,10 @@ export function SIHProvider({ children }) {
             .update({ status: 'pending' })
             .eq('id', existingRequest.id)
             .select();
-            
+
           if (error) throw error;
           finalRequestData = data[0];
-          
+
           // Remove old application from UI so it can be replaced
           setMyApplications(prev => prev.filter(app => app.id !== existingRequest.id));
         }
@@ -350,21 +350,21 @@ export function SIHProvider({ children }) {
           seeker_id: mySeekerProfile.id,
           status: 'pending'
         }]).select();
-        
+
         if (error) {
           if (error.code === '23505') throw new Error("You have already applied for this team.");
           throw error;
         }
         finalRequestData = data[0];
       }
-      
+
       if (finalRequestData) {
         // Fetch the team data to match the join query shape
         const { data: teamData } = await supabase.from('teams').select('*').eq('id', teamId).single();
         const newApp = { ...finalRequestData, teams: teamData };
         setMyApplications(prev => [newApp, ...prev]);
       }
-      
+
       // Notify team leader via email
       const targetTeam = teams.find(t => t.id === teamId);
       if (targetTeam) {
@@ -402,9 +402,9 @@ export function SIHProvider({ children }) {
       if (!myTeam) return;
 
       // SIH Rule Check: A complete team of 6 members must include at least one female member
-      const tempMembers = [...(myTeam.members || []), { 
-        name: seekerProfile.name, 
-        gender: seekerProfile.gender 
+      const tempMembers = [...(myTeam.members || []), {
+        name: seekerProfile.name,
+        gender: seekerProfile.gender
       }];
       if (tempMembers.length === 6 && !tempMembers.some(m => m.gender === 'f')) {
         throw new Error("SIH Rules: A complete 6-person team must include at least one female member.");
@@ -424,23 +424,23 @@ export function SIHProvider({ children }) {
       const phone = parts[0]?.trim() || "";
       const email = parts[1]?.trim() || "";
 
-      const newMembers = [...(myTeam.members || []), { 
-        name: seekerProfile.name, 
+      const newMembers = [...(myTeam.members || []), {
+        name: seekerProfile.name,
         email: email,
         phone: phone,
         program: seekerProfile.program || "UG",
-        dept: seekerProfile.dept, 
-        year: seekerProfile.year, 
-        gender: seekerProfile.gender, 
+        dept: seekerProfile.dept,
+        year: seekerProfile.year,
+        gender: seekerProfile.gender,
         skills: seekerProfile.skills?.join(', '),
         user_id: seekerProfile.user_id
       }];
       const newSeatsOpen = Math.max(0, myTeam.seatsOpen - 1);
-      
+
       await updateTeam(myTeam.id, { members: newMembers, seatsOpen: newSeatsOpen });
-      
+
       setMyRequests((prev) => prev.filter(r => r.id !== requestId));
-      
+
       if (email) {
         supabase.functions.invoke('send-email', {
           body: {
@@ -467,7 +467,7 @@ export function SIHProvider({ children }) {
     try {
       const { error } = await supabase.from('join_requests').update({ status: 'rejected' }).eq('id', requestId);
       if (error) throw error;
-      
+
       const req = myRequests.find(r => r.id === requestId);
       if (req && req.seekers) {
         const seekerEmail = req.seekers.whatsapp?.split('|')[1]?.trim();
@@ -499,7 +499,7 @@ export function SIHProvider({ children }) {
   const sendTeamInvite = useCallback(async (seeker, message) => {
     try {
       if (!myTeam) throw new Error("You must have a team to send invites.");
-      
+
       let seekerEmail = seeker.email;
       if (!seekerEmail && seeker.whatsapp) {
         seekerEmail = seeker.whatsapp.split('|')[1]?.trim();
@@ -519,7 +519,7 @@ export function SIHProvider({ children }) {
         }
       });
       if (fnErr) throw fnErr;
-      
+
     } catch (err) {
       addToast(err.message || "Failed to send invite", "err");
       throw err;

@@ -40,30 +40,30 @@ export default function AdminScreen() {
           <form onSubmit={handleAdminLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div className="fld">
               <label>SPOC ID (Email)</label>
-              <input 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                placeholder="admin@sih2026.com" 
-                required 
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@sih2026.com"
+                required
               />
             </div>
             <div className="fld">
               <label>Password</label>
               <div style={{ position: 'relative' }}>
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  placeholder="••••••••" 
-                  required 
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
                   style={{ width: '100%', paddingRight: '40px' }}
                 />
-                <button 
+                <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ 
-                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', 
+                  style={{
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
                     background: 'transparent', border: 'none', color: 'var(--dim)', cursor: 'pointer', padding: 0
                   }}
                 >
@@ -88,7 +88,7 @@ export default function AdminScreen() {
   teams.forEach(t => {
     const track = t.track === "Software" ? "Software" : t.track === "Hardware" ? "Hardware" : "Other";
     if (tracksMap[track] !== undefined) tracksMap[track]++;
-    
+
     if (t.theme) {
       themesMap[t.theme] = (themesMap[t.theme] || 0) + 1;
     }
@@ -163,7 +163,7 @@ export default function AdminScreen() {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
-          ) : <p style={{color: 'var(--dim)', textAlign:'center', marginTop:40}}>No team data yet.</p>}
+          ) : <p style={{ color: 'var(--dim)', textAlign: 'center', marginTop: 40 }}>No team data yet.</p>}
         </div>
 
         <div className="admin-chart-card">
@@ -172,13 +172,13 @@ export default function AdminScreen() {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={barData} margin={{ top: 20, right: 30, left: 0, bottom: 50 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="name" stroke="var(--dim)" angle={-45} textAnchor="end" tick={{fontSize: 12}} />
+                <XAxis dataKey="name" stroke="var(--dim)" angle={-45} textAnchor="end" tick={{ fontSize: 12 }} />
                 <YAxis stroke="var(--dim)" allowDecimals={false} />
-                <RechartsTooltip contentStyle={{ backgroundColor: 'var(--surface-2)', borderColor: 'var(--border)' }} cursor={{fill: 'var(--surface)'}} />
+                <RechartsTooltip contentStyle={{ backgroundColor: 'var(--surface-2)', borderColor: 'var(--border)' }} cursor={{ fill: 'var(--surface)' }} />
                 <Bar dataKey="count" fill="var(--accent)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          ) : <p style={{color: 'var(--dim)', textAlign:'center', marginTop:40}}>No theme data yet.</p>}
+          ) : <p style={{ color: 'var(--dim)', textAlign: 'center', marginTop: 40 }}>No theme data yet.</p>}
         </div>
       </div>
 
@@ -201,7 +201,7 @@ export default function AdminScreen() {
               <tr key={t.id} style={{ transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                 <td>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-                    <span 
+                    <span
                       onClick={() => setViewingTeam(t)}
                       style={{ fontWeight: 'bold', cursor: 'pointer', color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: 4 }}
                     >
@@ -226,7 +226,7 @@ export default function AdminScreen() {
                 </td>
               </tr>
             ))}
-            {teams.length === 0 && <tr><td colSpan="5" style={{textAlign: 'center', padding: 20}}>No teams registered yet.</td></tr>}
+            {teams.length === 0 && <tr><td colSpan="5" style={{ textAlign: 'center', padding: 20 }}>No teams registered yet.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -257,22 +257,22 @@ export default function AdminScreen() {
                 </td>
               </tr>
             ))}
-            {seekers.length === 0 && <tr><td colSpan="5" style={{textAlign: 'center', padding: 20}}>No seekers registered yet.</td></tr>}
+            {seekers.length === 0 && <tr><td colSpan="5" style={{ textAlign: 'center', padding: 20 }}>No seekers registered yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
       {editingTeam && (
-        <AdminEditTeamModal 
-          team={editingTeam} 
-          onClose={() => setEditingTeam(null)} 
+        <AdminEditTeamModal
+          team={editingTeam}
+          onClose={() => setEditingTeam(null)}
         />
       )}
 
       {viewingTeam && (
-        <AdminViewTeamModal 
-          team={viewingTeam} 
-          onClose={() => setViewingTeam(null)} 
+        <AdminViewTeamModal
+          team={viewingTeam}
+          onClose={() => setViewingTeam(null)}
         />
       )}
 
@@ -292,7 +292,7 @@ export default function AdminScreen() {
               <p style={{ color: "var(--stop)", fontSize: "0.85rem", margin: 0 }}>
                 This action is irreversible.
               </p>
-              
+
               <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
                 <button className="btn" style={{ flex: 1, background: "transparent", border: "1px solid var(--border)", color: "var(--text)" }} onClick={() => setConfirmDelete(null)}>Cancel</button>
                 <button className="btn danger" style={{ flex: 1, background: 'var(--stop)', color: '#fff', border: 'none' }} onClick={() => {
