@@ -9,12 +9,12 @@ export default function Navbar() {
     <>
       <header className="top nav-top">
         <div className="nav-logos">
+          <img src="/SIH2026-logo.png" alt="SIH 2026 Logo" className="sih-logo-img" />
+          <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
           <a href="#" title="Suryodaya Home" style={{ display: 'flex' }}>
             <img src="/Society.png" alt="Society Logo" />
           </a>
           <img src="/Academic.png" alt="Academic Logo" />
-          <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
-          <img src="/SIH2026-logo.png" alt="SIH 2026 Logo" className="sih-logo-img" />
         </div>
 
         <span className="sp" />
