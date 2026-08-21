@@ -568,7 +568,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
                     </tr>
                   </table>
                   <h1 class="email-header-title" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 22px; color: #f7f3ea; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">SIH 2026 SCET</h1>
-                  <div class="email-header-subtitle" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9ba2b4; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.12em;">Team Membership Update</div>
+                  <div class="email-header-subtitle" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9ba2b4; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.12em;">Application Status Update</div>
                 </td>
               </tr>
             </table>
@@ -579,22 +579,20 @@ export const generateEmailHTML = (type: string, payload: any) => {
         <tr>
           <td class="email-body" style="padding: 32px; color: #f7f3ea; font-size: 15px; line-height: 1.65;">
             <h2 class="email-heading" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 20px; color: #f7f3ea; margin-top: 0; margin-bottom: 18px; line-height: 1.25;">
-              Team Membership Update
+              Application Status Update
             </h2>
 
             <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{student_name}},</p>
 
-            <p style="margin: 0 0 16px; color: #f7f3ea;">This is to inform you that your request to join <strong style="color: #ff456b;">{{team_name}}</strong> has been declined, or you have been removed from the team.</p>
+            <p style="margin: 0 0 16px; color: #f7f3ea;">This is to inform you that your request to join <strong style="color: #ff456b;">{{team_name}}</strong> has been declined.</p>
 
             <!-- Removal Details Card -->
             <div class="details-card" style="background-color: #212533; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 20px; margin: 22px 0;">
               <span class="details-label" style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: #ff456b; text-transform: uppercase; letter-spacing: 0.18em; display: inline-block; margin-bottom: 10px; background: rgba(255, 69, 107, 0.12); border: 1px solid rgba(255, 69, 107, 0.25); padding: 3px 8px; border-radius: 4px;">Update Details</span>
               <p style="margin: 6px 0; color: #f7f3ea;"><strong style="color: #9ba2b4;">Team:</strong> {{team_name}}</p>
-              <p style="margin: 6px 0; color: #f7f3ea;"><strong style="color: #9ba2b4;">Action Taken By:</strong> {{team_leader}}</p>
+              <p style="margin: 6px 0; color: #f7f3ea;"><strong style="color: #9ba2b4;">Reviewed By:</strong> {{team_leader}}</p>
               <p style="margin: 6px 0; color: #f7f3ea;"><strong style="color: #9ba2b4;">Reason:</strong> {{removal_reason}}</p>
             </div>
-
-            <p style="margin: 0 0 16px; color: #9ba2b4;">You are no longer listed as a member of this team.</p>
 
             <p style="margin: 0 0 16px; color: #9ba2b4;">If you are still looking for a team, you can explore other available teams and connect with students looking for teammates through the platform.</p>
 
