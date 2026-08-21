@@ -1,0 +1,403 @@
+/* AuthModal.css - Translating Tailwind to Vanilla CSS for sign-in-flo */
+
+.auth-flo-wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #111827;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.auth-flo-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.auth-flo-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 28rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+}
+
+.auth-flo-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-flo-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+}
+
+.auth-flo-icon-wrap svg {
+  color: #3b82f6;
+  width: 2rem;
+  height: 2rem;
+}
+
+.auth-flo-title {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+.auth-flo-subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+/* Animated Form Field */
+.aff-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.aff-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  transition: all 0.3s ease-in-out;
+}
+
+.aff-container:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.aff-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  transition: color 0.2s;
+  pointer-events: none;
+}
+
+.aff-container:focus-within .aff-icon {
+  color: #3b82f6;
+}
+
+.aff-input {
+  width: 100%;
+  background: transparent;
+  padding: 1.25rem 3rem 0.5rem 2.5rem;
+  color: #111827;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.aff-label {
+  position: absolute;
+  left: 2.5rem;
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+.aff-label.active {
+  top: 0.25rem;
+  font-size: 0.75rem;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.aff-label.inactive {
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.aff-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.aff-toggle:hover {
+  color: #111827;
+}
+
+.aff-hover-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Auth Actions */
+.auth-flo-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.auth-flo-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.auth-flo-checkbox input {
+  width: 1rem;
+  height: 1rem;
+  color: #3b82f6;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+}
+
+.auth-flo-forgot {
+  font-size: 0.875rem;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.auth-flo-forgot:hover {
+  text-decoration: underline;
+}
+
+/* Submit Button */
+.auth-flo-submit {
+  width: 100%;
+  position: relative;
+  background-color: #3b82f6;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.auth-flo-submit:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.auth-flo-submit:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #3b82f6;
+}
+
+.auth-flo-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-flo-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-flo-spinner-ring {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.auth-flo-submit-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 1s ease-in-out;
+}
+
+.auth-flo-submit:hover .auth-flo-submit-glow {
+  transform: translateX(100%);
+}
+
+/* Social Divider */
+.auth-flo-divider {
+  position: relative;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.auth-flo-divider::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  top: 50%;
+  border-top: 1px solid #e5e7eb;
+}
+
+.auth-flo-divider span {
+  position: relative;
+  background-color: #ffffff;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Social Buttons */
+.auth-flo-socials {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 0.75rem;
+}
+
+.social-btn {
+  position: relative;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #111827;
+  font-weight: 500;
+}
+
+.social-btn:hover {
+  background-color: #f9fafb;
+}
+
+.social-btn-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(59,130,246,0.1), rgba(168,85,247,0.1), rgba(236,72,153,0.1));
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.social-btn:hover .social-btn-gradient {
+  transform: translateX(0);
+}
+
+.social-btn svg {
+  position: relative;
+  color: #111827;
+  transition: color 0.3s;
+}
+
+.social-btn:hover svg {
+  color: #3b82f6;
+}
+
+/* Footer Toggle */
+.auth-flo-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.auth-flo-footer button {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.auth-flo-footer button:hover {
+  text-decoration: underline;
+}
+
+.auth-flo-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0,0,0,0.05);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  z-index: 20;
+}
+
+.auth-flo-close:hover {
+  background: rgba(0,0,0,0.1);
+  color: #111827;
+}
+
+.auth-flo-error {
+  margin-top: 16px;
+  color: #dc2626;
+  font-size: 0.875rem;
+  padding: 12px;
+  background: #fef2f2;
+  border: 1px solid #f87171;
+  border-radius: 8px;
+  text-align: left;
+}
+
+@media (max-width: 480px) {
+  .auth-flo-card {
+    padding: 1.25rem 1rem;
+    border-radius: 0.75rem;
+  }
+  .auth-flo-title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}
