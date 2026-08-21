@@ -12,13 +12,14 @@ function timeAgo(ts) {
 }
 
 export default function TeamCard({ team, onEdit }) {
-  const { user, myTeam, mySeekerProfile, myAcceptedRequests, requestToJoin, addToast } = useSIH();
+  const { user, myTeam, mySeekerProfile, myAcceptedRequests, myApplications, requestToJoin, addToast } = useSIH();
   const actualSeatsOpen = Math.max(0, (team.totalSeats || 6) - (team.members?.length || 1));
   const filled = (team.totalSeats || 6) - actualSeatsOpen;
   const isFull = actualSeatsOpen === 0;
 
   const isMyTeam = myTeam && myTeam.id === team.id;
   const isAccepted = myAcceptedRequests?.includes(team.id);
+  const hasApplied = myApplications?.some(app => app.team_id === team.id && app.status === 'pending');
 
   const handleJoin = async () => {
     if (!user) {
@@ -100,6 +101,10 @@ export default function TeamCard({ team, onEdit }) {
           <div style={{ background: 'rgba(52, 211, 153, 0.15)', color: '#10b981', padding: '6px 12px', borderRadius: 8, fontSize: '0.85rem', fontWeight: 600 }}>
             {team.contact || "Accepted! (No contact info provided)"}
           </div>
+        ) : hasApplied ? (
+          <button className="btn sm sec" type="button" disabled style={{ opacity: 0.7, cursor: "not-allowed", color: "var(--text)" }}>
+            Applied
+          </button>
         ) : !isFull ? (
           <button className="btn sm pri" type="button" onClick={handleJoin}>
             Request to join
