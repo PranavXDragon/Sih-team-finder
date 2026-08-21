@@ -10,7 +10,7 @@ import AuthModal from "./components/modals/AuthModal";
 import OnboardingModal from "./components/modals/OnboardingModal";
 
 export default function App() {
-  const { toasts, session, isAuthLoading } = useSIH();
+  const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile } = useSIH();
   
   const [screen, setScreenState] = useState(() => {
     const hash = window.location.hash;
@@ -22,6 +22,19 @@ export default function App() {
   const [showAuth, setShowAuth] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [authDefaultSignUp, setAuthDefaultSignUp] = useState(false);
+  
+  useEffect(() => {
+    if (session?.user && !isLoading) {
+      const key = `sih_onboarding_${session.user.id}`;
+      if (!localStorage.getItem(key)) {
+        if (myTeam || mySeekerProfile) {
+          localStorage.setItem(key, "true");
+        } else {
+          setShowOnboarding(true);
+        }
+      }
+    }
+  }, [session, isLoading, myTeam, mySeekerProfile]);
   
   useEffect(() => {
     const handleAuthEvent = (e) => {
@@ -79,11 +92,10 @@ export default function App() {
       {showAuth && (
         <AuthModal 
           onClose={() => setShowAuth(false)} 
+          defaultIsSignUp={authDefaultSignUp}
           onSuccess={(isSignUp) => {
             setShowAuth(false);
-            if (isSignUp) {
-              setShowOnboarding(true);
-            }
+            // Onboarding is automatically handled by the useEffect for new users
           }} 
         />
       )}
@@ -91,11 +103,13 @@ export default function App() {
       {showOnboarding && (
         <OnboardingModal
           onSelect={(act) => {
+            if (session?.user) localStorage.setItem(`sih_onboarding_${session.user.id}`, "true");
             setShowOnboarding(false);
             setBoardAction(act);
             setScreen("board");
           }}
           onClose={() => {
+            if (session?.user) localStorage.setItem(`sih_onboarding_${session.user.id}`, "true");
             setShowOnboarding(false);
             setScreen("board");
           }}
