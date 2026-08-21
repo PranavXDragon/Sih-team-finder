@@ -32,16 +32,15 @@ export default function App() {
         
         if (myTeam || mySeekerProfile) {
           localStorage.setItem(key, "true");
-        } else if (intent === "post-team") {
-          localStorage.setItem(key, "true");
-          setScreenState("board");
-          setBoardAction("post-team");
         } else if (intent === "list-seeker") {
           localStorage.setItem(key, "true");
           setScreenState("board");
           setBoardAction("list-seeker");
         } else {
-          setShowOnboarding(true);
+          // Default to post-team if no intent was found (e.g. they just clicked sign up)
+          localStorage.setItem(key, "true");
+          setScreenState("board");
+          setBoardAction("post-team");
         }
       }
     }
