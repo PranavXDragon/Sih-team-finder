@@ -15,7 +15,8 @@ export default function TeamCard({ team, onEdit }) {
   const { user, myTeam, mySeekerProfile, myAcceptedRequests, requestToJoin, addToast } = useSIH();
   const actualSeatsOpen = Math.max(0, (team.totalSeats || 6) - (team.members?.length || 1));
   const filled = (team.totalSeats || 6) - actualSeatsOpen;
-  const isFull = actualSeatsOpen === 0;
+  const hasFemale = team.members?.some(m => m.gender === 'f');
+  const isFull = actualSeatsOpen === 0 && hasFemale;
 
   const isMyTeam = myTeam && myTeam.id === team.id;
   const isAccepted = myAcceptedRequests?.includes(team.id);
@@ -76,7 +77,14 @@ export default function TeamCard({ team, onEdit }) {
             <span key={i} className={`pip${i < filled ? " on" : ""}`} />
           ))}
         </div>
-        <b>{isFull ? "Team full" : `${actualSeatsOpen} seat${actualSeatsOpen > 1 ? "s" : ""} open`}</b>
+        <b>
+          {isFull 
+            ? "Team full" 
+            : (actualSeatsOpen === 0 && !hasFemale) 
+              ? "Needs Female Member" 
+              : `${actualSeatsOpen} seat${actualSeatsOpen > 1 ? "s" : ""} open`
+          }
+        </b>
         {team.needsFemale && (
           <span className="chip mini" style={{ background: "var(--warn-dim)", borderColor: "rgba(255, 159, 28, 0.4)", color: "var(--warn)", cursor: "default" }}>
             Needs ♀
