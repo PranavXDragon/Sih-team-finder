@@ -119,7 +119,11 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     if (!membersValid) e.members = true;
     
     setErrs(e);
-    return Object.keys(e).length === 0;
+    if (Object.keys(e).length > 0) {
+      addToast("Please fill all mandatory fields correctly.", "err");
+      return false;
+    }
+    return true;
   };
 
   const submit = async () => {
@@ -128,26 +132,34 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     const totalMembers = 1 + filledMembers.length; // leader + members
     const seatsOpen = Math.max(0, 6 - totalMembers);
     const payload = {
-      teamName: form.teamName.trim(),
+      teamName: (form.teamName || "").trim(),
       college: form.college || college,
       track: form.track,
       theme: form.theme,
       hasIdea: form.hasIdea,
-      psId: form.psId.trim(),
-      psTitle: form.psTitle.trim(),
-      pitch: form.pitch.trim(),
-      hasMentor: form.hasMentor,
-      contact: form.phone + ' | ' + form.email,
+      psId: (form.psId || "").trim(),
+      psTitle: (form.psTitle || "").trim(),
+      pitch: (form.pitch || "").trim(),
+      contact: (form.phone || "").trim() + ' | ' + (form.email || "").trim(),
       needsFemale: true, // simplified
       wantsSkills: form.wantsSkills,
       seatsOpen,
       totalSeats: 6,
       members: [
-        { name: form.leaderName, program: form.leaderProgram, dept: form.leaderBranch, year: form.leaderYear, gender: form.leaderGender, skills: form.leaderSkills, email: form.email, phone: form.phone },
+        { 
+          name: (form.leaderName || "").trim(), 
+          program: form.leaderProgram, 
+          dept: form.leaderBranch, 
+          year: form.leaderYear, 
+          gender: form.leaderGender, 
+          skills: (form.leaderSkills || "").trim(), 
+          email: (form.email || "").trim(), 
+          phone: (form.phone || "").trim() 
+        },
         ...filledMembers.map(m => ({
-          name: m.name.trim(),
-          email: m.email.trim(),
-          phone: m.phone.trim(),
+          name: (m.name || "").trim(),
+          email: (m.email || "").trim(),
+          phone: (m.phone || "").trim(),
           program: m.program,
           dept: m.branch,
           year: m.year,
@@ -166,7 +178,10 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
         if (onSuccess) onSuccess();
       }
       onClose();
-    } catch (e) {}
+    } catch (err) {
+      console.error("Error submitting team:", err);
+      addToast(err.message || "Failed to post team", "err");
+    }
 
   };
 
@@ -203,7 +218,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
               <label>Track<em>*</em></label>
               <div className="radios">
                 {["Software", "Hardware"].map((t) => (
-                  <label key={t} className={`radio${form.track === t ? " on" : ""}`}>
+                  <label key={t} className={`radio${form.track === t ? " on" : ""}`} onClick={() => set("track", t)}>
                     <input type="radio" name="track" value={t} onChange={() => set("track", t)} />
                     <b>{t}</b>
                     <small>{t === "Software" ? "App, web, AI, data" : "PCB, embedded, robots"}</small>
