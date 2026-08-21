@@ -31,7 +31,8 @@ export const PROGRAMS_DATA = {
     "Civil Polytechnic",
     "Mechanical Polytechnic",
     "Mining Engineering",
-    "Electrical Engineering"
+    "Electrical Engineering",
+    "Humanities"
   ],
   "UG": [
     "Mechanical Engineering",

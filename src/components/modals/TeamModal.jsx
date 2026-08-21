@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useSIH } from "../../hooks/useSIH";
-import { SIH_THEMES, SKILLS, DEPARTMENTS, YEARS } from "../../data/constants";
+import { SIH_THEMES, SKILLS, DEPARTMENTS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 
 import CustomSelect from "../CustomSelect";
 
-const EMPTY_MEMBER = { name: "", dept: "CSE", year: "3rd Year", gender: "na", skills: "" };
+const EMPTY_MEMBER = { name: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", skills: "" };
 
 const GENDER_OPTIONS = [
   { value: "na", label: "Prefer not to say" },
@@ -28,7 +28,14 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
   
   let initialMembers = emptyMembers;
   if (initialData?.members && initialData.members.length > 1) {
-    const others = initialData.members.slice(1);
+    const others = initialData.members.slice(1).map(m => ({
+      name: m.name || "",
+      program: m.program || "UG",
+      branch: m.dept || "Computer Engineering",
+      year: m.year || "3rd Year",
+      gender: m.gender || "na",
+      skills: m.skills || ""
+    }));
     initialMembers = others.concat(emptyMembers).slice(0, 4);
   }
 
@@ -50,7 +57,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     psTitle: initialData?.psTitle || "", 
     pitch: initialData?.pitch || "",
     leaderName: leader.name || "", 
-    leaderDept: leader.dept || "CSE", 
+    leaderProgram: leader.program || "UG", 
+    leaderBranch: leader.dept || "Computer Engineering", 
     leaderYear: leader.year || "3rd Year", 
     leaderGender: leader.gender || "na", 
     leaderSkills: leader.skills || "",
@@ -122,8 +130,15 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       seatsOpen,
       totalSeats: 6,
       members: [
-        { name: form.leaderName, dept: form.leaderDept, year: form.leaderYear, gender: form.leaderGender, skills: form.leaderSkills },
-        ...filledMembers,
+        { name: form.leaderName, program: form.leaderProgram, dept: form.leaderBranch, year: form.leaderYear, gender: form.leaderGender, skills: form.leaderSkills },
+        ...filledMembers.map(m => ({
+          name: m.name,
+          program: m.program,
+          dept: m.branch,
+          year: m.year,
+          gender: m.gender,
+          skills: m.skills || ""
+        })),
       ],
     };
 
@@ -235,13 +250,31 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                 <p className="err">Needed.</p>
               </div>
               <div className="fld">
-                <label>Department</label>
+                <label>Program</label>
                 <CustomSelect
-                  value={form.leaderDept}
-                  onChange={(val) => set("leaderDept", val)}
-                  options={DEPARTMENTS}
+                  value={form.leaderProgram}
+                  onChange={(val) => {
+                    const defaultBranch = PROGRAMS_DATA[val]?.[0] || "";
+                    setForm(p => ({
+                      ...p,
+                      leaderProgram: val,
+                      leaderBranch: defaultBranch
+                    }));
+                  }}
+                  options={Object.keys(PROGRAMS_DATA)}
                 />
               </div>
+              <div className="fld">
+                <label>Branch</label>
+                <CustomSelect
+                  value={form.leaderBranch}
+                  onChange={(val) => set("leaderBranch", val)}
+                  options={form.leaderProgram ? PROGRAMS_DATA[form.leaderProgram] : []}
+                  placeholder="Select branch…"
+                />
+              </div>
+            </div>
+            <div className="three">
               <div className="fld">
                 <label>Year</label>
                 <CustomSelect
@@ -250,8 +283,6 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                   options={YEARS}
                 />
               </div>
-            </div>
-            <div className="two">
               <div className="fld">
                 <label>Gender</label>
                 <CustomSelect
@@ -259,7 +290,6 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                   onChange={(val) => set("leaderGender", val)}
                   options={GENDER_OPTIONS}
                 />
-                <p className="hint">Used only for the "1 female member" SIH rule.</p>
               </div>
               <div className="fld">
                 <label>Your main skills</label>
@@ -279,9 +309,20 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                   <input placeholder={`Member ${i + 2} name (optional)`} value={m.name}
                     onChange={(e) => updateMember(i, "name", e.target.value)} />
                   <CustomSelect
-                    value={m.dept}
-                    onChange={(val) => updateMember(i, "dept", val)}
-                    options={DEPARTMENTS}
+                    value={m.program}
+                    onChange={(val) => {
+                      const defaultBranch = PROGRAMS_DATA[val]?.[0] || "";
+                      const updated = [...form.members];
+                      updated[i] = { ...updated[i], program: val, branch: defaultBranch };
+                      setForm(f => ({ ...f, members: updated }));
+                    }}
+                    options={Object.keys(PROGRAMS_DATA)}
+                  />
+                  <CustomSelect
+                    value={m.branch}
+                    onChange={(val) => updateMember(i, "branch", val)}
+                    options={m.program ? PROGRAMS_DATA[m.program] : []}
+                    placeholder="Select branch…"
                   />
                   <CustomSelect
                     value={m.year}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSIH } from "../../hooks/useSIH";
-import { SKILLS, DEPARTMENTS, YEARS } from "../../data/constants";
+import { SKILLS, DEPARTMENTS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 import CustomSelect from "../CustomSelect";
 
 const GENDER_OPTIONS = [
@@ -22,7 +22,8 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
 
   const [form, setForm] = useState({
     name: initialData?.name || "",
-    dept: initialData?.dept || "CSE",
+    program: initialData?.program || "UG",
+    branch: initialData?.dept || "Computer Engineering",
     year: initialData?.year || "3rd Year",
     gender: initialData?.gender || "na",
     skills: initialData?.skills || [],
@@ -61,7 +62,8 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
       const payload = {
         name: form.name.trim(),
         college: form.college || college,
-        dept: form.dept,
+        program: form.program,
+        dept: form.branch,
         year: form.year,
         gender: form.gender,
         skills: form.skills,
@@ -107,15 +109,34 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
             </div>
           </div>
 
-          <div className="three">
+          <div className="two">
             <div className="fld">
-              <label>Department<em>*</em></label>
+              <label>Program<em>*</em></label>
               <CustomSelect
-                value={form.dept}
-                onChange={(val) => set("dept", val)}
-                options={DEPARTMENTS}
+                value={form.program}
+                onChange={(val) => {
+                  const defaultBranch = PROGRAMS_DATA[val]?.[0] || "";
+                  setForm(p => ({
+                    ...p,
+                    program: val,
+                    branch: defaultBranch
+                  }));
+                }}
+                options={Object.keys(PROGRAMS_DATA)}
               />
             </div>
+            <div className="fld">
+              <label>Branch<em>*</em></label>
+              <CustomSelect
+                value={form.branch}
+                onChange={(val) => set("branch", val)}
+                options={form.program ? PROGRAMS_DATA[form.program] : []}
+                placeholder="Select branch…"
+              />
+            </div>
+          </div>
+
+          <div className="two">
             <div className="fld">
               <label>Year<em>*</em></label>
               <CustomSelect
