@@ -125,6 +125,16 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       addToast("Please fill all mandatory fields correctly.", "err");
       return false;
     }
+
+    // SIH rule: A complete team of 6 members must include at least one female student
+    const filledMembers = form.members.filter((m) => m.name.trim());
+    const totalMembers = 1 + filledMembers.length;
+    const hasFemale = (form.leaderGender === 'f') || filledMembers.some(m => m.gender === 'f');
+    if (totalMembers === 6 && !hasFemale) {
+      addToast("SIH Rules: A complete 6-person team must include at least one female member.", "err");
+      return false;
+    }
+    
     return true;
   };
 

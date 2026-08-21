@@ -293,6 +293,16 @@ export function SIHProvider({ children }) {
   const acceptRequest = useCallback(async (requestId, seekerProfile) => {
     try {
       if (!myTeam) return;
+
+      // SIH Rule Check: A complete team of 6 members must include at least one female member
+      const tempMembers = [...(myTeam.members || []), { 
+        name: seekerProfile.name, 
+        gender: seekerProfile.gender 
+      }];
+      if (tempMembers.length === 6 && !tempMembers.some(m => m.gender === 'f')) {
+        throw new Error("SIH Rules: A complete 6-person team must include at least one female member.");
+      }
+
       // Accept request
       const { error: rError } = await supabase.from('join_requests').update({ status: 'accepted' }).eq('id', requestId);
       if (rError) {
