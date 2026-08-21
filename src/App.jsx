@@ -17,7 +17,7 @@ export default function App() {
   const [screen, setScreenState] = useState(() => {
     const hash = window.location.hash;
     if (hash.startsWith("#board")) return "board";
-    if (hash === "#admin") return "admin";
+    if (hash === "#spoc") return "admin";
     return "landing";
   });
   const [boardAction, setBoardAction] = useState(null);
@@ -29,6 +29,7 @@ export default function App() {
   
   useEffect(() => {
     if (session?.user && !isLoading) {
+      if (session.user.email === "admin@sih2026.com") return; // Admin skips all onboarding
       const intent = localStorage.getItem('sih_intent');
       
       // Always process intent if present, regardless of whether they are a new user
@@ -77,7 +78,7 @@ export default function App() {
     const handleHash = () => {
       const hash = window.location.hash;
       if (hash.startsWith("#board")) setScreenState("board");
-      else if (hash === "#admin") setScreenState("admin");
+      else if (hash === "#spoc") setScreenState("admin");
       else setScreenState("landing");
     };
     window.addEventListener("hashchange", handleHash);

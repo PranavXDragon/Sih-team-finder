@@ -1,9 +1,84 @@
 import './AdminScreen.css';
+import { useState } from 'react';
 import { useSIH } from "../hooks/useSIH";
+import { supabase } from "../lib/supabase";
+import { Eye, EyeOff } from "lucide-react";
+import AdminEditTeamModal from "../components/modals/AdminEditTeamModal";
+import AdminViewTeamModal from "../components/modals/AdminViewTeamModal";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 export default function AdminScreen() {
   const { teams, seekers, stats, deleteTeam, deleteSeeker, user } = useSIH();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [editingTeam, setEditingTeam] = useState(null);
+  const [viewingTeam, setViewingTeam] = useState(null);
+
+  const handleAdminLogin = async (e) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    setLoginError("");
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } catch (err) {
+      setLoginError(err.message);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  if (user?.email !== "admin@sih2026.com") {
+    return (
+      <div className="admin-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <div style={{ background: 'var(--surface)', padding: 32, borderRadius: 16, border: '1px solid var(--border)', maxWidth: 400, width: '100%' }}>
+          <h2 style={{ textAlign: 'center', marginBottom: 24 }}>SPOC Login</h2>
+          <form onSubmit={handleAdminLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="fld">
+              <label>SPOC ID (Email)</label>
+              <input 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                placeholder="admin@sih2026.com" 
+                required 
+              />
+            </div>
+            <div className="fld">
+              <label>Password</label>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  placeholder="••••••••" 
+                  required 
+                  style={{ width: '100%', paddingRight: '40px' }}
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ 
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', 
+                    background: 'transparent', border: 'none', color: 'var(--dim)', cursor: 'pointer', padding: 0
+                  }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+            {loginError && <p className="err" style={{ display: 'block' }}>{loginError}</p>}
+            <button type="submit" className="btn pri" disabled={isLoggingIn} style={{ marginTop: 8 }}>
+              {isLoggingIn ? 'Verifying...' : 'Login to Dashboard'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   // Prepare data for Charts
   const tracksMap = { "Software": 0, "Hardware": 0 };
@@ -29,34 +104,16 @@ export default function AdminScreen() {
     fullName: key
   })).sort((a, b) => b.count - a.count);
 
-  const exportTeamsCSV = () => {
-    if (!teams.length) return;
-    const header = ["ID", "Team Name", "Track", "Theme", "Open Seats", "Contact"];
-    const rows = teams.map(t => [t.id, t.teamName, t.track, t.theme, t.seatsOpen, t.contact]);
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [header.join(","), ...rows.map(e => e.map(String).map(s => '"' + s.replace(/"/g, '""') + '"').join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "sih_teams.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const exportSeekersCSV = () => {
-    if (!seekers.length) return;
-    const header = ["ID", "Name", "Dept", "Year", "Gender", "WhatsApp", "Bio"];
-    const rows = seekers.map(s => [s.id, s.name, s.dept, s.year, s.gender, s.whatsapp, s.bio]);
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [header.join(","), ...rows.map(e => e.map(String).map(s => '"' + s.replace(/"/g, '""') + '"').join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "sih_seekers.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const getRuleViolations = (t) => {
+    const flags = [];
+    if (!t.members || t.members.length < (t.totalSeats || 6)) {
+      flags.push("Incomplete Team");
+    }
+    if (t.members && t.members.length > 0) {
+      const hasFemale = t.members.some(m => m.gender === 'f');
+      if (!hasFemale) flags.push("No Female");
+    }
+    return flags;
   };
 
   const handleDeleteTeam = (id) => {
@@ -74,14 +131,8 @@ export default function AdminScreen() {
   return (
     <div className="admin-container">
       <div className="admin-head">
-        <h1>SIH 2026 Admin Portal</h1>
+        <h1>SIH 2026 SPOC Portal</h1>
         <p style={{ color: 'var(--dim)' }}>Live analytics and data tables.</p>
-        
-        {user?.email !== "admin@sih2026.com" && (
-          <div style={{ background: 'var(--stop-dim)', color: 'var(--stop)', padding: 12, borderRadius: 8, marginTop: 16, border: '1px solid rgba(255, 84, 112, 0.4)' }}>
-            <b>Warning:</b> You are not logged in as admin@sih2026.com. Edit/Delete actions may fail due to Database Row Level Security rules.
-          </div>
-        )}
       </div>
 
       <div className="admin-stats">
@@ -136,7 +187,6 @@ export default function AdminScreen() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginTop: 32 }}>
         <h2>Teams Database</h2>
-        <button className="btn sm pri" onClick={exportTeamsCSV}>Export CSV</button>
       </div>
       <div className="admin-table-container">
         <table className="admin-table">
@@ -151,12 +201,30 @@ export default function AdminScreen() {
           </thead>
           <tbody>
             {teams.map(t => (
-              <tr key={t.id}>
-                <td><b>{t.teamName}</b></td>
+              <tr key={t.id} style={{ transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                <td>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                    <span 
+                      onClick={() => setViewingTeam(t)}
+                      style={{ fontWeight: 'bold', cursor: 'pointer', color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: 4 }}
+                    >
+                      {t.teamName}
+                    </span>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {getRuleViolations(t).map((flag, idx) => (
+                        <span key={idx} style={{ fontSize: '10px', background: 'var(--stop)', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                          {flag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </td>
                 <td>{t.theme}</td>
                 <td>{t.track}</td>
                 <td>{t.seatsOpen}/{t.totalSeats}</td>
-                <td>
+                <td style={{ display: 'flex', gap: '8px' }}>
+                  <button className="btn sm" onClick={() => setViewingTeam(t)}>View</button>
+                  <button className="btn sm sec" onClick={() => setEditingTeam(t)}>Edit</button>
                   <button className="btn sm danger" onClick={() => handleDeleteTeam(t.id)}>Delete</button>
                 </td>
               </tr>
@@ -168,7 +236,6 @@ export default function AdminScreen() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginTop: 32 }}>
         <h2>Seekers Database</h2>
-        <button className="btn sm pri" onClick={exportSeekersCSV}>Export CSV</button>
       </div>
       <div className="admin-table-container">
         <table className="admin-table">
@@ -197,6 +264,20 @@ export default function AdminScreen() {
           </tbody>
         </table>
       </div>
+
+      {editingTeam && (
+        <AdminEditTeamModal 
+          team={editingTeam} 
+          onClose={() => setEditingTeam(null)} 
+        />
+      )}
+
+      {viewingTeam && (
+        <AdminViewTeamModal 
+          team={viewingTeam} 
+          onClose={() => setViewingTeam(null)} 
+        />
+      )}
     </div>
   );
 }
