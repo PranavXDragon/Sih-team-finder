@@ -21,7 +21,7 @@ export default function TeamCard({ team, onEdit }) {
 
   const handleJoin = async () => {
     if (!user) {
-      addToast("You must log in to join a team.", "err");
+      document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signup' }));
       return;
     }
     if (myTeam) {

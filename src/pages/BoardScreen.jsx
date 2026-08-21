@@ -9,7 +9,7 @@ import SeekerModal from "../components/modals/SeekerModal";
 import CustomSelect from "../components/CustomSelect";
 
 export default function BoardScreen({ initialAction, onBack }) {
-  const { teams, seekers, stats, college, isLoading, myTeam } = useSIH();
+  const { teams, seekers, stats, college, isLoading, myTeam, user } = useSIH();
 
   const [tab, setTab] = useState(initialAction === "list-seeker" ? "seekers" : "teams");
   const [query, setQuery] = useState("");
@@ -144,7 +144,10 @@ export default function BoardScreen({ initialAction, onBack }) {
           
           <div style={{ display: "flex", gap: 12 }}>
             {!myTeam && (
-              <button className="btn sm pri" type="button" onClick={() => setShowTeamModal(true)}>+ Post a team</button>
+              <button className="btn sm pri" type="button" onClick={() => {
+                if (!user) document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signup' }));
+                else setShowTeamModal(true);
+              }}>+ Post a team</button>
             )}
           </div>
         </div>
