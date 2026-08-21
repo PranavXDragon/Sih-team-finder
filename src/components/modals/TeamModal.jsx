@@ -352,7 +352,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                       <input placeholder="Mobile Number" type="tel" value={m.phone} onChange={(e) => updateMember(i, "phone", e.target.value)} disabled={!m.name} />
                     </div>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr 1fr", gap: 12 }}>
+                  <div className="mrow-dropdowns">
                     <CustomSelect
                       value={m.program}
                       onChange={(val) => {

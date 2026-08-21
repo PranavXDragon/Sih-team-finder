@@ -18,6 +18,17 @@
   font-size: 15px;
   text-align: left;
   transition: border-color 0.16s, box-shadow 0.16s;
+  min-width: 0;
+}
+.cs-trigger span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 6px;
+}
+.cs-trigger svg {
+  flex-shrink: 0;
 }
 .cs-trigger:focus, .cs-trigger[data-open="true"] {
   border-color: var(--accent-2);
