@@ -14,7 +14,7 @@ export default function Navbar() {
           </a>
           <img src="/Academic.png" alt="Academic Logo" />
 
-          <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
+          <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 4px" }} />
 
           <img src="/SIH-Logo.png" alt="SIH Logo" className="sih-logo-img" style={{ height: "40px" }} />
         </div>

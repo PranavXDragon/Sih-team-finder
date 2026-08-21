@@ -41,7 +41,7 @@
 
 /* Navbar Branding Enhancements */
 .nav-top { gap: 16px; }
-.nav-logos { display: flex; align-items: center; gap: 8px; flex-direction: row; background: #ffffff; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); }
+.nav-logos { display: flex; align-items: center; gap: 8px; flex-direction: row; background: transparent; padding: 4px 0; }
 .nav-logos img { height: 40px; width: auto; object-fit: contain; }
 .nav-brand-text { display: flex; flex-direction: column; gap: 4px; justify-content: center; }
 .college-name { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text);  letter-spacing: 0.5px; line-height: 1; white-space: nowrap; }
