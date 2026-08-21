@@ -1,4 +1,4 @@
-﻿import './Cards.css';
+import './Cards.css';
 function timeAgo(ts) {
   const diff = Date.now() - new Date(ts).getTime();
   const m = Math.floor(diff / 60000);
@@ -19,7 +19,7 @@ export default function SeekerCard({ seeker, onInvite }) {
         <div className={`scard-av${isFemale ? " f" : ""}`}>{initials}</div>
         <div className="scard-info">
           <b>{seeker.name}</b>
-          <small>{seeker.dept} · {seeker.year} · {seeker.college.split(",")[0]}</small>
+          <small>{seeker.program ? `${seeker.program} - ` : ""}{seeker.dept} · {seeker.year} · {seeker.college.split(",")[0]}</small>
         </div>
         {isFemale && (
           <span className="chip mini" style={{ background: "rgba(219,39,119,0.15)", borderColor: "rgba(219,39,119,0.4)", color: "#f9a8d4", cursor: "default" }}>
