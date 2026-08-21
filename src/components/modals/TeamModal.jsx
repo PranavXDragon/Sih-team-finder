@@ -25,7 +25,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
   const [step, setStep] = useState(1);
     const leader = initialData?.members?.[0] || {};
   const emptyMembers = [
-    { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }
+    { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }
   ];
   
   let initialMembers = emptyMembers;
@@ -39,7 +39,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       year: m.year || "3rd Year",
       gender: m.gender || "na"
     }));
-    initialMembers = others.concat(emptyMembers).slice(0, 4);
+    initialMembers = others.concat(emptyMembers).slice(0, 5);
   }
 
   let initPhone = "";
