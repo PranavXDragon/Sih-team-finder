@@ -10,6 +10,7 @@ import AuthModal from "./components/modals/AuthModal";
 import OnboardingModal from "./components/modals/OnboardingModal";
 import TeamModal from "./components/modals/TeamModal";
 import SeekerModal from "./components/modals/SeekerModal";
+import RequestsModal from "./components/modals/RequestsModal";
 
 export default function App() {
   const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile, addToast, requestToJoin } = useSIH();
@@ -26,6 +27,7 @@ export default function App() {
   const [authDefaultSignUp, setAuthDefaultSignUp] = useState(false);
   const [globalPostTeam, setGlobalPostTeam] = useState(false);
   const [globalListSeeker, setGlobalListSeeker] = useState(false);
+  const [globalShowRequests, setGlobalShowRequests] = useState(false);
   
   useEffect(() => {
     if (session?.user && !isLoading) {
@@ -78,6 +80,11 @@ export default function App() {
     const handleHash = () => {
       const hash = window.location.hash;
       if (hash.startsWith("#board")) setScreenState("board");
+      else if (hash.startsWith("#requests")) {
+        setScreenState("board");
+        setGlobalShowRequests(true);
+        window.location.hash = "board"; // clean url after reading
+      }
       else if (hash === "#spoc") setScreenState("admin");
       else setScreenState("landing");
     };
@@ -178,12 +185,16 @@ export default function App() {
               try {
                 await requestToJoin(joinTeamId);
                 // We don't need to show a success toast here because requestToJoin handles it!
-              } catch (err) {
-                // Ignore, requestToJoin handles errors
+              } catch (e) {
+                console.error(e);
               }
             }
-          }}
+          }} 
         />
+      )}
+
+      {globalShowRequests && (
+        <RequestsModal onClose={() => setGlobalShowRequests(false)} />
       )}
       
       <div className="toasts" aria-live="polite">

@@ -713,7 +713,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/{{skills}}/g, payload.skills || 'N/A')
       .replace(/{{email}}/g, payload.email || 'N/A')
       .replace(/{{request_message}}/g, payload.request_message || 'I would love to join your team!')
-      .replace(/{{request_link}}/g, 'https://sih2026.tech/#board');
+      .replace(/{{request_link}}/g, 'https://sih2026.tech/#requests');
   } else {
     body = '<p>Notification from SIH SCET Platform.</p>';
   }
