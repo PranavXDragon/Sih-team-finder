@@ -260,7 +260,7 @@ export default function SeekerModal({ initialData, onClose, onSuccess, showAppli
         </form>
         )}
         
-        {((initialData && myApplications && myApplications.length > 0) || showApplicationsOnly) && (
+        {showApplicationsOnly && (
           <div className="mbody" style={{ marginTop: showApplicationsOnly ? 0 : -16, borderTop: showApplicationsOnly ? "none" : "1px solid var(--border)", paddingTop: showApplicationsOnly ? 0 : 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <h3 style={{ margin: 0 }}>Teams You Applied To</h3>
