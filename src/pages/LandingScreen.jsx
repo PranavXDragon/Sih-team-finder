@@ -73,8 +73,6 @@ export default function LandingScreen({ onEnter }) {
               look like right now, and it is why good ideas die before the
               deadline. <b>Put your name up.</b> Free, and your number stays
               hidden until someone says yes.
-              <br/><br/>
-              <span style={{ color: "var(--accent)", fontWeight: 600 }}>Note:</span> Please make sure to use the latest problem statements from the SIH 2026 website when registering your team.
             </p>
             <div className="landcta">
               <button className="big orange" type="button" onClick={() => handleAction("post-team")}>
@@ -164,12 +162,17 @@ export default function LandingScreen({ onEnter }) {
             <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0}}><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg> <span><b style={{ color: 'var(--accent)' }}>Institution:</b> All members must be from the same institute.</span></p>
             <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0}}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> <span><b style={{ color: 'var(--accent)' }}>Problem Statements:</b> Teams can choose from 17 distinct themes across Hardware and Software.</span></p>
             <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0}}><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6"/><path d="M9 10h6"/></svg> <span><b style={{ color: 'var(--accent)' }}>Registration:</b> Team Leaders register the team and specify skills needed. Other members can list themselves as Seekers.</span></p>
+            <div style={{ marginTop: 16, padding: '16px', background: 'var(--open-dim)', borderRadius: '12px', border: '1px solid var(--open)' }}>
+              <p style={{ fontSize: 15, color: 'var(--text)', margin: 0 }}>
+                <span style={{ color: "var(--accent)", fontWeight: 700 }}>Note:</span> Please make sure to use the latest problem statements from the SIH 2026 website when registering your team.
+                <br/><a href="https://sih.gov.in/sih2026PS" target="_blank" rel="noopener noreferrer" style={{ color: "var(--open)", fontWeight: 600, display: "inline-block", marginTop: 8 }}>View SIH 2026 Problem Statements ↗</a>
+              </p>
+            </div>
           </div>
         </div>
       </section>
     </div>
   );
 }
-
 
 
