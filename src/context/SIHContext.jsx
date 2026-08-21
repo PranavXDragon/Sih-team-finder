@@ -242,6 +242,20 @@ export function SIHProvider({ children }) {
         setSeekers((prev) => [data[0], ...prev]);
         setMySeekerProfile(data[0]);
         
+        // Send Welcome Email
+        const email = data[0].whatsapp?.split('|')[1]?.trim();
+        if (email) {
+          supabase.functions.invoke('send-email', {
+            body: {
+              to: email,
+              type: 'REGISTERED',
+              payload: {
+                student_name: data[0].name || 'Student'
+              }
+            }
+          }).catch(err => console.error("Failed to send welcome email", err));
+        }
+
         // Sync to Google Sheets if configured
         if (import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK) {
           fetch(import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK, {
@@ -450,7 +464,7 @@ export function SIHProvider({ children }) {
       console.error(err);
       addToast("Error rejecting request", "err");
     }
-  }, [addToast]);
+  }, [myRequests, myTeam, addToast]);
 
   const removeMember = useCallback(async (teamId, memberUserId) => {
     try {
