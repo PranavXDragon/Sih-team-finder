@@ -45,6 +45,17 @@ export default function BoardScreen({ initialAction, onBack }) {
     }
   }, [initialAction]);
 
+  useEffect(() => {
+    if (query || filterTrack || filterTheme || filterFemale || filterHasPs || activeSkills.length > 0) {
+      if (filterTeamId) {
+        setFilterTeamId("");
+        if (window.location.hash.includes("?team=")) {
+          window.location.hash = "board";
+        }
+      }
+    }
+  }, [query, filterTrack, filterTheme, filterFemale, filterHasPs, activeSkills, filterTeamId]);
+
   const toggleSkill = (s) =>
     setActiveSkills((prev) =>
       prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
@@ -53,6 +64,10 @@ export default function BoardScreen({ initialAction, onBack }) {
   const clearAll = () => {
     setQuery(""); setFilterTrack(""); setFilterTheme("");
     setFilterFemale(false); setFilterHasPs(false); setActiveSkills([]);
+    setFilterTeamId("");
+    if (window.location.hash.includes("?team=")) {
+      window.location.hash = "board";
+    }
   };
 
   const filteredTeams = useMemo(() => {
