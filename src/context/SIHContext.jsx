@@ -283,7 +283,12 @@ export function SIHProvider({ children }) {
       if (!myTeam) return;
       // Accept request
       const { error: rError } = await supabase.from('join_requests').update({ status: 'accepted' }).eq('id', requestId);
-      if (rError) throw rError;
+      if (rError) {
+        if (rError.code === "23505") {
+          throw new Error("This student has already joined another team.");
+        }
+        throw rError;
+      }
 
       // Update team seats and members
       const newMembers = [...(myTeam.members || []), { 
@@ -301,7 +306,7 @@ export function SIHProvider({ children }) {
       addToast("Student accepted into team!", "ok");
     } catch (err) {
       console.error(err);
-      addToast("Error accepting student", "err");
+      addToast(err.message || "Error accepting student", "err");
     }
   }, [myTeam, updateTeam]);
 
