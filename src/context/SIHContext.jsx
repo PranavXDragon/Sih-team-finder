@@ -499,31 +499,6 @@ export function SIHProvider({ children }) {
   const sendTeamInvite = useCallback(async (seeker, message) => {
     try {
       if (!myTeam) throw new Error("You must have a team to send invites.");
-
-      const { error: fnErr } = await supabase.functions.invoke('send-email', {
-        body: {
-          to: seeker.email,
-          subject: `Team Invitation from ${myTeam.teamName}`,
-          type: 'TEAM_INVITE',
-          payload: {
-            seeker_name: seeker.name,
-            team_name: myTeam.teamName,
-            team_leader_name: myTeam.members?.[0]?.name || 'The Team Leader',
-            invite_message: message
-          }
-        }
-      });
-      if (fnErr) throw fnErr;
-      
-    } catch (err) {
-      addToast(err.message || "Failed to send invite", "err");
-      throw err;
-    }
-  }, [myTeam, addToast]);
-
-  const sendTeamInvite = useCallback(async (seeker, message) => {
-    try {
-      if (!myTeam) throw new Error("You must have a team to send invites.");
       
       let seekerEmail = seeker.email;
       if (!seekerEmail && seeker.whatsapp) {

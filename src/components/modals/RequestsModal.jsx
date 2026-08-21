@@ -42,10 +42,10 @@ export default function RequestsModal({ onClose }) {
 
                   {rejectingId === req.id ? (
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      <input 
-                        type="text" 
-                        placeholder="Why are you rejecting? (Sent in email)" 
-                        className="inp" 
+                      <input
+                        type="text"
+                        placeholder="Why are you rejecting? (Sent in email)"
+                        className="inp"
                         value={rejectionReason}
                         onChange={(e) => setRejectionReason(e.target.value)}
                         autoFocus

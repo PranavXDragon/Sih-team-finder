@@ -22,11 +22,11 @@ const MEMBER_GENDER_OPTIONS = [
 export default function TeamModal({ onClose, initialData, onSuccess }) {
   const { addTeam, updateTeam, college, addToast, user, removeMember } = useSIH();
   const [submitting, setSubmitting] = useState(false);
-    const leader = initialData?.members?.[0] || {};
+  const leader = initialData?.members?.[0] || {};
   const emptyMembers = [
     { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }
   ];
-  
+
   let initialMembers = emptyMembers;
   if (initialData?.members && initialData.members.length > 1) {
     const others = initialData.members.slice(1).map(m => ({
@@ -64,25 +64,25 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
   }
 
   const [form, setForm] = useState({
-    teamName: initialData?.teamName || "", 
+    teamName: initialData?.teamName || "",
     college: initialData?.college || college || "Suryodaya College of Engineering and Technology",
-    track: initialData?.track || "", 
+    track: initialData?.track || "",
     theme: initialData?.theme || "",
-    hasIdea: initialData?.hasIdea || false, 
-    psId: initialData?.psId || "", 
-    psTitle: initialData?.psTitle || "", 
+    hasIdea: initialData?.hasIdea || false,
+    psId: initialData?.psId || "",
+    psTitle: initialData?.psTitle || "",
     pitch: initialData?.pitch || "",
-    leaderName: leader.name || (!initialData && user ? user.user_metadata?.full_name : ""), 
-    leaderProgram: leader.program || "UG", 
-    leaderBranch: leader.dept || "Computer Engineering", 
-    leaderYear: leader.year || "3rd Year", 
-    leaderGender: leader.gender || "na", 
+    leaderName: leader.name || (!initialData && user ? user.user_metadata?.full_name : ""),
+    leaderProgram: leader.program || "UG",
+    leaderBranch: leader.dept || "Computer Engineering",
+    leaderYear: leader.year || "3rd Year",
+    leaderGender: leader.gender || "na",
     leaderSkills: leader.skills || "",
     members: initialMembers,
-    wantsSkills: initWantsSkills, 
+    wantsSkills: initWantsSkills,
     customSkill: initCustomSkill,
     hasMentor: initialData?.hasMentor || false,
-    phone: initPhone, 
+    phone: initPhone,
     email: initEmail || (!initialData && user ? user.email : ""),
   });
   const [errs, setErrs] = useState({});
@@ -112,7 +112,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     if (!form.leaderName.trim()) e.leaderName = true;
     if (!form.wantsSkills.length) e.wantsSkills = true;
     if (!form.phone.trim()) e.phone = true;
-    
+
     // Member validation: if name is entered, all other fields are required
     let membersValid = true;
     form.members.forEach((m) => {
@@ -123,7 +123,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       }
     });
     if (!membersValid) e.members = true;
-    
+
     setErrs(e);
     if (Object.keys(e).length > 0) {
       addToast("Please fill all mandatory fields: " + Object.keys(e).join(", "), "err");
@@ -138,7 +138,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       addToast("SIH Rules: A complete 6-person team must include at least one female member.", "err");
       return false;
     }
-    
+
     return true;
   };
 
@@ -146,7 +146,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     if (submitting) return;
     if (!validate()) return;
     setSubmitting(true);
-        const filledMembers = form.members.filter((m) => m.name.trim());
+    const filledMembers = form.members.filter((m) => m.name.trim());
     const totalMembers = 1 + filledMembers.length; // leader + members
     const seatsOpen = Math.max(0, 6 - totalMembers);
     let finalWantsSkills = form.wantsSkills.filter(s => s !== "Other (Custom)");
@@ -169,15 +169,15 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       seatsOpen,
       totalSeats: 6,
       members: [
-        { 
-          name: (form.leaderName || "").trim(), 
-          program: form.leaderProgram, 
-          dept: form.leaderBranch, 
-          year: form.leaderYear, 
-          gender: form.leaderGender, 
-          skills: (form.leaderSkills || "").trim(), 
-          email: (form.email || "").trim(), 
-          phone: (form.phone || "").trim() 
+        {
+          name: (form.leaderName || "").trim(),
+          program: form.leaderProgram,
+          dept: form.leaderBranch,
+          year: form.leaderYear,
+          gender: form.leaderGender,
+          skills: (form.leaderSkills || "").trim(),
+          email: (form.email || "").trim(),
+          phone: (form.phone || "").trim()
         },
         ...filledMembers.map(m => ({
           name: (m.name || "").trim(),
@@ -193,7 +193,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       ],
     };
 
-    try { 
+    try {
       if (initialData) {
         await updateTeam(initialData.id, payload);
         addToast("Team updated!", "ok");
@@ -368,14 +368,14 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <b style={{ fontSize: 13, color: "var(--accent-2)" }}>Member {i + 2}</b>
                     {m.name.trim() && (
-                      <button 
-                        type="button" 
-                        className="btn sm" 
-                        style={{ 
-                          padding: "2px 8px", 
-                          fontSize: "0.75rem", 
-                          background: "rgba(239, 68, 68, 0.1)", 
-                          borderColor: "rgba(239, 68, 68, 0.2)", 
+                      <button
+                        type="button"
+                        className="btn sm"
+                        style={{
+                          padding: "2px 8px",
+                          fontSize: "0.75rem",
+                          background: "rgba(239, 68, 68, 0.1)",
+                          borderColor: "rgba(239, 68, 68, 0.2)",
                           color: "var(--stop)",
                           height: "auto",
                           margin: 0
@@ -460,9 +460,9 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
               </div>
               {form.wantsSkills.includes("Other (Custom)") && (
                 <div style={{ marginTop: 12 }}>
-                  <input 
-                    type="text" 
-                    placeholder="Type the custom skill you need" 
+                  <input
+                    type="text"
+                    placeholder="Type the custom skill you need"
                     value={form.customSkill}
                     onChange={(e) => set("customSkill", e.target.value)}
                     maxLength={25}
