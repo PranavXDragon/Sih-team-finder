@@ -77,12 +77,8 @@ export function SIHProvider({ children }) {
     }
   };
 
-  useEffect(() => {
-    fetchSupabaseData();
-  }, []);
-
   // Fetch role data when user changes
-  useEffect(() => {
+  const fetchRoles = useCallback(async () => {
     if (!user) {
       setMyTeam(null);
       setMySeekerProfile(null);
@@ -90,7 +86,7 @@ export function SIHProvider({ children }) {
       return;
     }
 
-    const fetchRoles = async () => {
+    try {
       const [tRes, sRes] = await Promise.all([
         supabase.from('teams').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('seekers').select('*').eq('user_id', user.id).maybeSingle()
@@ -101,11 +97,59 @@ export function SIHProvider({ children }) {
         // fetch incoming requests for this team
         const rRes = await supabase.from('join_requests').select('*, seekers(*)').eq('team_id', tRes.data.id).eq('status', 'pending');
         if (rRes.data) setMyRequests(rRes.data);
+      } else {
+        setMyTeam(null);
+        setMyRequests([]);
       }
       if (sRes.data) setMySeekerProfile(sRes.data);
-    };
-    fetchRoles();
+      else setMySeekerProfile(null);
+    } catch (err) {
+      console.error("Error fetching roles:", err);
+    }
   }, [user]);
+
+  useEffect(() => {
+    fetchRoles();
+  }, [fetchRoles]);
+
+  useEffect(() => {
+    fetchSupabaseData();
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'teams' },
+        (payload) => {
+          console.log('Realtime update: teams', payload);
+          fetchSupabaseData();
+          fetchRoles();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'seekers' },
+        (payload) => {
+          console.log('Realtime update: seekers', payload);
+          fetchSupabaseData();
+          fetchRoles();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'join_requests' },
+        (payload) => {
+          console.log('Realtime update: join_requests', payload);
+          fetchRoles();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchRoles]);
 
   const addTeam = useCallback(async (team) => {
     try {
