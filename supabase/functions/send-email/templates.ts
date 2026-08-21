@@ -584,7 +584,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
 
             <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{student_name}},</p>
 
-            <p style="margin: 0 0 16px; color: #f7f3ea;">This is to inform you that you have been <strong style="color: #ff456b;">removed from {{team_name}}</strong> on the SIH 2026 SCET Platform.</p>
+            <p style="margin: 0 0 16px; color: #f7f3ea;">This is to inform you that your request to join <strong style="color: #ff456b;">{{team_name}}</strong> has been declined, or you have been removed from the team.</p>
 
             <!-- Removal Details Card -->
             <div class="details-card" style="background-color: #212533; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 20px; margin: 22px 0;">

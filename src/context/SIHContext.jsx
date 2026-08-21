@@ -418,7 +418,7 @@ export function SIHProvider({ children }) {
 
   const rejectRequest = useCallback(async (requestId, reason = '') => {
     try {
-      const { error } = await supabase.from('join_requests').update({ status: 'rejected' }).eq('id', requestId);
+      const { error } = await supabase.from('join_requests').update({ status: 'rejected', rejection_reason: reason }).eq('id', requestId);
       if (error) throw error;
       
       const req = myRequests.find(r => r.id === requestId);
