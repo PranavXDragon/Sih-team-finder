@@ -25,7 +25,8 @@
 .modal.wide { max-width: 860px; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px) scale(0.985); } }
 .mhead { display: flex; align-items: flex-start; gap: 12px; padding: 20px 22px 0; }
-.mhead h2 { font-size: 22px; flex: 1; }
+.mhead > div { flex: 1; min-width: 0; }
+.mhead h2 { font-size: 22px; }
 .mhead p { margin: 6px 0 0; color: var(--dim); font-size: 13.5px; }
 .mbody { padding: 18px 22px 22px; display: grid; gap: 16px; }
 .mfoot { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 22px 22px; }
