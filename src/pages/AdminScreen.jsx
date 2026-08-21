@@ -220,8 +220,15 @@ export default function AdminScreen() {
           </thead>
           <tbody>
             {teams.map(t => (
-              <tr key={t.id}>
-                <td><b>{t.teamName}</b></td>
+              <tr key={t.id} style={{ transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                <td>
+                  <span 
+                    onClick={() => setViewingTeam(t)}
+                    style={{ fontWeight: 'bold', cursor: 'pointer', color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: 4 }}
+                  >
+                    {t.teamName}
+                  </span>
+                </td>
                 <td>{t.theme}</td>
                 <td>{t.track}</td>
                 <td>{t.seatsOpen}/{t.totalSeats}</td>
