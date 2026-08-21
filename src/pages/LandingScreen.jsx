@@ -14,19 +14,26 @@ export default function LandingScreen({ onEnter }) {
   const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
   useEffect(() => {
-    const target = new Date("2026-09-01T00:00:00").getTime();
-    const timer = setInterval(() => {
+    const target = new Date("2026-08-30T23:59:59").getTime();
+    
+    const tick = () => {
       const now = new Date().getTime();
       const diff = target - now;
-      if (diff < 0) return clearInterval(timer);
+      if (diff <= 0) {
+        setTimeLeft({ d: 0, h: 0, m: 0, s: 0 });
+        return;
+      }
       setTimeLeft({
         d: Math.floor(diff / (1000 * 60 * 60 * 24)),
         h: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
         m: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
         s: Math.floor((diff % (1000 * 60)) / 1000)
       });
-    }, 1000);
-    return () => clearInterval(timer);
+    };
+    
+    tick();
+    const iv = setInterval(tick, 1000);
+    return () => clearInterval(iv);
   }, []);
 
   const handleAction = (action) => {
@@ -54,6 +61,9 @@ export default function LandingScreen({ onEnter }) {
           <div className="hero-text-side">
             <div className="kicker-group">
               <span className="kicker">SMART INDIA HACKATHON <i>2026</i></span>
+              <div className="countdown-timer" style={{ display: "inline-flex", gap: "8px", marginLeft: "12px", background: "rgba(255, 171, 61, 0.15)", padding: "4px 12px", borderRadius: "100px", color: "var(--accent-2)", fontWeight: "800", fontSize: "0.85rem", border: "1px solid rgba(255,171,61,0.3)", alignItems: "center" }}>
+                <span>⏳ {timeLeft.d}d {timeLeft.h}h {timeLeft.m}m {timeLeft.s}s</span>
+              </div>
             </div>
             <h1 className="ph">
               <span className="l1">NO TEAM</span>
