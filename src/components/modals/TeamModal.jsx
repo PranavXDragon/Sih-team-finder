@@ -2,7 +2,21 @@ import { useState, useEffect } from "react";
 import { useSIH } from "../../hooks/useSIH";
 import { SIH_THEMES, SKILLS, DEPARTMENTS, YEARS } from "../../data/constants";
 
+import CustomSelect from "../CustomSelect";
+
 const EMPTY_MEMBER = { name: "", dept: "CSE", year: "3rd Year", gender: "na", skills: "" };
+
+const GENDER_OPTIONS = [
+  { value: "na", label: "Prefer not to say" },
+  { value: "f", label: "Female" },
+  { value: "m", label: "Male" }
+];
+
+const MEMBER_GENDER_OPTIONS = [
+  { value: "na", label: "—" },
+  { value: "f", label: "F" },
+  { value: "m", label: "M" }
+];
 
 export default function TeamModal({ onClose, initialData, onSuccess }) {
   const { addTeam, updateTeam, college, addToast, user } = useSIH();
@@ -171,10 +185,12 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
             </div>
             <div className={`fld${errs.theme ? " bad" : ""}`}>
               <label>Theme<em>*</em></label>
-              <select value={form.theme} onChange={(e) => set("theme", e.target.value)}>
-                <option value="">Select a theme…</option>
-                {SIH_THEMES.map((t) => <option key={t}>{t}</option>)}
-              </select>
+              <CustomSelect
+                value={form.theme}
+                onChange={(val) => set("theme", val)}
+                options={SIH_THEMES}
+                placeholder="Select a theme…"
+              />
               <p className="err">Pick the theme you are going for.</p>
             </div>
             <label className="check">
@@ -220,25 +236,29 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
               </div>
               <div className="fld">
                 <label>Department</label>
-                <select value={form.leaderDept} onChange={(e) => set("leaderDept", e.target.value)}>
-                  {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
-                </select>
+                <CustomSelect
+                  value={form.leaderDept}
+                  onChange={(val) => set("leaderDept", val)}
+                  options={DEPARTMENTS}
+                />
               </div>
               <div className="fld">
                 <label>Year</label>
-                <select value={form.leaderYear} onChange={(e) => set("leaderYear", e.target.value)}>
-                  {YEARS.map((y) => <option key={y}>{y}</option>)}
-                </select>
+                <CustomSelect
+                  value={form.leaderYear}
+                  onChange={(val) => set("leaderYear", val)}
+                  options={YEARS}
+                />
               </div>
             </div>
             <div className="two">
               <div className="fld">
                 <label>Gender</label>
-                <select value={form.leaderGender} onChange={(e) => set("leaderGender", e.target.value)}>
-                  <option value="na">Prefer not to say</option>
-                  <option value="f">Female</option>
-                  <option value="m">Male</option>
-                </select>
+                <CustomSelect
+                  value={form.leaderGender}
+                  onChange={(val) => set("leaderGender", val)}
+                  options={GENDER_OPTIONS}
+                />
                 <p className="hint">Used only for the "1 female member" SIH rule.</p>
               </div>
               <div className="fld">
@@ -258,17 +278,21 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                 <div key={i} className="mrow">
                   <input placeholder={`Member ${i + 2} name (optional)`} value={m.name}
                     onChange={(e) => updateMember(i, "name", e.target.value)} />
-                  <select value={m.dept} onChange={(e) => updateMember(i, "dept", e.target.value)}>
-                    {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
-                  </select>
-                  <select value={m.year} onChange={(e) => updateMember(i, "year", e.target.value)}>
-                    {YEARS.map((y) => <option key={y}>{y}</option>)}
-                  </select>
-                  <select value={m.gender} onChange={(e) => updateMember(i, "gender", e.target.value)} style={{ padding: "9px 6px" }}>
-                    <option value="na">—</option>
-                    <option value="f">F</option>
-                    <option value="m">M</option>
-                  </select>
+                  <CustomSelect
+                    value={m.dept}
+                    onChange={(val) => updateMember(i, "dept", val)}
+                    options={DEPARTMENTS}
+                  />
+                  <CustomSelect
+                    value={m.year}
+                    onChange={(val) => updateMember(i, "year", val)}
+                    options={YEARS}
+                  />
+                  <CustomSelect
+                    value={m.gender}
+                    onChange={(val) => updateMember(i, "gender", val)}
+                    options={MEMBER_GENDER_OPTIONS}
+                  />
                 </div>
               ))}
             </div>

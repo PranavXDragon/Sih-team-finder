@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useSIH } from "../../hooks/useSIH";
 import { SKILLS, DEPARTMENTS, YEARS } from "../../data/constants";
+import CustomSelect from "../CustomSelect";
+
+const GENDER_OPTIONS = [
+  { value: "na", label: "Prefer not to say" },
+  { value: "f", label: "Female" },
+  { value: "m", label: "Male" }
+];
 
 export default function SeekerModal({ initialData, onClose, onSuccess }) {
   const { addSeeker, updateSeeker, college, addToast } = useSIH();
@@ -103,23 +110,27 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
           <div className="three">
             <div className="fld">
               <label>Department<em>*</em></label>
-              <select value={form.dept} onChange={(e) => set("dept", e.target.value)}>
-                {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
-              </select>
+              <CustomSelect
+                value={form.dept}
+                onChange={(val) => set("dept", val)}
+                options={DEPARTMENTS}
+              />
             </div>
             <div className="fld">
               <label>Year<em>*</em></label>
-              <select value={form.year} onChange={(e) => set("year", e.target.value)}>
-                {YEARS.map((y) => <option key={y}>{y}</option>)}
-              </select>
+              <CustomSelect
+                value={form.year}
+                onChange={(val) => set("year", val)}
+                options={YEARS}
+              />
             </div>
             <div className="fld">
               <label>Gender</label>
-              <select value={form.gender} onChange={(e) => set("gender", e.target.value)}>
-                <option value="na">Prefer not to say</option>
-                <option value="f">Female</option>
-                <option value="m">Male</option>
-              </select>
+              <CustomSelect
+                value={form.gender}
+                onChange={(val) => set("gender", val)}
+                options={GENDER_OPTIONS}
+              />
               <p className="hint">For the "1 female member" SIH rule.</p>
             </div>
           </div>
