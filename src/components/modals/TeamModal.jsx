@@ -142,7 +142,7 @@ export default function TeamModal({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="veil" onPointerDown={onClose}>
+    <div className="veil open" onPointerDown={onClose}>
       <div className="modal big" style={{ maxWidth: 840 }} onPointerDown={(e) => e.stopPropagation()}>
         <div className="mhead">
           <h2>{myTeam ? "Edit Team" : "Register Team"}</h2>
