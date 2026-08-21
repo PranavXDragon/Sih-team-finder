@@ -1,4 +1,4 @@
-﻿import './BoardScreen.css';
+import './BoardScreen.css';
 import { useState, useMemo, useEffect } from "react";
 import { useSIH } from "../hooks/useSIH";
 import { SIH_THEMES, SKILLS } from "../data/constants";
@@ -6,9 +6,10 @@ import TeamCard from "../components/TeamCard";
 import SeekerCard from "../components/SeekerCard";
 import TeamModal from "../components/modals/TeamModal";
 import SeekerModal from "../components/modals/SeekerModal";
+import CustomSelect from "../components/CustomSelect";
 
 export default function BoardScreen({ initialAction, onBack }) {
-  const { teams, seekers, college, isLoading, myTeam } = useSIH();
+  const { teams, seekers, stats, college, isLoading, myTeam } = useSIH();
 
   const [tab, setTab] = useState(initialAction === "list-seeker" ? "seekers" : "teams");
   const [query, setQuery] = useState("");
@@ -88,6 +89,14 @@ export default function BoardScreen({ initialAction, onBack }) {
       </div>
 
       <main className="board" style={{ paddingTop: 0 }}>
+        {/* STAMPS */}
+        <section className="stamps" style={{ marginBottom: "30px" }}>
+          <div className="stamp"><b>{stats.teams}</b><span>Teams up</span></div>
+          <div className="stamp"><b>{stats.seats}</b><span>Seats open</span></div>
+          <div className="stamp"><b>{stats.seekers}</b><span>Students free</span></div>
+          <div className="stamp"><b>{stats.teams + stats.seekers}</b><span>Active Users</span></div>
+        </section>
+
         {/* TABS */}
         <div className="tabs">
           <button className={`tab ${tab === "teams" ? "on" : ""}`} onClick={() => setTab("teams")}>Teams <span className="cnt">{teams.length}</span></button>
@@ -117,35 +126,26 @@ export default function BoardScreen({ initialAction, onBack }) {
           {tab === "teams" && (
             <>
               <div className="f">
-                <select value={filterTrack} onChange={(e) => setFilterTrack(e.target.value)}>
-                  <option value="">All Tracks</option>
-                  <option value="Software">Software</option>
-                  <option value="Hardware">Hardware</option>
-                </select>
+                <CustomSelect 
+                  value={filterTrack} 
+                  onChange={setFilterTrack} 
+                  options={["Software", "Hardware"]} 
+                  placeholder="All Tracks" 
+                />
               </div>
               <div className="f">
-                <select value={filterTheme} onChange={(e) => setFilterTheme(e.target.value)}>
-                  <option value="">All Themes</option>
-                  {SIH_THEMES.map((th) => <option key={th} value={th}>{th}</option>)}
-                </select>
+                <CustomSelect 
+                  value={filterTheme} 
+                  onChange={setFilterTheme} 
+                  options={SIH_THEMES} 
+                  placeholder="All Themes" 
+                />
               </div>
             </>
           )}
           
           <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 16, marginTop: 12, paddingBottom: 16 }}>
-            <div style={{ width: "100%" }}>
-              <span style={{ fontSize: "0.85rem", color: "var(--mut)", display: "block", marginBottom: 8 }}>Filter by skills needed:</span>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {SKILLS.map((s) => {
-                  const active = activeSkills.includes(s);
-                  return (
-                    <button key={s} type="button" className={`chip ${active ? "on" : ""}`} onClick={() => toggleSkill(s)}>
-                      {s}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+
             
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
               {tab === "teams" && (

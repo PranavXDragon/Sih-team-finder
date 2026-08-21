@@ -1,0 +1,67 @@
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+.cs-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  text-align: left;
+  transition: border-color 0.16s, box-shadow 0.16s;
+}
+.cs-trigger:focus, .cs-trigger[data-open="true"] {
+  border-color: var(--accent-2);
+}
+.cs-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px -10px var(--shadow-1);
+  padding: 6px;
+  animation: cs-fade 0.12s ease-out;
+}
+@keyframes cs-fade { 
+  from { opacity: 0; transform: translateY(-4px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+.cs-opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14.5px;
+  transition: background 0.12s;
+}
+.cs-opt:hover {
+  background: var(--bg);
+}
+.cs-opt.selected {
+  color: var(--accent-2);
+  font-weight: 600;
+}
+.cs-placeholder {
+  color: var(--dim);
+}

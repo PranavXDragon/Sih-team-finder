@@ -3,17 +3,36 @@ import { useState, useEffect } from "react";
 import { useSIH } from "./hooks/useSIH";
 import LandingScreen from "./pages/LandingScreen";
 import BoardScreen from "./pages/BoardScreen";
+import AdminScreen from "./pages/AdminScreen";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import AuthModal from "./components/modals/AuthModal";
 
 export default function App() {
   const { toasts, session, isAuthLoading } = useSIH();
   
-  const [screen, setScreenState] = useState(() => window.location.hash === "#board" ? "board" : "landing");
+  const [screen, setScreenState] = useState(() => {
+    const hash = window.location.hash;
+    if (hash === "#board") return "board";
+    if (hash === "#admin") return "admin";
+    return "landing";
+  });
   const [boardAction, setBoardAction] = useState(null);
+  const [showAuth, setShowAuth] = useState(false);
+  
+  useEffect(() => {
+    const handleAuthEvent = (e) => setShowAuth(true);
+    document.addEventListener("triggerAuth", handleAuthEvent);
+    return () => document.removeEventListener("triggerAuth", handleAuthEvent);
+  }, []);
 
   useEffect(() => {
-    const handleHash = () => setScreenState(window.location.hash === "#board" ? "board" : "landing");
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash === "#board") setScreenState("board");
+      else if (hash === "#admin") setScreenState("admin");
+      else setScreenState("landing");
+    };
     window.addEventListener("hashchange", handleHash);
     return () => window.removeEventListener("hashchange", handleHash);
   }, []);
@@ -25,13 +44,6 @@ export default function App() {
     }
     setScreenState(s);
   };
-
-  // Protect the board route
-  useEffect(() => {
-    if (!isAuthLoading && screen === "board" && !session) {
-      setScreen("landing");
-    }
-  }, [isAuthLoading, session, screen]);
 
   return (
     <>
@@ -47,12 +59,18 @@ export default function App() {
           <div style={{ padding: "100px", textAlign: "center", minHeight: "80vh" }}>
             <h2>Loading...</h2>
           </div>
-        ) : session ? (
+        ) : (
           <BoardScreen initialAction={boardAction} onBack={() => { setBoardAction(null); setScreen("landing"); }} />
-        ) : null
+        )
+      )}
+      
+      {screen === "admin" && (
+        <AdminScreen />
       )}
       
       <Footer />
+      
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} />}
       
       <div className="toasts" aria-live="polite">
         {toasts.map((t) => (

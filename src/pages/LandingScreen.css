@@ -57,6 +57,17 @@
   font-weight: 700;
   opacity: 0.72;
 }
+@media (max-width: 720px) {
+  .stamps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+@media (max-width: 480px) {
+  .stamp {
+    padding: 16px 12px;
+  }
+}
 
 /* Intro screen */
 .intro-screen {
@@ -172,7 +183,14 @@
   .hero-bg-img {
     background-position: 85% center;
     background-size: cover;
-    opacity: 1;
+    opacity: 0.15; /* Reduced opacity on mobile for better text legibility */
+  }
+  .psub {
+    background: var(--surface);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px -10px var(--shadow-1);
   }
 }
 

@@ -1,4 +1,4 @@
-﻿import './Cards.css';
+import './Cards.css';
 import { useSIH } from "../hooks/useSIH";
 
 function timeAgo(ts) {
@@ -64,7 +64,7 @@ export default function TeamCard({ team, onEdit }) {
         </div>
         <b>{isFull ? "Team full" : `${team.seatsOpen} seat${team.seatsOpen > 1 ? "s" : ""} open`}</b>
         {team.needsFemale && (
-          <span className="chip mini" style={{ background: "rgba(219,39,119,0.15)", borderColor: "rgba(219,39,119,0.4)", color: "#f9a8d4", cursor: "default" }}>
+          <span className="chip mini" style={{ background: "var(--warn-dim)", borderColor: "rgba(255, 159, 28, 0.4)", color: "var(--warn)", cursor: "default" }}>
             Needs ♀
           </span>
         )}

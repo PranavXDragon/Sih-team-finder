@@ -3,7 +3,7 @@
   position: relative;
   background: var(--bg-2);
   border-top: 1px solid var(--border);
-  padding: 30px clamp(14px, 4vw, 34px) 40px;
+  padding: 16px clamp(14px, 4vw, 34px) 24px;
   text-align: center;
   color: var(--dim);
   font-size: 13px;

@@ -1,11 +1,9 @@
-﻿import './Navbar.css';
-import { useState } from "react";
+import './Navbar.css';
 import { useSIH } from "../hooks/useSIH";
-import ProfileModal from "./modals/ProfileModal";
+import ProfileDropdown from "./ProfileDropdown";
 
 export default function Navbar() {
   const { theme, toggleTheme, user } = useSIH();
-  const [showProfile, setShowProfile] = useState(false);
 
   return (
     <>
@@ -17,25 +15,22 @@ export default function Navbar() {
           <img src="/SIH2026-logo.png" alt="SIH 2026 Logo" className="sih-logo-img" />
         </div>
         <div className="nav-brand-text">
-          <span className="college-name">
-            Suryodaya College of Engineering & Technology
-          </span>
           <div className="brand-sih-row">
             <a className="brand" href="#">
               <span>SIH <b>2026</b></span>
             </a>
-            <span className="tag">Team Finder</span>
           </div>
         </div>
         <span className="sp" />
-        {user && (
-          <button 
-            className="btn sm profile-btn" 
-            type="button" 
-            onClick={() => setShowProfile(true)} 
-          >
-            Profile
-          </button>
+        {!user ? (
+          <div style={{ display: 'flex', gap: '8px', marginRight: '12px' }}>
+            <button className="btn sm profile-btn" type="button" onClick={() => document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signin' }))} style={{ margin: 0 }}>Sign In</button>
+            <button className="btn sm" type="button" onClick={() => document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signup' }))} style={{ margin: 0 }}>Sign Up</button>
+          </div>
+        ) : (
+          <div style={{ marginRight: '12px' }}>
+            <ProfileDropdown />
+          </div>
         )}
         <button className="iconbtn" type="button" onClick={toggleTheme} title="Toggle Theme" style={{ width: 34, height: 34, borderRadius: 100 }}>
           {theme === "dark" ? (
@@ -45,8 +40,6 @@ export default function Navbar() {
           )}
         </button>
       </header>
-      
-      {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
     </>
   );
 }
