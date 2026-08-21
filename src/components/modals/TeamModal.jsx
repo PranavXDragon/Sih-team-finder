@@ -39,8 +39,14 @@ export default function TeamModal({ onClose }) {
         leaderName: myTeam.contact_name || "",
         leaderEmail: myTeam.contact_email || "",
       }));
+    } else if (user) {
+      setForm(p => ({
+        ...p,
+        leaderEmail: p.leaderEmail || user.email || "",
+        leaderName: p.leaderName || user.user_metadata?.full_name || "",
+      }));
     }
-  }, [myTeam]);
+  }, [myTeam, user]);
 
   const set = (k, v) => {
     setForm((p) => ({ ...p, [k]: v }));
