@@ -29,6 +29,7 @@ export default function App() {
   
   useEffect(() => {
     if (session?.user && !isLoading) {
+      if (session.user.email === "admin@sih2026.com") return; // Admin skips all onboarding
       const intent = localStorage.getItem('sih_intent');
       
       // Always process intent if present, regardless of whether they are a new user
