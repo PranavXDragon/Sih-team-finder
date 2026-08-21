@@ -27,8 +27,19 @@ export default function App() {
     if (session?.user && !isLoading) {
       const key = `sih_onboarding_${session.user.id}`;
       if (!localStorage.getItem(key)) {
+        const intent = localStorage.getItem('sih_intent');
+        localStorage.removeItem('sih_intent');
+        
         if (myTeam || mySeekerProfile) {
           localStorage.setItem(key, "true");
+        } else if (intent === "post-team") {
+          localStorage.setItem(key, "true");
+          setScreenState("board");
+          setBoardAction("post-team");
+        } else if (intent === "list-seeker") {
+          localStorage.setItem(key, "true");
+          setScreenState("board");
+          setBoardAction("list-seeker");
         } else {
           setShowOnboarding(true);
         }

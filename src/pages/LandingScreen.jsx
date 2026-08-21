@@ -48,6 +48,7 @@ export default function LandingScreen({ onEnter }) {
       }
       onEnter(action);
     } else {
+      localStorage.setItem('sih_intent', action);
       document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signin' }));
     }
   };
