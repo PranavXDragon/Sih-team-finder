@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SIH_THEMES, SKILLS, PROGRAMS_DATA, YEARS } from "../../data/constants";
 import { useSIH } from "../../hooks/useSIH";
 
 const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "", branch: "", year: "", gender: "" };
 
 export default function TeamModal({ onClose }) {
-  const { user, addToast, session } = useSIH();
+  const { user, addToast, session, myTeam, addTeam, updateTeam } = useSIH();
   const [form, setForm] = useState({
     teamName: "",
     theme: "",
@@ -27,6 +27,20 @@ export default function TeamModal({ onClose }) {
     customSkill: ""
   });
   const [errs, setErrs] = useState({});
+  
+  useEffect(() => {
+    if (myTeam) {
+      setForm(p => ({
+        ...p,
+        teamName: myTeam.name || "",
+        theme: myTeam.theme || "",
+        hasIdea: !!myTeam.idea,
+        pitch: myTeam.idea || "",
+        leaderName: myTeam.contact_name || "",
+        leaderEmail: myTeam.contact_email || "",
+      }));
+    }
+  }, [myTeam]);
 
   const set = (k, v) => {
     setForm((p) => ({ ...p, [k]: v }));
@@ -94,7 +108,7 @@ export default function TeamModal({ onClose }) {
     <div className="veil" onPointerDown={onClose}>
       <div className="modal big" style={{ maxWidth: 840 }} onPointerDown={(e) => e.stopPropagation()}>
         <div className="mhead">
-          <h2>Register Team</h2>
+          <h2>{myTeam ? "Edit Team" : "Register Team"}</h2>
           <button className="iconbtn x" type="button" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
@@ -104,8 +118,8 @@ export default function TeamModal({ onClose }) {
           <div className="fset">
             <span className="mono">1 · Team details</span>
             <div className={`fld${errs.teamName ? " bad" : ""}`}>
-              <label>Team name*</label>
-              <input maxLength={46} value={form.teamName} onChange={(e) => set("teamName", e.target.value)} />
+              <label>Team name* {myTeam && <span style={{fontSize: 10, color: "var(--err)", marginLeft: 6}}>(Cannot be changed)</span>}</label>
+              <input maxLength={46} value={form.teamName} disabled={!!myTeam} onChange={(e) => set("teamName", e.target.value)} style={myTeam ? { opacity: 0.7 } : {}} />
             </div>
             
             <div className="fld">
