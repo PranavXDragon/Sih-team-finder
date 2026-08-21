@@ -390,7 +390,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
         </tr>
       </table>`
       .replace(/{{student_name}}/g, payload.student_name || 'Student')
-      .replace(/{{platform_link}}/g, 'https://sih2026.tech/');
+      .replace(/{{platform_link}}/g, 'https://sih.scetngp.com/');
   } else if (type === 'TEAM_CREATED') {
     body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
         <!-- Header -->
@@ -472,7 +472,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/You’re Registered on the SIH 2026 SCET Platform 🎉/g, 'Your Team has been Created 🎉')
       .replace(/Your registration has been successfully completed./g, 'You have successfully created your team on the platform!')
       .replace(/{{student_name}}/g, payload.student_name || 'Team Leader')
-      .replace(/{{platform_link}}/g, 'https://sih2026.tech/#board');
+      .replace(/{{platform_link}}/g, 'https://sih.scetngp.com/#board');
   } else if (type === 'ACCEPTED') {
     body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
         <!-- Header -->
@@ -551,7 +551,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/{{team_name}}/g, payload.team_name || 'the team')
       .replace(/{{team_leader}}/g, payload.team_leader || 'Team Leader')
       .replace(/{{member_count}}/g, payload.member_count || 'Several')
-      .replace(/{{team_link}}/g, 'https://sih2026.tech/#board');
+      .replace(/{{team_link}}/g, 'https://sih.scetngp.com/#board');
   } else if (type === 'REJECTED') {
     body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
         <!-- Header -->
@@ -627,7 +627,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/{{team_name}}/g, payload.team_name || 'the team')
       .replace(/{{team_leader}}/g, payload.team_leader || 'Team Leader')
       .replace(/{{removal_reason}}/g, payload.removal_reason || 'Team requirements were updated.')
-      .replace(/{{platform_link}}/g, 'https://sih2026.tech/');
+      .replace(/{{platform_link}}/g, 'https://sih.scetngp.com/');
   } else if (type === 'JOIN_REQUEST') {
     body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
         <!-- Header -->
@@ -713,7 +713,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/{{skills}}/g, payload.skills || 'N/A')
       .replace(/{{email}}/g, payload.email || 'N/A')
       .replace(/{{request_message}}/g, payload.request_message || 'I would love to join your team!')
-      .replace(/{{request_link}}/g, 'https://sih2026.tech/#requests');
+      .replace(/{{request_link}}/g, 'https://sih.scetngp.com/#requests');
   } else {
     body = '<p>Notification from SIH SCET Platform.</p>';
   }
