@@ -4,7 +4,7 @@ import { SIH_THEMES, SKILLS, DEPARTMENTS, YEARS, PROGRAMS_DATA } from "../../dat
 
 import CustomSelect from "../CustomSelect";
 
-const EMPTY_MEMBER = { name: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", skills: "" };
+const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na" };
 
 const GENDER_OPTIONS = [
   { value: "na", label: "Prefer not to say" },
@@ -13,9 +13,9 @@ const GENDER_OPTIONS = [
 ];
 
 const MEMBER_GENDER_OPTIONS = [
-  { value: "na", label: "—" },
-  { value: "f", label: "F" },
-  { value: "m", label: "M" }
+  { value: "na", label: "Prefer not to say" },
+  { value: "f", label: "Female" },
+  { value: "m", label: "Male" }
 ];
 
 export default function TeamModal({ onClose, initialData, onSuccess }) {
@@ -30,11 +30,12 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
   if (initialData?.members && initialData.members.length > 1) {
     const others = initialData.members.slice(1).map(m => ({
       name: m.name || "",
+      email: m.email || "",
+      phone: m.phone || "",
       program: m.program || "UG",
       branch: m.dept || "Computer Engineering",
       year: m.year || "3rd Year",
-      gender: m.gender || "na",
-      skills: m.skills || ""
+      gender: m.gender || "na"
     }));
     initialMembers = others.concat(emptyMembers).slice(0, 4);
   }
@@ -105,6 +106,18 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     if (!form.leaderName.trim()) e.leaderName = true;
     if (!form.wantsSkills.length) e.wantsSkills = true;
     if (!form.phone.trim()) e.phone = true;
+    
+    // Member validation: if name is entered, all other fields are required
+    let membersValid = true;
+    form.members.forEach((m) => {
+      if (m.name.trim()) {
+        if (!m.email.trim() || !m.phone.trim() || !m.program || !m.branch || !m.year || !m.gender) {
+          membersValid = false;
+        }
+      }
+    });
+    if (!membersValid) e.members = true;
+    
     setErrs(e);
     return Object.keys(e).length === 0;
   };
@@ -130,14 +143,15 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       seatsOpen,
       totalSeats: 6,
       members: [
-        { name: form.leaderName, program: form.leaderProgram, dept: form.leaderBranch, year: form.leaderYear, gender: form.leaderGender, skills: form.leaderSkills },
+        { name: form.leaderName, program: form.leaderProgram, dept: form.leaderBranch, year: form.leaderYear, gender: form.leaderGender, skills: form.leaderSkills, email: form.email, phone: form.phone },
         ...filledMembers.map(m => ({
-          name: m.name,
+          name: m.name.trim(),
+          email: m.email.trim(),
+          phone: m.phone.trim(),
           program: m.program,
           dept: m.branch,
           year: m.year,
-          gender: m.gender,
-          skills: m.skills || ""
+          gender: m.gender
         })),
       ],
     };
@@ -302,41 +316,58 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           {/* Section 3: Members */}
           <div className="fset">
             <span className="mono">3 · Members already in the team</span>
-            <p className="hint" style={{ margin: 0 }}>You are member 1. Add anyone who already said yes. Leave the rest empty — those become open seats.</p>
-            <div style={{ display: "grid", gap: 9 }}>
+            <p className="hint">You are member 1. Add anyone who already said yes. Leave the rest empty — those become open seats. If you enter a name, all fields for that member are required.</p>
+            <div style={{ display: "grid", gap: 12 }}>
               {form.members.map((m, i) => (
-                <div key={i} className="mrow">
-                  <input placeholder={`Member ${i + 2} name (optional)`} value={m.name}
-                    onChange={(e) => updateMember(i, "name", e.target.value)} />
-                  <CustomSelect
-                    value={m.program}
-                    onChange={(val) => {
-                      const defaultBranch = PROGRAMS_DATA[val]?.[0] || "";
-                      const updated = [...form.members];
-                      updated[i] = { ...updated[i], program: val, branch: defaultBranch };
-                      setForm(f => ({ ...f, members: updated }));
-                    }}
-                    options={Object.keys(PROGRAMS_DATA)}
-                  />
-                  <CustomSelect
-                    value={m.branch}
-                    onChange={(val) => updateMember(i, "branch", val)}
-                    options={m.program ? PROGRAMS_DATA[m.program] : []}
-                    placeholder="Select branch…"
-                  />
-                  <CustomSelect
-                    value={m.year}
-                    onChange={(val) => updateMember(i, "year", val)}
-                    options={YEARS}
-                  />
-                  <CustomSelect
-                    value={m.gender}
-                    onChange={(val) => updateMember(i, "gender", val)}
-                    options={MEMBER_GENDER_OPTIONS}
-                  />
+                <div key={i} style={{ padding: 16, border: "1px solid var(--border)", borderRadius: 12, background: "var(--bg)" }}>
+                  <b style={{ display: "block", marginBottom: 12, fontSize: 13, color: "var(--accent-2)" }}>Member {i + 2}</b>
+                  <div className="three" style={{ gap: 12, marginBottom: 12 }}>
+                    <div className="fld">
+                      <input placeholder="Name (optional)" value={m.name} onChange={(e) => updateMember(i, "name", e.target.value)} />
+                    </div>
+                    <div className="fld">
+                      <input placeholder="Email" type="email" value={m.email} onChange={(e) => updateMember(i, "email", e.target.value)} disabled={!m.name} />
+                    </div>
+                    <div className="fld">
+                      <input placeholder="Mobile Number" type="tel" value={m.phone} onChange={(e) => updateMember(i, "phone", e.target.value)} disabled={!m.name} />
+                    </div>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr 1fr", gap: 12 }}>
+                    <CustomSelect
+                      value={m.program}
+                      onChange={(val) => {
+                        const defaultBranch = PROGRAMS_DATA[val]?.[0] || "";
+                        const updated = [...form.members];
+                        updated[i] = { ...updated[i], program: val, branch: defaultBranch };
+                        setForm(f => ({ ...f, members: updated }));
+                      }}
+                      options={Object.keys(PROGRAMS_DATA)}
+                      disabled={!m.name}
+                    />
+                    <CustomSelect
+                      value={m.branch}
+                      onChange={(val) => updateMember(i, "branch", val)}
+                      options={m.program ? PROGRAMS_DATA[m.program] : []}
+                      placeholder="Select branch…"
+                      disabled={!m.name}
+                    />
+                    <CustomSelect
+                      value={m.year}
+                      onChange={(val) => updateMember(i, "year", val)}
+                      options={YEARS}
+                      disabled={!m.name}
+                    />
+                    <CustomSelect
+                      value={m.gender}
+                      onChange={(val) => updateMember(i, "gender", val)}
+                      options={MEMBER_GENDER_OPTIONS}
+                      disabled={!m.name}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
+            {errs.members && <p className="err" style={{ display: "block", marginTop: 8 }}>Please fill all fields for the added members.</p>}
           </div>
 
           {/* Section 4: Needs */}
