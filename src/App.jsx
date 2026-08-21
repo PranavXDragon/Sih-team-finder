@@ -8,6 +8,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AuthModal from "./components/modals/AuthModal";
 import OnboardingModal from "./components/modals/OnboardingModal";
+import TeamModal from "./components/modals/TeamModal";
+import SeekerModal from "./components/modals/SeekerModal";
 
 export default function App() {
   const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile } = useSIH();
@@ -22,6 +24,8 @@ export default function App() {
   const [showAuth, setShowAuth] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [authDefaultSignUp, setAuthDefaultSignUp] = useState(false);
+  const [globalPostTeam, setGlobalPostTeam] = useState(false);
+  const [globalListSeeker, setGlobalListSeeker] = useState(false);
   
   useEffect(() => {
     if (session?.user && !isLoading) {
@@ -31,11 +35,9 @@ export default function App() {
       if (intent) {
         localStorage.removeItem('sih_intent');
         if (intent === "post-team") {
-          setScreen("board");
-          setBoardAction("post-team");
+          setGlobalPostTeam(true);
         } else if (intent === "list-seeker") {
-          setScreen("board");
-          setBoardAction("list-seeker");
+          setGlobalListSeeker(true);
         }
       }
 
@@ -46,8 +48,7 @@ export default function App() {
         } else if (!intent) {
           // Default to post-team if no intent was found (e.g. they just clicked sign up)
           localStorage.setItem(key, "true");
-          setScreen("board");
-          setBoardAction("post-team");
+          setGlobalPostTeam(true);
         } else {
           localStorage.setItem(key, "true");
         }
@@ -89,7 +90,16 @@ export default function App() {
       <Navbar />
       
       {screen === "landing" && (
-        <LandingScreen onEnter={(act) => { setBoardAction(act); setScreen("board"); }} />
+        <LandingScreen onEnter={(act) => {
+          if (act === "post-team") {
+            setGlobalPostTeam(true);
+          } else if (act === "list-seeker") {
+            setGlobalListSeeker(true);
+          } else {
+            setBoardAction(null);
+            setScreen("board");
+          }
+        }} />
       )}
       
       {screen === "board" && (
@@ -124,12 +134,32 @@ export default function App() {
           onSelect={(act) => {
             if (session?.user) localStorage.setItem(`sih_onboarding_${session.user.id}`, "true");
             setShowOnboarding(false);
-            setBoardAction(act);
-            setScreen("board");
+            if (act === "post-team") setGlobalPostTeam(true);
+            else if (act === "list-seeker") setGlobalListSeeker(true);
           }}
           onClose={() => {
             if (session?.user) localStorage.setItem(`sih_onboarding_${session.user.id}`, "true");
             setShowOnboarding(false);
+            setScreen("board");
+          }}
+        />
+      )}
+
+      {globalPostTeam && (
+        <TeamModal 
+          onClose={() => setGlobalPostTeam(false)} 
+          onSuccess={() => {
+            setGlobalPostTeam(false);
+            setScreen("board");
+          }}
+        />
+      )}
+
+      {globalListSeeker && (
+        <SeekerModal 
+          onClose={() => setGlobalListSeeker(false)} 
+          onSuccess={() => {
+            setGlobalListSeeker(false);
             setScreen("board");
           }}
         />

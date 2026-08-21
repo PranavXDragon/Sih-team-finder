@@ -4,7 +4,7 @@ import { useSIH } from "../../hooks/useSIH";
 
 const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "", branch: "", year: "", gender: "" };
 
-export default function TeamModal({ onClose }) {
+export default function TeamModal({ onClose, onSuccess }) {
   const { user, addToast, session, myTeam, addTeam, updateTeam } = useSIH();
   const [form, setForm] = useState({
     teamName: "",
@@ -106,8 +106,39 @@ export default function TeamModal({ onClose }) {
 
   const submit = async () => {
     if (!validate()) return;
-    addToast("Team registered successfully!", "ok");
-    onClose();
+    try {
+      const payload = {
+        name: form.teamName.trim(),
+        theme: form.theme,
+        idea: form.hasIdea ? form.pitch.trim() : "",
+        ps_id: form.hasIdea ? form.psId.trim() : "",
+        ps_title: form.hasIdea ? form.psTitle.trim() : "",
+        contact_name: form.leaderName.trim(),
+        contact_email: form.leaderEmail.trim(),
+        contact_phone: form.leaderPhone.trim(),
+        leader_program: form.leaderProgram,
+        leader_branch: form.leaderBranch,
+        leader_year: form.leaderYear,
+        leader_gender: form.leaderGender,
+        leader_skills: form.leaderSkills.trim(),
+        members: form.members.filter(m => m.name && m.name.trim() !== ""),
+        wants_skills: form.wantsSkills,
+        custom_skill: form.wantsSkills.includes("Other (Custom)") ? form.customSkill.trim() : "",
+        college: form.college || "Suryodaya College of Engineering and Technology",
+      };
+
+      if (myTeam) {
+        await updateTeam(myTeam.id, payload);
+        addToast("Team updated successfully!", "ok");
+      } else {
+        await addTeam(payload);
+        addToast("Team registered successfully!", "ok");
+        if (onSuccess) onSuccess();
+      }
+      onClose();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

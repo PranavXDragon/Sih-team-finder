@@ -1,8 +1,8 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useSIH } from "../../hooks/useSIH";
 import { SKILLS, DEPARTMENTS, YEARS } from "../../data/constants";
 
-export default function SeekerModal({ initialData, onClose }) {
+export default function SeekerModal({ initialData, onClose, onSuccess }) {
   const { addSeeker, updateSeeker, college, addToast } = useSIH();
 
   let initPhone = "";
@@ -69,6 +69,7 @@ export default function SeekerModal({ initialData, onClose }) {
       } else {
         await addSeeker(payload);
         addToast("You are now listed! Teams can find you.", "ok");
+        if (onSuccess) onSuccess();
       }
       onClose();
     } catch (e) { }
