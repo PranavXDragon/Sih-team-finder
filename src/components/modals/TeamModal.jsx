@@ -20,7 +20,7 @@ const MEMBER_GENDER_OPTIONS = [
 ];
 
 export default function TeamModal({ onClose, initialData, onSuccess }) {
-  const { addTeam, updateTeam, college, addToast, user } = useSIH();
+  const { addTeam, updateTeam, college, addToast, user, removeMember } = useSIH();
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(1);
     const leader = initialData?.members?.[0] || {};
@@ -37,7 +37,9 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       program: m.program || "UG",
       branch: m.dept || "Computer Engineering",
       year: m.year || "3rd Year",
-      gender: m.gender || "na"
+      gender: m.gender || "na",
+      skills: m.skills || "",
+      user_id: m.user_id
     }));
     initialMembers = others.concat(emptyMembers).slice(0, 5);
   }
@@ -177,7 +179,9 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           program: m.program,
           dept: m.branch,
           year: m.year,
-          gender: m.gender
+          gender: m.gender,
+          skills: (m.skills || "").trim(),
+          user_id: m.user_id
         })),
       ],
     };
@@ -351,7 +355,38 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
             <div style={{ display: "grid", gap: 12 }}>
               {form.members.map((m, i) => (
                 <div key={i} style={{ padding: 16, border: "1px solid var(--border)", borderRadius: 12, background: "var(--bg)" }}>
-                  <b style={{ display: "block", marginBottom: 12, fontSize: 13, color: "var(--accent-2)" }}>Member {i + 2}</b>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <b style={{ fontSize: 13, color: "var(--accent-2)" }}>Member {i + 2}</b>
+                    {m.name.trim() && (
+                      <button 
+                        type="button" 
+                        className="btn sm" 
+                        style={{ 
+                          padding: "2px 8px", 
+                          fontSize: "0.75rem", 
+                          background: "rgba(239, 68, 68, 0.1)", 
+                          borderColor: "rgba(239, 68, 68, 0.2)", 
+                          color: "var(--stop)",
+                          height: "auto",
+                          margin: 0
+                        }}
+                        onClick={async () => {
+                          if (confirm(`Are you sure you want to remove ${m.name} from the team?`)) {
+                            if (m.user_id && initialData) {
+                              await removeMember(initialData.id, m.user_id);
+                            }
+                            // Clear local state fields for this member
+                            const updated = [...form.members];
+                            updated[i] = { ...EMPTY_MEMBER };
+                            setForm(f => ({ ...f, members: updated }));
+                            addToast("Member removed from visual list. Click 'Save Changes' to update the team.", "ok");
+                          }
+                        }}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
                   <div className="three" style={{ gap: 12, marginBottom: 12 }}>
                     <div className="fld">
                       <input placeholder="Name (optional)" value={m.name} onChange={(e) => updateMember(i, "name", e.target.value)} />

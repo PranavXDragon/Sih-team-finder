@@ -325,7 +325,8 @@ export function SIHProvider({ children }) {
         dept: seekerProfile.dept, 
         year: seekerProfile.year, 
         gender: seekerProfile.gender, 
-        skills: seekerProfile.skills?.join(', ') 
+        skills: seekerProfile.skills?.join(', '),
+        user_id: seekerProfile.user_id
       }];
       const newSeatsOpen = Math.max(0, myTeam.seatsOpen - 1);
       
@@ -348,6 +349,20 @@ export function SIHProvider({ children }) {
     } catch (err) {
       console.error(err);
       addToast("Error rejecting request", "err");
+    }
+  }, []);
+
+  const removeMember = useCallback(async (teamId, memberUserId) => {
+    try {
+      const { error } = await supabase
+        .from('join_requests')
+        .delete()
+        .eq('team_id', teamId)
+        .eq('user_id', memberUserId);
+      if (error) throw error;
+    } catch (err) {
+      console.error("Error releasing member:", err);
+      addToast("Failed to release member in database", "err");
     }
   }, []);
 
@@ -374,7 +389,7 @@ export function SIHProvider({ children }) {
     session, user, isAuthLoading,
     signOut: () => supabase.auth.signOut(),
     myTeam, mySeekerProfile, myRequests, myAcceptedRequests,
-    requestToJoin, acceptRequest, rejectRequest
+    requestToJoin, acceptRequest, rejectRequest, removeMember
   };
 
   return <SIHContext.Provider value={value}>{children}</SIHContext.Provider>;
