@@ -12,7 +12,7 @@ export default function Navbar() {
           <img src="/SIH-Logo.png" alt="SIH Logo" style={{ height: "40px" }} />
           <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
           
-          <div className="sprite-ministry" title="Ministry of Education" />
+          <img src="/Ministry.png" alt="Ministry of Education" style={{ height: "40px" }} />
           <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
           
           <a href="#" title="Suryodaya Home" style={{ display: 'flex' }}>
@@ -21,7 +21,8 @@ export default function Navbar() {
           <img src="/Academic.png" alt="Academic Logo" />
           <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
 
-          <div className="sprite-other" title="AICTE & MoE" />
+          <img src="/AICTE.png" alt="AICTE" style={{ height: "40px" }} />
+          <img src="/MoE.png" alt="MoE Innovation Cell" style={{ height: "40px" }} />
         </div>
 
         <span className="sp" />
