@@ -1,9 +1,10 @@
+import { createPortal } from "react-dom";
 import { useSIH } from "../../hooks/useSIH";
 
 export default function RequestsModal({ onClose }) {
   const { myRequests, acceptRequest, rejectRequest, addToast } = useSIH();
 
-  return (
+  return createPortal(
     <div className="veil open" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ width: "100%", maxWidth: 500 }}>
         <div className="mhead">
@@ -46,7 +47,8 @@ export default function RequestsModal({ onClose }) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

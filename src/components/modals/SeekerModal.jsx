@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useSIH } from "../../hooks/useSIH";
 import { SKILLS, DEPARTMENTS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 import CustomSelect from "../CustomSelect";
@@ -99,7 +100,7 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
     }
   };
 
-  return (
+  return createPortal(
     <div className="veil open" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: 580 }}>
         <div className="mhead">
@@ -113,11 +114,12 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
 
           <div className="two">
             <div className={`fld${errs.name ? " bad" : ""}`}>
-              <label htmlFor="sName">Your full name<em>*</em></label>
-              <input id="sName" maxLength={46}
+              <label htmlFor="sName">Full Name<em>*</em></label>
+              <input id="sName" placeholder="e.g. Aditi Sharma"
                 value={form.name} onChange={(e) => set("name", e.target.value)} />
-              <p className="err">Needed.</p>
+              <p className="err">Your name is required.</p>
             </div>
+
             <div className="fld">
               <label>College</label>
               <input value={form.college} disabled style={{ opacity: 0.7 }} />
@@ -130,23 +132,26 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
               <CustomSelect
                 value={form.program}
                 onChange={(val) => {
-                  const defaultBranch = PROGRAMS_DATA[val]?.[0] || "";
-                  setForm(p => ({
-                    ...p,
-                    program: val,
-                    branch: defaultBranch
-                  }));
+                  set("program", val);
+                  set("branch", ""); // Reset branch when program changes
                 }}
-                options={Object.keys(PROGRAMS_DATA)}
+                options={[
+                  { value: "UG", label: "UG (Undergraduate)" },
+                  { value: "PG", label: "PG (Postgraduate)" },
+                  { value: "Diploma", label: "Diploma" }
+                ]}
+                placeholder="Select program..."
               />
             </div>
+
             <div className="fld">
-              <label>Branch<em>*</em></label>
+              <label>Branch/Department<em>*</em></label>
               <CustomSelect
                 value={form.branch}
                 onChange={(val) => set("branch", val)}
                 options={form.program ? PROGRAMS_DATA[form.program] : []}
-                placeholder="Select branch…"
+                placeholder={form.program ? "Select branch..." : "Choose program first"}
+                disabled={!form.program}
               />
             </div>
           </div>
@@ -158,68 +163,73 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
                 value={form.year}
                 onChange={(val) => set("year", val)}
                 options={YEARS}
+                placeholder="Select year..."
               />
             </div>
+
             <div className="fld">
-              <label>Gender</label>
+              <label>Gender<em>*</em></label>
               <CustomSelect
                 value={form.gender}
                 onChange={(val) => set("gender", val)}
                 options={GENDER_OPTIONS}
+                placeholder="Select gender..."
               />
-              <p className="hint">For the "1 female member" SIH rule.</p>
             </div>
+          </div>
+
+          <div className="fld">
+            <label htmlFor="sBio">Bio/Description (Optional)</label>
+            <textarea id="sBio" placeholder="Tell teams what you're interested in, what you've built, or your background..." maxLength={180}
+              value={form.bio} onChange={(e) => set("bio", e.target.value)} />
+            <p className="hint">{form.bio.length}/180</p>
           </div>
 
           <div className={`fld${errs.skills ? " bad" : ""}`}>
-            <label>What are you good at?<em>*</em></label>
-            <div className="chipbar" style={{ margin: 0 }}>
-              {SKILLS.map((s) => (
-                <button key={s} type="button"
-                  className={`chip${form.skills.includes(s) ? " on" : ""}`}
-                  onClick={() => toggleSkill(s)}>{s}</button>
-              ))}
+            <label>Your key skills (Select at least one)<em>*</em></label>
+            <div className="chips">
+              {SKILLS.map((sk) => {
+                const on = form.skills.includes(sk);
+                return (
+                  <button key={sk} className={`chip${on ? " on" : ""}`} type="button"
+                    onClick={() => {
+                      const next = on ? form.skills.filter(x => x !== sk) : [...form.skills, sk];
+                      set("skills", next);
+                    }}>
+                    {sk}
+                  </button>
+                );
+              })}
             </div>
-            <p className="err">Pick at least one skill.</p>
-          </div>
-
-          <div className={`fld${errs.bio ? " bad" : ""}`}>
-            <label htmlFor="sBio">One line about you<em>*</em></label>
-            <textarea id="sBio" maxLength={170} rows={3}
-              placeholder="e.g. I design my own PCBs and have 3 working ESP32 builds."
-              value={form.bio} onChange={(e) => set("bio", e.target.value)} />
-            <p className="err">One line so a team leader can judge you in five seconds.</p>
-            <p className="hint">{form.bio.length}/170</p>
+            <p className="err">Select at least one skill.</p>
           </div>
 
           <div className="two">
             <div className={`fld${errs.phone ? " bad" : ""}`}>
               <label htmlFor="sPhone">WhatsApp number<em>*</em></label>
-              <input id="sPhone" inputMode="tel" maxLength={18} placeholder="10 digit number"
+              <input id="sPhone" type="tel" placeholder="10-digit number"
                 value={form.phone} onChange={(e) => set("phone", e.target.value)} />
-              <p className="err">Enter a valid number.</p>
+              <p className="err">Valid 10-digit WhatsApp number is required.</p>
             </div>
-            <div className="fld">
-              <label htmlFor="sEmail">Email</label>
-              <input id="sEmail" type="email" maxLength={70}
+
+            <div className={`fld${errs.email ? " bad" : ""}`}>
+              <label htmlFor="sEmail">Email address<em>*</em></label>
+              <input id="sEmail" type="email" placeholder="e.g. you@gmail.com"
                 value={form.email} onChange={(e) => set("email", e.target.value)} />
+              <p className="err">Valid email address is required.</p>
             </div>
           </div>
 
           {initialData && (
-            <div className="fld">
-              <label style={{ display: "flex", gap: 6, alignItems: "center", cursor: "pointer", fontWeight: 600 }}>
+            <div style={{ margin: "8px 0" }}>
+              <label className="checkbox">
                 <input type="checkbox" checked={form.listed} onChange={(e) => set("listed", e.target.checked)} />
-                Visible on the board
+                <span className="box" />
+                List profile on student board
               </label>
               <p className="hint">Uncheck this if you've found a team and want to hide your profile.</p>
             </div>
           )}
-
-          <div className="note warn">
-            <span>🔒</span>
-            <span>Your number and email are <b>never</b> shown on the board. Shared only when you accept a team.</span>
-          </div>
 
         </form>
         <div className="mfoot">
@@ -230,7 +240,7 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
-

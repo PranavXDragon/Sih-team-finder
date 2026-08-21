@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useSIH } from "../../hooks/useSIH";
 import { SIH_THEMES, SKILLS, DEPARTMENTS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 
@@ -190,7 +191,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
 
   };
 
-  return (
+  return createPortal(
     <div className="veil open" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal wide">
         <div className="mhead">
@@ -444,7 +445,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
