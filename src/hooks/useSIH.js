@@ -1,5 +1,5 @@
-﻿import { useContext } from "react";
-import { SIHContext } from "../context/SIHContext";
+import { useContext } from "react";
+import { SIHContext } from "../context/context";
 
 export function useSIH() {
   const context = useContext(SIHContext);

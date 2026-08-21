@@ -1,5 +1,21 @@
+const escapeHtml = (unsafe) => {
+  if (typeof unsafe !== 'string') return unsafe;
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
 
-export const generateEmailHTML = (type: string, payload: any) => {
+export const generateEmailHTML = (type: string, rawPayload: any) => {
+  // Sanitize all payload strings to prevent XSS injections in emails
+  const payload = { ...rawPayload };
+  for (const key in payload) {
+    if (Object.prototype.hasOwnProperty.call(payload, key)) {
+      payload[key] = escapeHtml(payload[key]);
+    }
+  }
   const head = `
 <!DOCTYPE html>
 <html lang="en">

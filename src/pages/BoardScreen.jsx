@@ -1,7 +1,7 @@
 import './BoardScreen.css';
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSIH } from "../hooks/useSIH";
-import { SIH_THEMES, SKILLS } from "../data/constants";
+import { SIH_THEMES } from "../data/constants";
 import TeamCard from "../components/TeamCard";
 import SeekerCard from "../components/SeekerCard";
 import TeamModal from "../components/modals/TeamModal";
@@ -19,20 +19,20 @@ export default function BoardScreen({ initialAction, onBack }) {
   const [filterHasPs, setFilterHasPs] = useState(false);
   const [activeSkills, setActiveSkills] = useState([]);
 
-  const [filterTeamId, setFilterTeamId] = useState("");
+  // Initialize filterTeamId directly from window.location.hash
+  const [filterTeamId, setFilterTeamId] = useState(() => {
+    const hash = window.location.hash;
+    return hash.includes('?team=') ? decodeURIComponent(hash.split('?team=')[1]) : "";
+  });
+  
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [showSeekerModal, setShowSeekerModal] = useState(false);
 
   useEffect(() => {
     const handleHashTeam = () => {
       const hash = window.location.hash;
-      if (hash.includes('?team=')) {
-        setFilterTeamId(decodeURIComponent(hash.split('?team=')[1]));
-      } else {
-        setFilterTeamId("");
-      }
+      setFilterTeamId(hash.includes('?team=') ? decodeURIComponent(hash.split('?team=')[1]) : "");
     };
-    handleHashTeam();
     window.addEventListener("hashchange", handleHashTeam);
     return () => window.removeEventListener("hashchange", handleHashTeam);
   }, []);
@@ -45,16 +45,13 @@ export default function BoardScreen({ initialAction, onBack }) {
     }
   }, [initialAction]);
 
-  useEffect(() => {
-    if (query || filterTrack || filterTheme || filterFemale || filterHasPs || activeSkills.length > 0) {
-      if (filterTeamId) {
-        setFilterTeamId("");
-        if (window.location.hash.includes("?team=")) {
-          window.location.hash = "board";
-        }
-      }
+  // Clear team filter if they start typing other filters
+  if ((query || filterTrack || filterTheme || filterFemale || filterHasPs || activeSkills.length > 0) && filterTeamId) {
+    setFilterTeamId("");
+    if (window.location.hash.includes("?team=")) {
+      window.location.hash = "board";
     }
-  }, [query, filterTrack, filterTheme, filterFemale, filterHasPs, activeSkills, filterTeamId]);
+  }
 
 
 

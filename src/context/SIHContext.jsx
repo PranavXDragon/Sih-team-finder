@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
-
-export const SIHContext = createContext(null);
+import { SIHContext } from "./context";
 
 const load = (key, fallback) => {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -136,8 +135,7 @@ export function SIHProvider({ children }) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'teams' },
-        (payload) => {
-          console.log('Realtime update: teams', payload);
+        () => {
           fetchSupabaseData();
           fetchRoles();
         }
@@ -145,8 +143,7 @@ export function SIHProvider({ children }) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'seekers' },
-        (payload) => {
-          console.log('Realtime update: seekers', payload);
+        () => {
           fetchSupabaseData();
           fetchRoles();
         }
@@ -154,8 +151,8 @@ export function SIHProvider({ children }) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'join_requests' },
-        (payload) => {
-          console.log('Realtime update: join_requests', payload);
+        () => {
+          fetchSupabaseData();
           fetchRoles();
         }
       )
@@ -398,7 +395,7 @@ export function SIHProvider({ children }) {
       addToast(err.message || "Error sending request", "err");
       throw err;
     }
-  }, [user, mySeekerProfile, addToast]);
+  }, [user, mySeekerProfile, teams, addToast]);
 
   const acceptRequest = useCallback(async (requestId, seekerProfile) => {
     try {
@@ -533,12 +530,6 @@ export function SIHProvider({ children }) {
   };
 
   return <SIHContext.Provider value={value}>{children}</SIHContext.Provider>;
-}
-
-export function useSIH() {
-  const context = useContext(SIHContext);
-  if (!context) throw new Error("useSIH must be used within SIHProvider");
-  return context;
 }
 
 
