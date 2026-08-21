@@ -73,6 +73,9 @@ export default function LandingScreen({ onEnter }) {
               <button className="big blue" type="button" onClick={() => handleAction("list-seeker")}>
                 JOIN A TEAM
               </button>
+              <button className="big" type="button" style={{ background: "transparent", color: "var(--text)", border: "2px solid var(--text)" }} onClick={() => onEnter(null)}>
+                EXPLORE TEAMS
+              </button>
             </div>
           </div>
         </div>
