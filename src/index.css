@@ -356,11 +356,13 @@ img, svg { display: block; max-width: 100%; }
 .fset > .mono { margin-bottom: -4px; }
 .two { display: grid; gap: 13px; grid-template-columns: 1fr 1fr; }
 .three { display: grid; gap: 13px; grid-template-columns: 1fr 1fr 1fr; }
+.fld { min-width: 0; }
 .fld label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
 .fld label em { font-style: normal; color: var(--accent); margin-left: 3px; }
 .fld .hint { margin: 5px 0 0; font-size: 11.5px; color: var(--dim); font-family: var(--mono); letter-spacing: 0.03em; }
 .fld input, .fld select, .fld textarea {
   width: 100%;
+  min-width: 0;
   padding: 11px 13px;
   border-radius: 10px;
   border: 1px solid var(--border);

@@ -1,6 +1,7 @@
 .custom-select {
   position: relative;
   width: 100%;
+  min-width: 0;
 }
 .cs-trigger {
   width: 100%;
