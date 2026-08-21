@@ -289,6 +289,22 @@ export function SIHProvider({ children }) {
         if (error.code === '23505') throw new Error("You have already applied for this team.");
         throw error;
       }
+      
+      // Notify team leader via email
+      const targetTeam = teams.find(t => t.id === teamId);
+      if (targetTeam) {
+        const leaderEmail = targetTeam.members?.[0]?.email || targetTeam.contact?.split('|')[1]?.trim();
+        if (leaderEmail) {
+          supabase.functions.invoke('send-email', {
+            body: {
+              to: leaderEmail,
+              subject: `New Request to join ${targetTeam.teamName || 'your team'}!`,
+              html: `<p>Hi there,</p><p><strong>${mySeekerProfile.name}</strong> has just requested to join your SIH 2026 team!</p><p>Go to your dashboard to review their profile.</p>`
+            }
+          }).catch(err => console.error("Failed to send email to leader", err));
+        }
+      }
+
       addToast("Request sent to Team Leader!", "ok");
     } catch (err) {
       console.error(err);
@@ -340,6 +356,17 @@ export function SIHProvider({ children }) {
       await updateTeam(myTeam.id, { members: newMembers, seatsOpen: newSeatsOpen });
       
       setMyRequests((prev) => prev.filter(r => r.id !== requestId));
+      
+      if (email) {
+        supabase.functions.invoke('send-email', {
+          body: {
+            to: email,
+            subject: `Request Accepted: Welcome to ${myTeam.teamName || 'the team'}!`,
+            html: `<p>Hi ${seekerProfile.name},</p><p>Great news! Your request to join <strong>${myTeam.teamName}</strong> has been accepted.</p><p>You can contact your new team leader at <strong>${myTeam.contact || 'their provided contact info'}</strong>.</p>`
+          }
+        }).catch(err => console.error("Failed to send acceptance email", err));
+      }
+
       addToast("Student accepted into team!", "ok");
     } catch (err) {
       console.error(err);
@@ -351,6 +378,21 @@ export function SIHProvider({ children }) {
     try {
       const { error } = await supabase.from('join_requests').update({ status: 'rejected' }).eq('id', requestId);
       if (error) throw error;
+      
+      const req = myRequests.find(r => r.id === requestId);
+      if (req && req.seekers) {
+        const seekerEmail = req.seekers.whatsapp?.split('|')[1]?.trim();
+        if (seekerEmail) {
+          supabase.functions.invoke('send-email', {
+            body: {
+              to: seekerEmail,
+              subject: `Update on your team request for ${myTeam?.teamName || 'the team'}`,
+              html: `<p>Hi ${req.seekers.name},</p><p>Unfortunately, your request to join <strong>${myTeam?.teamName || 'the team'}</strong> was declined.</p><p>Don't worry, there are many other teams looking for your skills! Keep applying on the board.</p>`
+            }
+          }).catch(err => console.error("Failed to send rejection email", err));
+        }
+      }
+
       setMyRequests((prev) => prev.filter(r => r.id !== requestId));
       addToast("Request rejected.", "ok");
     } catch (err) {
