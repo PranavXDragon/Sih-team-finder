@@ -31,6 +31,12 @@ export default function TeamCard({ team, onEdit }) {
     await requestToJoin(team.id);
   };
 
+  const handleShare = () => {
+    const url = `${window.location.origin}${window.location.pathname}#board?team=${team.id}`;
+    navigator.clipboard.writeText(url);
+    addToast("Link copied!", "ok");
+  };
+
   return (
     <div className="card" data-full={isFull ? "1" : "0"}>
       <div className="rail">
@@ -74,6 +80,10 @@ export default function TeamCard({ team, onEdit }) {
         <span className="ago">{timeAgo(team.createdAt)}</span>
         <span className="sp" />
         
+        <button className="iconbtn" type="button" onClick={handleShare} style={{ marginRight: 8, width: 32, height: 32 }} title="Copy link to team">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        </button>
+
         {isMyTeam ? (
           <span style={{ color: "var(--mut)", fontSize: "0.85rem", fontWeight: 600 }}>Your Team</span>
         ) : isAccepted ? (

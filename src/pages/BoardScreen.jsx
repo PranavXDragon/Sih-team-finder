@@ -19,8 +19,23 @@ export default function BoardScreen({ initialAction, onBack }) {
   const [filterHasPs, setFilterHasPs] = useState(false);
   const [activeSkills, setActiveSkills] = useState([]);
 
+  const [filterTeamId, setFilterTeamId] = useState("");
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [showSeekerModal, setShowSeekerModal] = useState(false);
+
+  useEffect(() => {
+    const handleHashTeam = () => {
+      const hash = window.location.hash;
+      if (hash.includes('?team=')) {
+        setFilterTeamId(hash.split('?team=')[1]);
+      } else {
+        setFilterTeamId("");
+      }
+    };
+    handleHashTeam();
+    window.addEventListener("hashchange", handleHashTeam);
+    return () => window.removeEventListener("hashchange", handleHashTeam);
+  }, []);
 
   useEffect(() => {
     if (initialAction === "post-team") {
@@ -42,6 +57,7 @@ export default function BoardScreen({ initialAction, onBack }) {
 
   const filteredTeams = useMemo(() => {
     return teams.filter((t) => {
+      if (filterTeamId && t.id !== filterTeamId) return false;
       if (filterTrack && t.track !== filterTrack) return false;
       if (filterTheme && t.theme !== filterTheme) return false;
       if (filterFemale && !t.needsFemale) return false;
@@ -53,7 +69,7 @@ export default function BoardScreen({ initialAction, onBack }) {
       }
       return true;
     });
-  }, [teams, filterTrack, filterTheme, filterFemale, filterHasPs, query, activeSkills]);
+  }, [teams, filterTrack, filterTheme, filterFemale, filterHasPs, query, activeSkills, filterTeamId]);
 
   const filteredSeekers = useMemo(() => {
     return seekers.filter((s) => {

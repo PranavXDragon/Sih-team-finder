@@ -13,7 +13,7 @@ export default function App() {
   
   const [screen, setScreenState] = useState(() => {
     const hash = window.location.hash;
-    if (hash === "#board") return "board";
+    if (hash.startsWith("#board")) return "board";
     if (hash === "#admin") return "admin";
     return "landing";
   });
@@ -29,7 +29,7 @@ export default function App() {
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash;
-      if (hash === "#board") setScreenState("board");
+      if (hash.startsWith("#board")) setScreenState("board");
       else if (hash === "#admin") setScreenState("admin");
       else setScreenState("landing");
     };
