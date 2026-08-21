@@ -316,21 +316,55 @@ export function SIHProvider({ children }) {
         throw new Error("You are already in a team. You can only join one team.");
       }
 
-      const { data, error } = await supabase.from('join_requests').insert([{
-        team_id: teamId,
-        user_id: user.id,
-        seeker_id: mySeekerProfile.id,
-        status: 'pending'
-      }]).select();
-      if (error) {
-        if (error.code === '23505') throw new Error("You have already applied for this team.");
-        throw error;
+      // Check if they already applied to THIS team
+      const { data: existingRequest } = await supabase
+        .from('join_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('team_id', teamId)
+        .maybeSingle();
+
+      let finalRequestData = null;
+
+      if (existingRequest) {
+        if (existingRequest.status === 'pending') {
+          throw new Error("You already have a pending request for this team.");
+        }
+        if (existingRequest.status === 'accepted') {
+          throw new Error("You are already in this team.");
+        }
+        // If they were rejected, allow them to re-apply
+        if (existingRequest.status === 'rejected') {
+          const { data, error } = await supabase.from('join_requests')
+            .update({ status: 'pending' })
+            .eq('id', existingRequest.id)
+            .select();
+            
+          if (error) throw error;
+          finalRequestData = data[0];
+          
+          // Remove old application from UI so it can be replaced
+          setMyApplications(prev => prev.filter(app => app.id !== existingRequest.id));
+        }
+      } else {
+        const { data, error } = await supabase.from('join_requests').insert([{
+          team_id: teamId,
+          user_id: user.id,
+          seeker_id: mySeekerProfile.id,
+          status: 'pending'
+        }]).select();
+        
+        if (error) {
+          if (error.code === '23505') throw new Error("You have already applied for this team.");
+          throw error;
+        }
+        finalRequestData = data[0];
       }
       
-      if (data && data[0]) {
+      if (finalRequestData) {
         // Fetch the team data to match the join query shape
         const { data: teamData } = await supabase.from('teams').select('*').eq('id', teamId).single();
-        const newApp = { ...data[0], teams: teamData };
+        const newApp = { ...finalRequestData, teams: teamData };
         setMyApplications(prev => [newApp, ...prev]);
       }
       
