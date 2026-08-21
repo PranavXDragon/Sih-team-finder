@@ -22,13 +22,26 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
     initEmail = parts[1]?.trim() || "";
   }
 
+  let initSkills = initialData?.skills || [];
+  let initCustom = "";
+  if (initialData?.skills) {
+    const custom = initialData.skills.find(s => !SKILLS.includes(s) && s !== "Other (Custom)");
+    if (custom) {
+      initCustom = custom;
+      if (!initSkills.includes("Other (Custom)")) {
+        initSkills = [...initSkills, "Other (Custom)"];
+      }
+    }
+  }
+
   const [form, setForm] = useState({
     name: initialData?.name || (!initialData && user ? user.user_metadata?.full_name : ""),
     program: initialData?.program || "UG",
     branch: initialData?.branch || "Computer Engineering",
     year: initialData?.year || "1st Year",
     gender: initialData?.gender || "na",
-    skills: initialData?.skills || [],
+    skills: initSkills,
+    customSkill: initCustom,
     bio: initialData?.bio || "",
     phone: initPhone,
     email: initEmail,
@@ -56,6 +69,11 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
     if (!validate()) return;
     setSubmitting(true);
     try {
+      let finalSkills = form.skills.filter(s => s !== "Other (Custom)");
+      if (form.skills.includes("Other (Custom)") && form.customSkill.trim()) {
+        finalSkills.push(form.customSkill.trim());
+      }
+
       const payload = {
         name: form.name.trim(),
         college: form.college || college,
@@ -63,7 +81,7 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
         dept: form.branch,
         year: form.year,
         gender: form.gender,
-        skills: form.skills,
+        skills: finalSkills,
         bio: form.bio.trim(),
         whatsapp: form.phone.trim() + " | " + form.email.trim(),
         listed: form.listed,
@@ -185,6 +203,18 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
                 );
               })}
             </div>
+            {form.skills.includes("Other (Custom)") && (
+              <div style={{ marginTop: 12 }}>
+                <input 
+                  type="text" 
+                  placeholder="Type your custom skill (e.g. GraphQL, Next.js)" 
+                  value={form.customSkill}
+                  onChange={(e) => set("customSkill", e.target.value)}
+                  maxLength={25}
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)" }}
+                />
+              </div>
+            )}
             <p className="err">Select at least one skill.</p>
           </div>
 

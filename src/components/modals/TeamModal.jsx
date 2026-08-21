@@ -51,6 +51,18 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     initEmail = parts[1]?.trim() || "";
   }
 
+  let initWantsSkills = initialData?.wantsSkills || [];
+  let initCustomSkill = "";
+  if (initialData?.wantsSkills) {
+    const custom = initialData.wantsSkills.find(s => !SKILLS.includes(s) && s !== "Other (Custom)");
+    if (custom) {
+      initCustomSkill = custom;
+      if (!initWantsSkills.includes("Other (Custom)")) {
+        initWantsSkills = [...initWantsSkills, "Other (Custom)"];
+      }
+    }
+  }
+
   const [form, setForm] = useState({
     teamName: initialData?.teamName || "", 
     college: initialData?.college || college || "Suryodaya College of Engineering and Technology",
@@ -67,7 +79,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     leaderGender: leader.gender || "na", 
     leaderSkills: leader.skills || "",
     members: initialMembers,
-    wantsSkills: initialData?.wantsSkills || [], 
+    wantsSkills: initWantsSkills, 
+    customSkill: initCustomSkill,
     hasMentor: initialData?.hasMentor || false,
     phone: initPhone, 
     email: initEmail || (!initialData && user ? user.email : ""),
@@ -136,6 +149,11 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
         const filledMembers = form.members.filter((m) => m.name.trim());
     const totalMembers = 1 + filledMembers.length; // leader + members
     const seatsOpen = Math.max(0, 6 - totalMembers);
+    let finalWantsSkills = form.wantsSkills.filter(s => s !== "Other (Custom)");
+    if (form.wantsSkills.includes("Other (Custom)") && form.customSkill.trim()) {
+      finalWantsSkills.push(form.customSkill.trim());
+    }
+
     const payload = {
       teamName: (form.teamName || "").trim(),
       college: form.college || college,
@@ -147,7 +165,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       pitch: (form.pitch || "").trim(),
       contact: (form.phone || "").trim() + ' | ' + (form.email || "").trim(),
       needsFemale: true, // simplified
-      wantsSkills: form.wantsSkills,
+      wantsSkills: finalWantsSkills,
       seatsOpen,
       totalSeats: 6,
       members: [
@@ -437,6 +455,18 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                     onClick={() => toggleSkill(s)}>{s}</button>
                 ))}
               </div>
+              {form.wantsSkills.includes("Other (Custom)") && (
+                <div style={{ marginTop: 12 }}>
+                  <input 
+                    type="text" 
+                    placeholder="Type the custom skill you need" 
+                    value={form.customSkill}
+                    onChange={(e) => set("customSkill", e.target.value)}
+                    maxLength={25}
+                    style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)" }}
+                  />
+                </div>
+              )}
               <p className="err">Pick at least one skill you need.</p>
             </div>
             <label className="check">
