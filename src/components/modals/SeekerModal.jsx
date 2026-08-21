@@ -1,10 +1,10 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useSIH } from "../../hooks/useSIH";
-import { SKILLS, PROGRAMS_DATA, YEARS } from "../../data/constants";
+import { SKILLS, DEPARTMENTS, YEARS } from "../../data/constants";
 
 export default function SeekerModal({ initialData, onClose }) {
   const { addSeeker, updateSeeker, college, addToast } = useSIH();
-  
+
   let initPhone = "";
   let initEmail = "";
   if (initialData?.whatsapp) {
@@ -13,27 +13,17 @@ export default function SeekerModal({ initialData, onClose }) {
     initEmail = parts[1]?.trim() || "";
   }
 
-  // To avoid migration, we split the old "dept" if it contains a hyphen, or just use it as branch
-  let initProg = "";
-  let initBranch = initialData?.dept || "";
-  if (initialData?.dept?.includes(" - ")) {
-    const parts = initialData.dept.split(" - ");
-    initProg = parts[0];
-    initBranch = parts[1];
-  }
-
   const [form, setForm] = useState({
     name: initialData?.name || "",
-    program: initProg,
-    branch: initBranch,
-    year: initialData?.year || "",
-    gender: initialData?.gender || "",
+    dept: initialData?.dept || "CSE",
+    year: initialData?.year || "3rd Year",
+    gender: initialData?.gender || "na",
     skills: initialData?.skills || [],
     bio: initialData?.bio || "",
     phone: initPhone,
     email: initEmail,
     listed: initialData?.listed ?? true,
-    college: initialData?.college || college || "Suryodaya College of Engineering and Technology",
+    college: initialData?.college || college || "",
   });
   const [errs, setErrs] = useState({});
 
@@ -51,25 +41,20 @@ export default function SeekerModal({ initialData, onClose }) {
   const validate = () => {
     const e = {};
     if (!form.name.trim()) e.name = true;
-    if (!form.program) e.program = true;
-    if (!form.branch) e.branch = true;
-    if (!form.year) e.year = true;
-    if (!form.gender) e.gender = true;
     if (!form.skills.length) e.skills = true;
     if (!form.bio.trim()) e.bio = true;
     if (!form.phone.trim()) e.phone = true;
-    if (!form.email.trim()) e.email = true;
     setErrs(e);
     return Object.keys(e).length === 0;
   };
 
   const submit = async () => {
     if (!validate()) return;
-    try { 
+    try {
       const payload = {
         name: form.name.trim(),
-        college: form.college,
-        dept: `${form.program} - ${form.branch}`,
+        college: form.college || college,
+        dept: form.dept,
         year: form.year,
         gender: form.gender,
         skills: form.skills,
@@ -86,7 +71,7 @@ export default function SeekerModal({ initialData, onClose }) {
         addToast("You are now listed! Teams can find you.", "ok");
       }
       onClose();
-    } catch (e) {}
+    } catch (e) { }
   };
 
   return (
@@ -97,7 +82,7 @@ export default function SeekerModal({ initialData, onClose }) {
             <h2>{initialData ? "Edit Profile" : "List yourself as a seeker"}</h2>
             <p>Teams with open seats can find and invite you. Your number stays hidden until you accept.</p>
           </div>
-          <button className="x" type="button" onClick={onClose}>x</button>
+          <button className="x" type="button" onClick={onClose}>×</button>
         </div>
         <form className="mbody" onSubmit={(e) => e.preventDefault()} noValidate>
 
@@ -106,46 +91,35 @@ export default function SeekerModal({ initialData, onClose }) {
               <label htmlFor="sName">Your full name<em>*</em></label>
               <input id="sName" maxLength={46}
                 value={form.name} onChange={(e) => set("name", e.target.value)} />
+              <p className="err">Needed.</p>
             </div>
             <div className="fld">
               <label>College</label>
-              <input value={form.college} disabled style={{ opacity: 0.7 }} />
+              <input value={form.college} onChange={(e) => setForm({ ...form, college: e.target.value })} placeholder="e.g. IIT Bombay" />
             </div>
           </div>
 
-          <div className="two">
-            <div className={`fld${errs.program ? " bad" : ""}`}>
-              <label>Program<em>*</em></label>
-              <select value={form.program} onChange={(e) => { set("program", e.target.value); set("branch", ""); }}>
-                <option value="">Select</option>
-                {Object.keys(PROGRAMS_DATA).map(p => <option key={p}>{p}</option>)}
+          <div className="three">
+            <div className="fld">
+              <label>Department<em>*</em></label>
+              <select value={form.dept} onChange={(e) => set("dept", e.target.value)}>
+                {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
               </select>
             </div>
-            <div className={`fld${errs.branch ? " bad" : ""}`}>
-              <label>Branch<em>*</em></label>
-              <select value={form.branch} onChange={(e) => set("branch", e.target.value)} disabled={!form.program}>
-                <option value="">Select</option>
-                {form.program && PROGRAMS_DATA[form.program].map(b => <option key={b}>{b}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div className="two">
-            <div className={`fld${errs.year ? " bad" : ""}`}>
+            <div className="fld">
               <label>Year<em>*</em></label>
               <select value={form.year} onChange={(e) => set("year", e.target.value)}>
-                <option value="">Select</option>
                 {YEARS.map((y) => <option key={y}>{y}</option>)}
               </select>
             </div>
-            <div className={`fld${errs.gender ? " bad" : ""}`}>
-              <label>Gender<em>*</em></label>
+            <div className="fld">
+              <label>Gender</label>
               <select value={form.gender} onChange={(e) => set("gender", e.target.value)}>
-                <option value="">Select</option>
-                <option value="Female">Female</option>
-                <option value="Male">Male</option>
-                <option value="Prefer not to say">Prefer not to say</option>
+                <option value="na">Prefer not to say</option>
+                <option value="f">Female</option>
+                <option value="m">Male</option>
               </select>
+              <p className="hint">For the "1 female member" SIH rule.</p>
             </div>
           </div>
 
@@ -158,6 +132,7 @@ export default function SeekerModal({ initialData, onClose }) {
                   onClick={() => toggleSkill(s)}>{s}</button>
               ))}
             </div>
+            <p className="err">Pick at least one skill.</p>
           </div>
 
           <div className={`fld${errs.bio ? " bad" : ""}`}>
@@ -165,6 +140,7 @@ export default function SeekerModal({ initialData, onClose }) {
             <textarea id="sBio" maxLength={170} rows={3}
               placeholder="e.g. I design my own PCBs and have 3 working ESP32 builds."
               value={form.bio} onChange={(e) => set("bio", e.target.value)} />
+            <p className="err">One line so a team leader can judge you in five seconds.</p>
             <p className="hint">{form.bio.length}/170</p>
           </div>
 
@@ -173,9 +149,10 @@ export default function SeekerModal({ initialData, onClose }) {
               <label htmlFor="sPhone">WhatsApp number<em>*</em></label>
               <input id="sPhone" inputMode="tel" maxLength={18} placeholder="10 digit number"
                 value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+              <p className="err">Enter a valid number.</p>
             </div>
-            <div className={`fld${errs.email ? " bad" : ""}`}>
-              <label htmlFor="sEmail">Email<em>*</em></label>
+            <div className="fld">
+              <label htmlFor="sEmail">Email</label>
               <input id="sEmail" type="email" maxLength={70}
                 value={form.email} onChange={(e) => set("email", e.target.value)} />
             </div>
@@ -191,6 +168,11 @@ export default function SeekerModal({ initialData, onClose }) {
             </div>
           )}
 
+          <div className="note warn">
+            <span>🔒</span>
+            <span>Your number and email are <b>never</b> shown on the board. Shared only when you accept a team.</span>
+          </div>
+
         </form>
         <div className="mfoot">
           <span className="sp" />
@@ -201,3 +183,4 @@ export default function SeekerModal({ initialData, onClose }) {
     </div>
   );
 }
+

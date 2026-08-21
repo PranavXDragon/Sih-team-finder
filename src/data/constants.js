@@ -50,4 +50,18 @@ export const PROGRAMS_DATA = {
 
 export const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
 
+export const DEPARTMENTS = [
+  "CSE",
+  "IT",
+  "ECE",
+  "EEE",
+  "MECH",
+  "CIVIL",
+  "AIML",
+  "AIDS",
+  "MCA",
+  "MBA",
+  "Other"
+];
+
 export const WA_LINK = "https://wa.me/916374166705?text=Hi!%20I%27m%20a%20student%20looking%20for%20help%20with%20my%20project.";

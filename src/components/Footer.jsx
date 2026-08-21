@@ -1,4 +1,4 @@
-﻿import './Footer.css';
+import './Footer.css';
 export default function Footer() {
   return (
     <footer className="foot">
@@ -10,6 +10,9 @@ export default function Footer() {
         Always check team rules on the official SIH portal.
         Your phone number and email stay hidden until you accept a request.
       </p>
+      <div className="dev-credit">
+        Designed & Developed by <span className="dev-name">Pranav Navgahre</span>, <span className="dev-name">Piyush Chafle</span> and <span className="dev-name">Kunal Panche</span>
+      </div>
     </footer>
   );
 }

@@ -9,14 +9,42 @@
   border: 2px solid var(--border);
   background: var(--surface);
 }
-.boardbar .sp { flex: 1; min-width: 10px; }
-.boardbar .bb-txt b { display: block; font-family: "Archivo Black"; font-size: 14.5px; }
-.boardbar .bb-txt span { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+
+.boardbar .sp {
+  flex: 1;
+  min-width: 10px;
+}
+
+.boardbar .bb-txt b {
+  display: block;
+  font-family: "Archivo Black";
+  font-size: 14.5px;
+}
+
+.boardbar .bb-txt span {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
 
 /* Filters */
-.filters { display: grid; gap: 10px; grid-template-columns: 1.6fr 1fr 1fr; align-items: end; margin-bottom: 14px; }
-.f label { display: block; margin-bottom: 5px; }
-.f input, .f select {
+.filters {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  align-items: end;
+  margin-bottom: 14px;
+}
+
+.f label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.f input,
+.f select {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
@@ -26,8 +54,15 @@
   outline: none;
   transition: border-color 0.16s;
 }
-.f input:focus, .f select:focus { border-color: var(--accent-2); }
-.f select option { background: var(--surface-2); }
+
+.f input:focus,
+.f select:focus {
+  border-color: var(--accent-2);
+}
+
+.f select option {
+  background: var(--surface-2);
+}
 
 /* Empty / skeleton states */
 .empty {
@@ -38,8 +73,20 @@
   border-radius: var(--r);
   color: var(--dim);
 }
-.empty h3 { margin-bottom: 8px; font-size: 19px; color: var(--text); }
-.skel { grid-column: 1 / -1; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+
+.empty h3 {
+  margin-bottom: 8px;
+  font-size: 19px;
+  color: var(--text);
+}
+
+.skel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
 .skel div {
   height: 206px;
   border-radius: var(--r);
@@ -48,5 +95,9 @@
   background-size: 200% 100%;
   animation: sweep 1.5s linear infinite;
 }
-@keyframes sweep { to { background-position: -200% 0; } }
 
+@keyframes sweep {
+  to {
+    background-position: -200% 0;
+  }
+}

@@ -185,6 +185,10 @@ img, svg { display: block; max-width: 100%; }
 }
 .kicker-group {
   margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
 }
 .kicker {
   display: inline-flex;
@@ -444,7 +448,7 @@ img, svg { display: block; max-width: 100%; }
   }
   .hero-text-side { order: 2; }
   .hero-img-side { order: 1; margin-bottom: 20px; }
-  .top { backdrop-filter: none; background: #0c0705; gap: 8px; padding: 9px 12px; }
+  .top { gap: 8px; padding: 9px 12px; }
   .tag { display: none; }
   .filters { grid-template-columns: 1fr; }
   .two, .three { grid-template-columns: 1fr; }

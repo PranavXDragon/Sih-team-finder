@@ -22,12 +22,12 @@ export default function RequestsModal({ onClose }) {
                 <div key={req.id} style={{ border: "1px solid var(--border)", padding: 16, borderRadius: 8, background: "var(--card)" }}>
                   <h4 style={{ margin: "0 0 8px 0" }}>{req.seekers.name}</h4>
                   <div style={{ display: "flex", gap: 8, fontSize: "0.85rem", color: "var(--mut)", marginBottom: 12 }}>
-                    <span>{req.seekers.dept}</span> &bull; 
-                    <span>{req.seekers.year}</span> &bull; 
+                    <span>{req.seekers.dept}</span> &bull;
+                    <span>{req.seekers.year}</span> &bull;
                     <span>{req.seekers.gender === 'm' ? 'Male' : req.seekers.gender === 'f' ? 'Female' : 'Any'}</span>
                   </div>
                   <p style={{ margin: "0 0 12px 0", fontSize: "0.9rem" }}>{req.seekers.bio}</p>
-                  
+
                   {req.seekers.skills?.length > 0 && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 16 }}>
                       {req.seekers.skills.map(s => (

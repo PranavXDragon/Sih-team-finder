@@ -9,7 +9,7 @@ export default function Navbar() {
     <>
       <header className="top nav-top">
         <div className="nav-logos">
-          <img src="/SIH-Logo.png" alt="SIH Logo" style={{ height: "40px" }} />
+          <img src="/SIH-Logo.png" alt="SIH Logo" className="sih-logo-img" style={{ height: "40px" }} />
           <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
           
           <img src="/Ministry.png" alt="Ministry of Education" style={{ height: "40px" }} />

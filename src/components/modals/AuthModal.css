@@ -390,3 +390,14 @@
   border-radius: 8px;
   text-align: left;
 }
+
+@media (max-width: 480px) {
+  .auth-flo-card {
+    padding: 1.25rem 1rem;
+    border-radius: 0.75rem;
+  }
+  .auth-flo-title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}
