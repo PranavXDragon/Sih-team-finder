@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './Cards.css';
 import { useSIH } from "../hooks/useSIH";
 
@@ -12,6 +13,7 @@ function timeAgo(ts) {
 }
 
 export default function TeamCard({ team, onEdit }) {
+  const [isJoining, setIsJoining] = useState(false);
   const { user, myTeam, mySeekerProfile, myAcceptedRequests, myApplications, requestToJoin, addToast } = useSIH();
   const actualSeatsOpen = Math.max(0, (team.totalSeats || 6) - (team.members?.length || 1));
   const filled = (team.totalSeats || 6) - actualSeatsOpen;
@@ -22,6 +24,8 @@ export default function TeamCard({ team, onEdit }) {
   const hasApplied = myApplications?.some(app => app.team_id === team.id && app.status === 'pending');
 
   const handleJoin = async () => {
+    if (isJoining) return;
+    
     if (!user) {
       localStorage.setItem('sih_intent', 'list-seeker');
       localStorage.setItem('sih_join_team_id', team.id);
@@ -33,7 +37,13 @@ export default function TeamCard({ team, onEdit }) {
       addToast("You lead a team! You cannot join another.", "err");
       return;
     }
-    await requestToJoin(team.id);
+    
+    setIsJoining(true);
+    try {
+      await requestToJoin(team.id);
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   const handleShare = () => {
@@ -106,8 +116,8 @@ export default function TeamCard({ team, onEdit }) {
             Applied
           </button>
         ) : !isFull ? (
-          <button className="btn sm pri" type="button" onClick={handleJoin}>
-            Request to join
+          <button className="btn sm pri" type="button" onClick={handleJoin} disabled={isJoining}>
+            {isJoining ? "Sending..." : "Request to join"}
           </button>
         ) : null}
       </div>
