@@ -175,12 +175,12 @@ const FloatingParticles = () => {
   );
 };
 
-export default function AuthModal({ onClose, onSuccess }) {
+export default function AuthModal({ onClose, onSuccess, defaultIsSignUp }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState(""); // Optionally track name from the new design
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(defaultIsSignUp || false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
