@@ -7,6 +7,7 @@ import AdminScreen from "./pages/AdminScreen";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AuthModal from "./components/modals/AuthModal";
+import OnboardingModal from "./components/modals/OnboardingModal";
 
 export default function App() {
   const { toasts, session, isAuthLoading } = useSIH();
@@ -19,9 +20,14 @@ export default function App() {
   });
   const [boardAction, setBoardAction] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [authDefaultSignUp, setAuthDefaultSignUp] = useState(false);
   
   useEffect(() => {
-    const handleAuthEvent = (e) => setShowAuth(true);
+    const handleAuthEvent = (e) => {
+      setAuthDefaultSignUp(e.detail === 'signup');
+      setShowAuth(true);
+    };
     document.addEventListener("triggerAuth", handleAuthEvent);
     return () => document.removeEventListener("triggerAuth", handleAuthEvent);
   }, []);
@@ -76,10 +82,23 @@ export default function App() {
           onSuccess={(isSignUp) => {
             setShowAuth(false);
             if (isSignUp) {
-              setBoardAction("post-team");
-              setScreen("board");
+              setShowOnboarding(true);
             }
           }} 
+        />
+      )}
+      
+      {showOnboarding && (
+        <OnboardingModal
+          onSelect={(act) => {
+            setShowOnboarding(false);
+            setBoardAction(act);
+            setScreen("board");
+          }}
+          onClose={() => {
+            setShowOnboarding(false);
+            setScreen("board");
+          }}
         />
       )}
       
