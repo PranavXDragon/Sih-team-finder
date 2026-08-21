@@ -55,7 +55,7 @@ export default function RequestsModal({ onClose }) {
                           setRejectingId(null);
                           setRejectionReason("");
                         }}>Cancel</button>
-                        <button className="btn sm" style={{ flex: 1, background: "var(--err)", color: "#fff", border: "none" }} type="button" onClick={() => {
+                        <button className="btn sm" style={{ flex: 1, background: "var(--stop)", color: "#fff", border: "none" }} type="button" onClick={() => {
                           rejectRequest(req.id, rejectionReason);
                           setRejectingId(null);
                           setRejectionReason("");
