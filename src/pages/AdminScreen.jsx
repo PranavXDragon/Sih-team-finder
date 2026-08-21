@@ -16,6 +16,7 @@ export default function AdminScreen() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
   const [viewingTeam, setViewingTeam] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -116,16 +117,12 @@ export default function AdminScreen() {
     return flags;
   };
 
-  const handleDeleteTeam = (id) => {
-    if (window.confirm("Are you sure you want to delete this team? This action is irreversible.")) {
-      deleteTeam(id);
-    }
+  const handleDeleteTeam = (t) => {
+    setConfirmDelete({ type: 'team', id: t.id, name: t.teamName });
   };
 
-  const handleDeleteSeeker = (id) => {
-    if (window.confirm("Are you sure you want to delete this seeker profile?")) {
-      deleteSeeker(id);
-    }
+  const handleDeleteSeeker = (s) => {
+    setConfirmDelete({ type: 'seeker', id: s.id, name: s.name });
   };
 
   return (
@@ -225,7 +222,7 @@ export default function AdminScreen() {
                 <td style={{ display: 'flex', gap: '8px' }}>
                   <button className="btn sm" onClick={() => setViewingTeam(t)}>View</button>
                   <button className="btn sm sec" onClick={() => setEditingTeam(t)}>Edit</button>
-                  <button className="btn sm danger" onClick={() => handleDeleteTeam(t.id)}>Delete</button>
+                  <button className="btn sm danger" onClick={() => handleDeleteTeam(t)}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -256,7 +253,7 @@ export default function AdminScreen() {
                 <td>{s.year}</td>
                 <td>{s.gender === 'f' ? 'Female' : s.gender === 'm' ? 'Male' : 'N/A'}</td>
                 <td>
-                  <button className="btn sm danger" onClick={() => handleDeleteSeeker(s.id)}>Delete</button>
+                  <button className="btn sm danger" onClick={() => handleDeleteSeeker(s)}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -277,6 +274,39 @@ export default function AdminScreen() {
           team={viewingTeam} 
           onClose={() => setViewingTeam(null)} 
         />
+      )}
+
+      {confirmDelete && (
+        <div className="veil open" onClick={(e) => e.target === e.currentTarget && setConfirmDelete(null)}>
+          <div className="modal" style={{ width: "100%", maxWidth: 400 }}>
+            <div className="mhead">
+              <div>
+                <h2 style={{ margin: 0 }}>Confirm Deletion</h2>
+              </div>
+              <button className="x" onClick={() => setConfirmDelete(null)}>×</button>
+            </div>
+            <div className="mbody" style={{ padding: 24 }}>
+              <p style={{ margin: "0 0 12px 0" }}>
+                Are you sure you want to delete the {confirmDelete.type} <strong>{confirmDelete.name}</strong>?
+              </p>
+              <p style={{ color: "var(--stop)", fontSize: "0.85rem", margin: 0 }}>
+                This action is irreversible.
+              </p>
+              
+              <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+                <button className="btn" style={{ flex: 1, background: "transparent", border: "1px solid var(--border)", color: "var(--text)" }} onClick={() => setConfirmDelete(null)}>Cancel</button>
+                <button className="btn danger" style={{ flex: 1, background: 'var(--stop)', color: '#fff', border: 'none' }} onClick={() => {
+                  if (confirmDelete.type === 'team') {
+                    deleteTeam(confirmDelete.id);
+                  } else {
+                    deleteSeeker(confirmDelete.id);
+                  }
+                  setConfirmDelete(null);
+                }}>Delete Forever</button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
