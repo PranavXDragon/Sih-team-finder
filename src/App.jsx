@@ -25,22 +25,31 @@ export default function App() {
   
   useEffect(() => {
     if (session?.user && !isLoading) {
+      const intent = localStorage.getItem('sih_intent');
+      
+      // Always process intent if present, regardless of whether they are a new user
+      if (intent) {
+        localStorage.removeItem('sih_intent');
+        if (intent === "post-team") {
+          setScreen("board");
+          setBoardAction("post-team");
+        } else if (intent === "list-seeker") {
+          setScreen("board");
+          setBoardAction("list-seeker");
+        }
+      }
+
       const key = `sih_onboarding_${session.user.id}`;
       if (!localStorage.getItem(key)) {
-        const intent = localStorage.getItem('sih_intent');
-        localStorage.removeItem('sih_intent');
-        
         if (myTeam || mySeekerProfile) {
           localStorage.setItem(key, "true");
-        } else if (intent === "list-seeker") {
-          localStorage.setItem(key, "true");
-          setScreenState("board");
-          setBoardAction("list-seeker");
-        } else {
+        } else if (!intent) {
           // Default to post-team if no intent was found (e.g. they just clicked sign up)
           localStorage.setItem(key, "true");
-          setScreenState("board");
+          setScreen("board");
           setBoardAction("post-team");
+        } else {
+          localStorage.setItem(key, "true");
         }
       }
     }
