@@ -13,7 +13,7 @@ export default function Navbar() {
             <img src="/Society.png" alt="Society Logo" />
           </a>
           <img src="/Academic.png" alt="Academic Logo" />
-          <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 4px" }} />
+          <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
           <img src="/SIH2026-logo.png" alt="SIH 2026 Logo" className="sih-logo-img" />
         </div>
 
