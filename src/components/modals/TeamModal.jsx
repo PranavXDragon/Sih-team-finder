@@ -28,7 +28,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
 
   const [form, setForm] = useState({
     teamName: initialData?.teamName || "", 
-    college: initialData?.college || college || "",
+    college: initialData?.college || college || "Suryodaya College of Engineering and Technology",
     track: initialData?.track || "", 
     theme: initialData?.theme || "",
     hasIdea: initialData?.hasIdea || false, 
@@ -153,7 +153,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
               </div>
               <div className="fld">
                 <label>College</label>
-                <input value={form.college} onChange={(e) => setForm({...form, college: e.target.value})} placeholder="e.g. IIT Bombay" />
+                <input value={form.college} disabled style={{ opacity: 0.7 }} />
               </div>
             </div>
             <div className={`fld${errs.track ? " bad" : ""}`}>

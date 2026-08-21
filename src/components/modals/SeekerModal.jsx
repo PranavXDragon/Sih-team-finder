@@ -23,7 +23,7 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
     phone: initPhone,
     email: initEmail,
     listed: initialData?.listed ?? true,
-    college: initialData?.college || college || "",
+    college: initialData?.college || college || "Suryodaya College of Engineering and Technology",
   });
   const [errs, setErrs] = useState({});
 
@@ -96,7 +96,7 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
             </div>
             <div className="fld">
               <label>College</label>
-              <input value={form.college} onChange={(e) => setForm({ ...form, college: e.target.value })} placeholder="e.g. IIT Bombay" />
+              <input value={form.college} disabled style={{ opacity: 0.7 }} />
             </div>
           </div>
 
