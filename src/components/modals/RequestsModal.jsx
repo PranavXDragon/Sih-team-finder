@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useSIH } from "../../hooks/useSIH";
 
 export default function RequestsModal({ onClose }) {
   const { myRequests, acceptRequest, rejectRequest, addToast } = useSIH();
+  const [rejectingId, setRejectingId] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   return createPortal(
     <div className="veil open" onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -37,15 +40,37 @@ export default function RequestsModal({ onClose }) {
                     </div>
                   )}
 
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button className="btn sm pri" style={{ flex: 1 }} type="button" onClick={() => acceptRequest(req.id, req.seekers)}>Accept</button>
-                    <button className="btn sm" style={{ flex: 1, background: "transparent", border: "1px solid var(--border)", color: "var(--text)" }} type="button" onClick={() => {
-                      const reason = window.prompt("Why are you rejecting this request? (This will be sent in the email)");
-                      if (reason !== null) {
-                        rejectRequest(req.id, reason);
-                      }
-                    }}>Reject</button>
-                  </div>
+                  {rejectingId === req.id ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      <input 
+                        type="text" 
+                        placeholder="Why are you rejecting? (Sent in email)" 
+                        className="inp" 
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        autoFocus
+                      />
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button className="btn sm" style={{ flex: 1, background: "transparent", border: "1px solid var(--border)", color: "var(--text)" }} type="button" onClick={() => {
+                          setRejectingId(null);
+                          setRejectionReason("");
+                        }}>Cancel</button>
+                        <button className="btn sm" style={{ flex: 1, background: "var(--err)", color: "#fff", border: "none" }} type="button" onClick={() => {
+                          rejectRequest(req.id, rejectionReason);
+                          setRejectingId(null);
+                          setRejectionReason("");
+                        }}>Confirm Reject</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button className="btn sm pri" style={{ flex: 1 }} type="button" onClick={() => acceptRequest(req.id, req.seekers)}>Accept</button>
+                      <button className="btn sm" style={{ flex: 1, background: "transparent", border: "1px solid var(--border)", color: "var(--text)" }} type="button" onClick={() => {
+                        setRejectingId(req.id);
+                        setRejectionReason("");
+                      }}>Reject</button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
