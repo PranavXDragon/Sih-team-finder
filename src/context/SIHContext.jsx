@@ -328,7 +328,7 @@ export function SIHProvider({ children }) {
               to: leaderEmail,
               type: 'JOIN_REQUEST',
               payload: {
-                team_leader_name: targetTeam.contact?.split('|')[0]?.trim() || 'Team Leader',
+                team_leader_name: targetTeam.members?.[0]?.name || 'Team Leader',
                 requester_name: mySeekerProfile.name,
                 branch: mySeekerProfile.dept || 'N/A',
                 year: mySeekerProfile.year || 'N/A',
@@ -402,7 +402,7 @@ export function SIHProvider({ children }) {
             payload: {
               student_name: seekerProfile.name,
               team_name: myTeam.teamName || 'the team',
-              team_leader: myTeam.contact?.split('|')[0]?.trim() || 'Team Leader',
+              team_leader: myTeam.members?.[0]?.name || 'Team Leader',
               member_count: myTeam.members.length + 1
             }
           }
@@ -432,7 +432,7 @@ export function SIHProvider({ children }) {
               payload: {
                 student_name: req.seekers.name,
                 team_name: myTeam?.teamName || 'the team',
-                team_leader: myTeam?.contact?.split('|')[0]?.trim() || 'Team Leader',
+                team_leader: myTeam?.members?.[0]?.name || 'Team Leader',
                 removal_reason: reason || 'Team requirements were updated.'
               }
             }
