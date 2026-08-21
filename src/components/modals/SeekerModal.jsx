@@ -10,7 +10,7 @@ const GENDER_OPTIONS = [
   { value: "m", label: "Male" }
 ];
 
-export default function SeekerModal({ initialData, onClose, onSuccess }) {
+export default function SeekerModal({ initialData, onClose, onSuccess, showApplicationsOnly }) {
   const { addSeeker, updateSeeker, college, addToast, user, myApplications } = useSIH();
   const [submitting, setSubmitting] = useState(false);
 
@@ -117,12 +117,13 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
       <div className="modal" style={{ maxWidth: 580 }}>
         <div className="mhead">
           <div>
-            <h2>{initialData ? "Edit Profile" : "List yourself as a seeker"}</h2>
-            <p>Teams with open seats can find and invite you. Your number stays hidden until you accept.</p>
+            <h2>{showApplicationsOnly ? "My Applications" : (initialData ? "Edit Profile" : "List yourself as a seeker")}</h2>
+            {!showApplicationsOnly && <p>Teams with open seats can find and invite you. Your number stays hidden until you accept.</p>}
           </div>
           <button className="x" type="button" onClick={onClose}>×</button>
         </div>
-        <form className="mbody" onSubmit={(e) => e.preventDefault()} noValidate>
+        {!showApplicationsOnly && (
+          <form className="mbody" onSubmit={(e) => e.preventDefault()} noValidate>
 
           <div className="two">
             <div className={`fld${errs.name ? " bad" : ""}`}>
@@ -257,18 +258,27 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
           )}
 
         </form>
+        )}
         
-        {initialData && myApplications && myApplications.length > 0 && (
-          <div className="mbody" style={{ marginTop: -16, borderTop: "1px solid var(--border)", paddingTop: 20 }}>
+        {((initialData && myApplications && myApplications.length > 0) || showApplicationsOnly) && (
+          <div className="mbody" style={{ marginTop: showApplicationsOnly ? 0 : -16, borderTop: showApplicationsOnly ? "none" : "1px solid var(--border)", paddingTop: showApplicationsOnly ? 0 : 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <h3 style={{ margin: 0 }}>Teams You Applied To</h3>
-              <div style={{ display: "flex", gap: 8, fontSize: 12, flexWrap: "wrap" }}>
-                <span style={{ padding: "4px 8px", background: "var(--surface)", borderRadius: 12, color: "var(--text)", border: "1px solid var(--border)" }}>Total: {myApplications.length}</span>
-                <span style={{ padding: "4px 8px", background: "#c8f24d20", borderRadius: 12, color: "#c8f24d", border: "1px solid #c8f24d40" }}>Accepted: {myApplications.filter(a => a.status === 'accepted').length}</span>
-                <span style={{ padding: "4px 8px", background: "#ff4d4d20", borderRadius: 12, color: "#ff4d4d", border: "1px solid #ff4d4d40" }}>Rejected: {myApplications.filter(a => a.status === 'rejected').length}</span>
-              </div>
+              {myApplications && myApplications.length > 0 && (
+                <div style={{ display: "flex", gap: 8, fontSize: 12, flexWrap: "wrap" }}>
+                  <span style={{ padding: "4px 8px", background: "var(--surface)", borderRadius: 12, color: "var(--text)", border: "1px solid var(--border)" }}>Total: {myApplications.length}</span>
+                  <span style={{ padding: "4px 8px", background: "#c8f24d20", borderRadius: 12, color: "#c8f24d", border: "1px solid #c8f24d40" }}>Accepted: {myApplications.filter(a => a.status === 'accepted').length}</span>
+                  <span style={{ padding: "4px 8px", background: "#ff4d4d20", borderRadius: 12, color: "#ff4d4d", border: "1px solid #ff4d4d40" }}>Rejected: {myApplications.filter(a => a.status === 'rejected').length}</span>
+                </div>
+              )}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 12 }}>
+            
+            {(!myApplications || myApplications.length === 0) ? (
+              <div style={{ padding: "32px 16px", textAlign: "center", color: "var(--text-dim)", background: "var(--surface-hover)", borderRadius: 8, marginTop: 12 }}>
+                You haven't applied to any teams yet.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 12 }}>
               {myApplications.map(app => (
                 <div key={app.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "var(--surface-hover)", borderRadius: 8, border: "1px solid var(--border)" }}>
                   <div>
@@ -289,15 +299,22 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
                 </div>
               ))}
             </div>
+            )}
           </div>
         )}
 
         <div className="mfoot">
           <span className="sp" />
-          <button className="btn gho" type="button" onClick={onClose} disabled={submitting}>Cancel</button>
-          <button className="btn pri" type="button" onClick={submit} disabled={submitting}>
-            {submitting ? "Saving..." : (initialData ? "Save Changes" : "Save and list me")}
-          </button>
+          {showApplicationsOnly ? (
+            <button className="btn pri" type="button" onClick={onClose}>Close</button>
+          ) : (
+            <>
+              <button className="btn gho" type="button" onClick={onClose} disabled={submitting}>Cancel</button>
+              <button className="btn pri" type="button" onClick={submit} disabled={submitting}>
+                {submitting ? "Saving..." : (initialData ? "Save Changes" : "Save and list me")}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>,

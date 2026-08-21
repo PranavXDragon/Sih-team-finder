@@ -78,7 +78,7 @@ export default function ProfileDropdown() {
             {mySeekerProfile && (
               <>
                 <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')}>Edit Seeker Profile</button>
-                <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <button type="button" className="cs-opt" onClick={() => handleOpenModal('apps')} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   My Applications
                   {myApplications?.length > 0 && <span style={{ background: "var(--accent)", color: "#fff", fontSize: 10, padding: "2px 6px", borderRadius: 100, fontWeight: 700 }}>{myApplications.length}</span>}
                 </button>
@@ -102,6 +102,7 @@ export default function ProfileDropdown() {
 
       {activeModal === 'team' && <TeamModal initialData={myTeam} onClose={() => setActiveModal(null)} />}
       {activeModal === 'seeker' && <SeekerModal initialData={mySeekerProfile} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'apps' && <SeekerModal initialData={mySeekerProfile} onClose={() => setActiveModal(null)} showApplicationsOnly={true} />}
       {activeModal === 'reqs' && <RequestsModal onClose={() => setActiveModal(null)} />}
     </div>
   );
