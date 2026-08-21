@@ -4,6 +4,7 @@ import { supabase } from "../../lib/supabase";
 export default function AuthModal({ onClose, onSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -29,7 +30,14 @@ export default function AuthModal({ onClose, onSuccess }) {
     setErrorMsg("");
     setLoading(true);
     try {
+      if (password.length < 6) {
+        throw new Error("Password must be at least 6 characters long.");
+      }
+      
       if (isSignUp) {
+        if (password !== confirmPassword) {
+          throw new Error("Passwords do not match.");
+        }
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
         onSuccess(true);
@@ -122,6 +130,22 @@ export default function AuthModal({ onClose, onSuccess }) {
               />
             </div>
 
+            {isSignUp && (
+              <div className="fld" style={{ marginTop: 16 }}>
+                <label style={{ fontSize: "13px", fontWeight: 600, color: "var(--dim)", marginBottom: 6, display: "block" }}>Confirm Password</label>
+                <input 
+                  type="password" 
+                  value={confirmPassword} 
+                  onChange={e => setConfirmPassword(e.target.value)} 
+                  required 
+                  minLength={6} 
+                  disabled={loading} 
+                  style={{ padding: "14px 16px", borderRadius: "12px", background: "var(--surface)", border: "1px solid var(--border)", fontSize: "16px", width: "100%", color: "var(--text)" }}
+                  placeholder="••••••••"
+                />
+              </div>
+            )}
+
             {errorMsg && (
               <div style={{ marginTop: 16, color: "var(--stop)", fontSize: "0.9rem", padding: "12px", background: "var(--stop-dim)", borderRadius: "10px", border: "1px solid rgba(255, 69, 107, 0.2)" }}>
                 {errorMsg}
@@ -138,7 +162,7 @@ export default function AuthModal({ onClose, onSuccess }) {
             <button 
               type="button" 
               style={{ background: "none", border: "none", color: "var(--accent)", cursor: "pointer", marginLeft: 8, fontWeight: 700, fontSize: "0.95rem" }}
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(""); setConfirmPassword(""); }}
               disabled={loading}
             >
               {isSignUp ? "Sign In" : "Sign Up"}
