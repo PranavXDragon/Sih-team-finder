@@ -303,8 +303,15 @@ export function SIHProvider({ children }) {
       }
 
       // Update team seats and members
+      const parts = (seekerProfile.whatsapp || "").split("|");
+      const phone = parts[0]?.trim() || "";
+      const email = parts[1]?.trim() || "";
+
       const newMembers = [...(myTeam.members || []), { 
         name: seekerProfile.name, 
+        email: email,
+        phone: phone,
+        program: seekerProfile.program || "UG",
         dept: seekerProfile.dept, 
         year: seekerProfile.year, 
         gender: seekerProfile.gender, 
