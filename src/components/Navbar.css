@@ -49,7 +49,7 @@
 .profile-btn { margin-right: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--text); }
 
 @media (max-width: 600px) {
-  .nav-logos img:not(.sih-logo-img) { display: none; }
+  .nav-logos img.sih-logo-img { display: none; }
   .nav-logos div { display: none; } /* Hide the separator */
   .brand-sih-row { gap: 6px; }
   .brand { font-size: 13px; gap: 5px; }
