@@ -21,6 +21,7 @@ export default function TeamCard({ team, onEdit }) {
 
   const handleJoin = async () => {
     if (!user) {
+      window.location.hash = ""; // Redirect to landing page
       document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signup' }));
       return;
     }

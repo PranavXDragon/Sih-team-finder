@@ -145,8 +145,12 @@ export default function BoardScreen({ initialAction, onBack }) {
           <div style={{ display: "flex", gap: 12 }}>
             {!myTeam && (
               <button className="btn sm pri" type="button" onClick={() => {
-                if (!user) document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signup' }));
-                else setShowTeamModal(true);
+                if (!user) {
+                  window.location.hash = "";
+                  document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signup' }));
+                } else {
+                  setShowTeamModal(true);
+                }
               }}>+ Post a team</button>
             )}
           </div>
