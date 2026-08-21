@@ -1,9 +1,65 @@
 import './AdminScreen.css';
+import { useState } from 'react';
 import { useSIH } from "../hooks/useSIH";
+import { supabase } from "../lib/supabase";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 export default function AdminScreen() {
   const { teams, seekers, stats, deleteTeam, deleteSeeker, user } = useSIH();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const handleAdminLogin = async (e) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    setLoginError("");
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } catch (err) {
+      setLoginError(err.message);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  if (user?.email !== "admin@sih2026.com") {
+    return (
+      <div className="admin-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <div style={{ background: 'var(--surface)', padding: 32, borderRadius: 16, border: '1px solid var(--border)', maxWidth: 400, width: '100%' }}>
+          <h2 style={{ textAlign: 'center', marginBottom: 24 }}>SPOC Login</h2>
+          <form onSubmit={handleAdminLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="fld">
+              <label>SPOC ID (Email)</label>
+              <input 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                placeholder="admin@sih2026.com" 
+                required 
+              />
+            </div>
+            <div className="fld">
+              <label>Password</label>
+              <input 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                placeholder="••••••••" 
+                required 
+              />
+            </div>
+            {loginError && <p className="err" style={{ display: 'block' }}>{loginError}</p>}
+            <button type="submit" className="btn pri" disabled={isLoggingIn} style={{ marginTop: 8 }}>
+              {isLoggingIn ? 'Verifying...' : 'Login to Dashboard'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   // Prepare data for Charts
   const tracksMap = { "Software": 0, "Hardware": 0 };
@@ -74,14 +130,8 @@ export default function AdminScreen() {
   return (
     <div className="admin-container">
       <div className="admin-head">
-        <h1>SIH 2026 Admin Portal</h1>
+        <h1>SIH 2026 SPOC Portal</h1>
         <p style={{ color: 'var(--dim)' }}>Live analytics and data tables.</p>
-        
-        {user?.email !== "admin@sih2026.com" && (
-          <div style={{ background: 'var(--stop-dim)', color: 'var(--stop)', padding: 12, borderRadius: 8, marginTop: 16, border: '1px solid rgba(255, 84, 112, 0.4)' }}>
-            <b>Warning:</b> You are not logged in as admin@sih2026.com. Edit/Delete actions may fail due to Database Row Level Security rules.
-          </div>
-        )}
       </div>
 
       <div className="admin-stats">

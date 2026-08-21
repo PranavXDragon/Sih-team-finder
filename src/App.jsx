@@ -17,7 +17,7 @@ export default function App() {
   const [screen, setScreenState] = useState(() => {
     const hash = window.location.hash;
     if (hash.startsWith("#board")) return "board";
-    if (hash === "#admin") return "admin";
+    if (hash === "#spoc") return "admin";
     return "landing";
   });
   const [boardAction, setBoardAction] = useState(null);
@@ -77,7 +77,7 @@ export default function App() {
     const handleHash = () => {
       const hash = window.location.hash;
       if (hash.startsWith("#board")) setScreenState("board");
-      else if (hash === "#admin") setScreenState("admin");
+      else if (hash === "#spoc") setScreenState("admin");
       else setScreenState("landing");
     };
     window.addEventListener("hashchange", handleHash);
