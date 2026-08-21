@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useSIH } from "../hooks/useSIH";
 import { supabase } from "../lib/supabase";
 import { Eye, EyeOff } from "lucide-react";
+import AdminEditTeamModal from "../components/modals/AdminEditTeamModal";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 export default function AdminScreen() {
@@ -12,6 +13,7 @@ export default function AdminScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [editingTeam, setEditingTeam] = useState(null);
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -221,7 +223,8 @@ export default function AdminScreen() {
                 <td>{t.theme}</td>
                 <td>{t.track}</td>
                 <td>{t.seatsOpen}/{t.totalSeats}</td>
-                <td>
+                <td style={{ display: 'flex', gap: '8px' }}>
+                  <button className="btn sm sec" onClick={() => setEditingTeam(t)}>Edit</button>
                   <button className="btn sm danger" onClick={() => handleDeleteTeam(t.id)}>Delete</button>
                 </td>
               </tr>
@@ -262,6 +265,13 @@ export default function AdminScreen() {
           </tbody>
         </table>
       </div>
+
+      {editingTeam && (
+        <AdminEditTeamModal 
+          team={editingTeam} 
+          onClose={() => setEditingTeam(null)} 
+        />
+      )}
     </div>
   );
 }
