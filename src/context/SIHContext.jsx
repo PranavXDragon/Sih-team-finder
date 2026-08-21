@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 
 export const SIHContext = createContext(null);
@@ -115,6 +115,16 @@ export function SIHProvider({ children }) {
       if (data) {
         setTeams((prev) => [data[0], ...prev]);
         setMyTeam(data[0]);
+        
+        // Sync to Google Sheets if configured
+        if (import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK) {
+          fetch(import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'team', data: data[0] })
+          }).catch(console.error);
+        }
       }
       return data[0];
     } catch (err) {
@@ -159,6 +169,16 @@ export function SIHProvider({ children }) {
       if (data) {
         setSeekers((prev) => [data[0], ...prev]);
         setMySeekerProfile(data[0]);
+        
+        // Sync to Google Sheets if configured
+        if (import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK) {
+          fetch(import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'seeker', data: data[0] })
+          }).catch(console.error);
+        }
       }
     } catch (err) {
       console.error(err);
