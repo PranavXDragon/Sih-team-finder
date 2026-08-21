@@ -2,12 +2,14 @@ import './AdminScreen.css';
 import { useState } from 'react';
 import { useSIH } from "../hooks/useSIH";
 import { supabase } from "../lib/supabase";
+import { Eye, EyeOff } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 export default function AdminScreen() {
   const { teams, seekers, stats, deleteTeam, deleteSeeker, user } = useSIH();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -43,13 +45,26 @@ export default function AdminScreen() {
             </div>
             <div className="fld">
               <label>Password</label>
-              <input 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                placeholder="••••••••" 
-                required 
-              />
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  placeholder="••••••••" 
+                  required 
+                  style={{ width: '100%', paddingRight: '40px' }}
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ 
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', 
+                    background: 'transparent', border: 'none', color: 'var(--dim)', cursor: 'pointer', padding: 0
+                  }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             {loginError && <p className="err" style={{ display: 'block' }}>{loginError}</p>}
             <button type="submit" className="btn pri" disabled={isLoggingIn} style={{ marginTop: 8 }}>
