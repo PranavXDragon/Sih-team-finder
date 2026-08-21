@@ -12,7 +12,7 @@ import TeamModal from "./components/modals/TeamModal";
 import SeekerModal from "./components/modals/SeekerModal";
 
 export default function App() {
-  const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile } = useSIH();
+  const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile, addToast } = useSIH();
   
   const [screen, setScreenState] = useState(() => {
     const hash = window.location.hash;
@@ -35,9 +35,17 @@ export default function App() {
       if (intent) {
         localStorage.removeItem('sih_intent');
         if (intent === "post-team") {
-          setGlobalPostTeam(true);
+          if (myTeam) {
+            addToast("You already have a registered team!", "err");
+          } else {
+            setGlobalPostTeam(true);
+          }
         } else if (intent === "list-seeker") {
-          setGlobalListSeeker(true);
+          if (mySeekerProfile) {
+            addToast("You already have a listed profile!", "err");
+          } else {
+            setGlobalListSeeker(true);
+          }
         }
       }
 

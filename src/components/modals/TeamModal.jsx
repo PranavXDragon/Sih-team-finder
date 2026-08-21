@@ -20,6 +20,7 @@ const MEMBER_GENDER_OPTIONS = [
 
 export default function TeamModal({ onClose, initialData, onSuccess }) {
   const { addTeam, updateTeam, college, addToast, user } = useSIH();
+  const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(1);
     const leader = initialData?.members?.[0] || {};
   const emptyMembers = [
@@ -127,7 +128,9 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
   };
 
   const submit = async () => {
+    if (submitting) return;
     if (!validate()) return;
+    setSubmitting(true);
         const filledMembers = form.members.filter((m) => m.name.trim());
     const totalMembers = 1 + filledMembers.length; // leader + members
     const seatsOpen = Math.max(0, 6 - totalMembers);
@@ -181,6 +184,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     } catch (err) {
       console.error("Error submitting team:", err);
       addToast(err.message || "Failed to post team", "err");
+    } finally {
+      setSubmitting(false);
     }
 
   };
@@ -433,8 +438,10 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
         </form>
         <div className="mfoot">
           <span className="sp" />
-          <button className="btn gho" type="button" onClick={onClose}>Cancel</button>
-          <button className="btn pri" type="button" onClick={submit}>{initialData ? "Save Changes" : "Post team"}</button>
+          <button className="btn gho" type="button" onClick={onClose} disabled={submitting}>Cancel</button>
+          <button className="btn pri" type="button" onClick={submit} disabled={submitting}>
+            {submitting ? "Posting..." : (initialData ? "Save Changes" : "Post team")}
+          </button>
         </div>
       </div>
     </div>

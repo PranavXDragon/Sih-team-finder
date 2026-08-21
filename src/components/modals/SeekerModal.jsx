@@ -11,6 +11,7 @@ const GENDER_OPTIONS = [
 
 export default function SeekerModal({ initialData, onClose, onSuccess }) {
   const { addSeeker, updateSeeker, college, addToast } = useSIH();
+  const [submitting, setSubmitting] = useState(false);
 
   let initPhone = "";
   let initEmail = "";
@@ -57,7 +58,9 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
   };
 
   const submit = async () => {
+    if (submitting) return;
     if (!validate()) return;
+    setSubmitting(true);
     try {
       const payload = {
         name: form.name.trim(),
@@ -81,7 +84,9 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
         if (onSuccess) onSuccess();
       }
       onClose();
-    } catch (e) { }
+    } catch (e) { } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -209,8 +214,10 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
         </form>
         <div className="mfoot">
           <span className="sp" />
-          <button className="btn gho" type="button" onClick={onClose}>Cancel</button>
-          <button className="btn pri" type="button" onClick={submit}>{initialData ? "Save Changes" : "Save and list me"}</button>
+          <button className="btn gho" type="button" onClick={onClose} disabled={submitting}>Cancel</button>
+          <button className="btn pri" type="button" onClick={submit} disabled={submitting}>
+            {submitting ? "Saving..." : (initialData ? "Save Changes" : "Save and list me")}
+          </button>
         </div>
       </div>
     </div>
