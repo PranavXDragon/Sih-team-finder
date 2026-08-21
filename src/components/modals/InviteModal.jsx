@@ -1,21 +1,27 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useSIH } from "../../hooks/useSIH";
 
 export default function InviteModal({ seeker, onClose }) {
-  const { toast } = useSIH();
+  const { toast, sendTeamInvite } = useSIH();
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   if (!seeker) return null;
 
-  const send = () => {
+  const send = async () => {
     if (msg.trim().length < 10) { setErr(true); return; }
-    const text = encodeURIComponent(
-      `Hi! I found you on SIH 2026 Team Finder.\n\nI want to invite you to our team.\n\n${msg}`
-    );
-    window.open(`https://wa.me/916374166705?text=${text}`, "_blank");
-    toast(`Invite sent to ${seeker.name}!`, "ok");
-    onClose();
+    
+    setLoading(true);
+    try {
+      await sendTeamInvite(seeker, msg);
+      toast(`Invite sent to ${seeker.name}!`, "ok");
+      onClose();
+    } catch (error) {
+      // Error is handled by context toast
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,8 +55,10 @@ export default function InviteModal({ seeker, onClose }) {
         </div>
         <div className="mfoot">
           <span className="sp" />
-          <button className="btn gho" type="button" onClick={onClose}>Cancel</button>
-          <button className="btn pri" type="button" onClick={send}>Send invite</button>
+          <button className="btn gho" type="button" onClick={onClose} disabled={loading}>Cancel</button>
+          <button className="btn pri" type="button" onClick={send} disabled={loading}>
+            {loading ? 'Sending...' : 'Send invite'}
+          </button>
         </div>
       </div>
     </div>

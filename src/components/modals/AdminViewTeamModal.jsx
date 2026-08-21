@@ -14,7 +14,7 @@ export default function AdminViewTeamModal({ team, onClose }) {
         </div>
 
         <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
               <p style={{ fontSize: 12, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 1 }}>Track</p>

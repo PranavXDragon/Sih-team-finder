@@ -475,12 +475,13 @@ export function SIHProvider({ children }) {
           supabase.functions.invoke('send-email', {
             body: {
               to: seekerEmail,
+              subject: `Update on your team request for ${myTeam?.teamName || 'the team'}`,
               type: 'REJECTED',
               payload: {
-                student_name: req.seekers.name,
+                student_name: req.seekers.name || 'Student',
                 team_name: myTeam?.teamName || 'the team',
                 team_leader: myTeam?.members?.[0]?.name || 'Team Leader',
-                removal_reason: reason || 'Team requirements were updated.'
+                removal_reason: reason || 'The team leader has declined your request.'
               }
             }
           }).catch(err => console.error("Failed to send rejection email", err));
@@ -491,9 +492,64 @@ export function SIHProvider({ children }) {
       addToast("Request rejected.", "ok");
     } catch (err) {
       console.error(err);
-      addToast("Error rejecting request", "err");
+      addToast(err.message || "Error rejecting request", "err");
     }
   }, [myRequests, myTeam, addToast]);
+
+  const sendTeamInvite = useCallback(async (seeker, message) => {
+    try {
+      if (!myTeam) throw new Error("You must have a team to send invites.");
+
+      const { error: fnErr } = await supabase.functions.invoke('send-email', {
+        body: {
+          to: seeker.email,
+          subject: `Team Invitation from ${myTeam.teamName}`,
+          type: 'TEAM_INVITE',
+          payload: {
+            seeker_name: seeker.name,
+            team_name: myTeam.teamName,
+            team_leader_name: myTeam.members?.[0]?.name || 'The Team Leader',
+            invite_message: message
+          }
+        }
+      });
+      if (fnErr) throw fnErr;
+      
+    } catch (err) {
+      addToast(err.message || "Failed to send invite", "err");
+      throw err;
+    }
+  }, [myTeam, addToast]);
+
+  const sendTeamInvite = useCallback(async (seeker, message) => {
+    try {
+      if (!myTeam) throw new Error("You must have a team to send invites.");
+      
+      let seekerEmail = seeker.email;
+      if (!seekerEmail && seeker.whatsapp) {
+        seekerEmail = seeker.whatsapp.split('|')[1]?.trim();
+      }
+
+      const { error: fnErr } = await supabase.functions.invoke('send-email', {
+        body: {
+          to: seekerEmail || seeker.email,
+          subject: `Team Invitation from ${myTeam.teamName}`,
+          type: 'TEAM_INVITE',
+          payload: {
+            seeker_name: seeker.name,
+            team_name: myTeam.teamName,
+            team_leader_name: myTeam.members?.[0]?.name || 'The Team Leader',
+            invite_message: message
+          }
+        }
+      });
+      if (fnErr) throw fnErr;
+      
+    } catch (err) {
+      addToast(err.message || "Failed to send invite", "err");
+      throw err;
+    }
+  }, [myTeam, addToast]);
 
   const removeMember = useCallback(async (teamId, memberUserId) => {
     try {
@@ -526,7 +582,7 @@ export function SIHProvider({ children }) {
     session, user, isAuthLoading,
     signOut: () => supabase.auth.signOut(),
     myTeam, mySeekerProfile, myRequests, myApplications,
-    requestToJoin, acceptRequest, rejectRequest, removeMember
+    requestToJoin, acceptRequest, rejectRequest, removeMember, sendTeamInvite
   };
 
   return <SIHContext.Provider value={value}>{children}</SIHContext.Provider>;

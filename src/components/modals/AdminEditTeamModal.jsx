@@ -4,7 +4,7 @@ import "./AuthModal.css"; // Reuse the flo-modal styles for consistency
 
 export default function AdminEditTeamModal({ team, onClose }) {
   const { updateTeam } = useSIH();
-  
+
   const [teamName, setTeamName] = useState(team.teamName || "");
   const [contact, setContact] = useState(team.contact || "");
   const [track, setTrack] = useState(team.track || "");
@@ -13,7 +13,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
   const [psTitle, setPsTitle] = useState(team.psTitle || "");
   const [pitch, setPitch] = useState(team.pitch || "");
   const [members, setMembers] = useState(team.members || []);
-  
+
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -21,7 +21,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
-    
+
     try {
       await updateTeam(team.id, {
         teamName,
@@ -57,20 +57,20 @@ export default function AdminEditTeamModal({ team, onClose }) {
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
           <div className="fld">
             <label>Team Name</label>
-            <input 
-              type="text" 
-              value={teamName} 
-              onChange={(e) => setTeamName(e.target.value)} 
-              required 
+            <input
+              type="text"
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+              required
             />
           </div>
 
           <div className="fld">
             <label>Contact (Phone/Email)</label>
-            <input 
-              type="text" 
-              value={contact} 
-              onChange={(e) => setContact(e.target.value)} 
+            <input
+              type="text"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
             />
           </div>
 
@@ -82,13 +82,13 @@ export default function AdminEditTeamModal({ team, onClose }) {
                 <option value="Hardware">Hardware</option>
               </select>
             </div>
-            
+
             <div className="fld">
               <label>Theme</label>
-              <input 
-                type="text" 
-                value={theme} 
-                onChange={(e) => setTheme(e.target.value)} 
+              <input
+                type="text"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
               />
             </div>
           </div>
@@ -96,27 +96,27 @@ export default function AdminEditTeamModal({ team, onClose }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
             <div className="fld">
               <label>PS ID</label>
-              <input 
-                type="text" 
-                value={psId} 
-                onChange={(e) => setPsId(e.target.value)} 
+              <input
+                type="text"
+                value={psId}
+                onChange={(e) => setPsId(e.target.value)}
               />
             </div>
             <div className="fld">
               <label>PS Title</label>
-              <input 
-                type="text" 
-                value={psTitle} 
-                onChange={(e) => setPsTitle(e.target.value)} 
+              <input
+                type="text"
+                value={psTitle}
+                onChange={(e) => setPsTitle(e.target.value)}
               />
             </div>
           </div>
 
           <div className="fld">
             <label>Pitch / Idea Description</label>
-            <textarea 
-              value={pitch} 
-              onChange={(e) => setPitch(e.target.value)} 
+            <textarea
+              value={pitch}
+              onChange={(e) => setPitch(e.target.value)}
               rows={4}
               style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'var(--text)', outline: 'none' }}
             />
@@ -126,8 +126,8 @@ export default function AdminEditTeamModal({ team, onClose }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <label>Team Members ({members.length}/{team.totalSeats})</label>
               {members.length < team.totalSeats && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setMembers([...members, { name: "", email: "", phone: "", dept: "", gender: "m" }])}
                   style={{ background: 'var(--accent)', color: '#fff', border: 'none', padding: '4px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}
                 >
@@ -141,7 +141,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
                 <div key={idx} style={{ padding: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 8 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                     <b style={{ fontSize: 14 }}>Member {idx + 1} {idx === 0 ? "(Leader)" : ""}</b>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setMembers(members.filter((_, i) => i !== idx))}
                       style={{ background: 'transparent', border: 'none', color: 'var(--stop)', cursor: 'pointer', fontSize: 12, textDecoration: 'underline' }}
@@ -150,36 +150,36 @@ export default function AdminEditTeamModal({ team, onClose }) {
                     </button>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    <input 
-                      type="text" 
-                      placeholder="Name" 
-                      value={m.name} 
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={m.name}
                       onChange={(e) => { const newM = [...members]; newM[idx].name = e.target.value; setMembers(newM); }}
                       style={{ padding: 6, fontSize: 13 }}
                     />
-                    <input 
-                      type="text" 
-                      placeholder="Email" 
-                      value={m.email} 
+                    <input
+                      type="text"
+                      placeholder="Email"
+                      value={m.email}
                       onChange={(e) => { const newM = [...members]; newM[idx].email = e.target.value; setMembers(newM); }}
                       style={{ padding: 6, fontSize: 13 }}
                     />
-                    <input 
-                      type="text" 
-                      placeholder="Phone" 
-                      value={m.phone} 
+                    <input
+                      type="text"
+                      placeholder="Phone"
+                      value={m.phone}
                       onChange={(e) => { const newM = [...members]; newM[idx].phone = e.target.value; setMembers(newM); }}
                       style={{ padding: 6, fontSize: 13 }}
                     />
-                    <input 
-                      type="text" 
-                      placeholder="Department" 
-                      value={m.dept} 
+                    <input
+                      type="text"
+                      placeholder="Department"
+                      value={m.dept}
                       onChange={(e) => { const newM = [...members]; newM[idx].dept = e.target.value; setMembers(newM); }}
                       style={{ padding: 6, fontSize: 13 }}
                     />
-                    <select 
-                      value={m.gender} 
+                    <select
+                      value={m.gender}
                       onChange={(e) => { const newM = [...members]; newM[idx].gender = e.target.value; setMembers(newM); }}
                       style={{ padding: 6, fontSize: 13 }}
                     >
@@ -209,13 +209,13 @@ export default function AdminEditTeamModal({ team, onClose }) {
             <span style={{ opacity: loading ? 0 : 1 }}>
               Save Changes
             </span>
-            
+
             {loading && (
               <div className="auth-flo-spinner">
                 <div className="auth-flo-spinner-ring" />
               </div>
             )}
-            
+
             <div className="auth-flo-submit-glow" />
           </button>
         </form>
