@@ -79,10 +79,11 @@ export default function ProfileDropdown() {
               <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')}>Edit Seeker Profile</button>
             )}
 
-            {!myTeam && !mySeekerProfile && (
-              <div style={{ padding: "8px 10px", fontSize: 12, color: "var(--dim)" }}>
-                No active profiles
-              </div>
+            {!myTeam && (
+              <button type="button" className="cs-opt" onClick={() => handleOpenModal('team')}>Register Team</button>
+            )}
+            {!mySeekerProfile && (
+              <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')}>Join a Team (Seeker)</button>
             )}
             
             <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
