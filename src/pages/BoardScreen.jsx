@@ -9,7 +9,7 @@ import SeekerModal from "../components/modals/SeekerModal";
 import CustomSelect from "../components/CustomSelect";
 
 export default function BoardScreen({ initialAction, onBack }) {
-  const { teams, seekers, stats, college, isLoading, myTeam, user } = useSIH();
+  const { teams, seekers, stats, isLoading } = useSIH();
 
   const [tab, setTab] = useState(initialAction === "list-seeker" ? "seekers" : "teams");
   const [query, setQuery] = useState("");
@@ -56,10 +56,7 @@ export default function BoardScreen({ initialAction, onBack }) {
     }
   }, [query, filterTrack, filterTheme, filterFemale, filterHasPs, activeSkills, filterTeamId]);
 
-  const toggleSkill = (s) =>
-    setActiveSkills((prev) =>
-      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
-    );
+
 
   const clearAll = () => {
     setQuery(""); setFilterTrack(""); setFilterTheme("");

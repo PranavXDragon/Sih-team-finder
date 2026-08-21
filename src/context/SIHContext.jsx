@@ -23,7 +23,6 @@ export function SIHProvider({ children }) {
   const [myTeam, setMyTeam] = useState(null);
   const [mySeekerProfile, setMySeekerProfile] = useState(null);
   const [myRequests, setMyRequests] = useState([]);
-  const [myAcceptedRequests, setMyAcceptedRequests] = useState([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -56,7 +55,15 @@ export function SIHProvider({ children }) {
     localStorage.setItem("sih_college", JSON.stringify(c));
   }, []);
 
-  const fetchSupabaseData = async () => {
+  const addToast = useCallback((msg, kind = "ok") => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, msg, kind }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4500);
+  }, []);
+
+  const fetchSupabaseData = useCallback(async () => {
     try {
       const [teamsRes, seekersRes] = await Promise.all([
         supabase.from('teams').select('*').order('createdAt', { ascending: false }),
@@ -75,7 +82,7 @@ export function SIHProvider({ children }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [addToast]);
 
   // Fetch role data when user changes
   const fetchRoles = useCallback(async () => {
@@ -149,7 +156,7 @@ export function SIHProvider({ children }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchRoles]);
+  }, [fetchRoles, fetchSupabaseData]);
 
   const addTeam = useCallback(async (team) => {
     try {
@@ -176,7 +183,7 @@ export function SIHProvider({ children }) {
       addToast("Error creating team", "err");
       throw err;
     }
-  }, [user]);
+  }, [user, addToast]);
 
   const updateTeam = useCallback(async (id, data) => {
     try {
@@ -188,7 +195,7 @@ export function SIHProvider({ children }) {
       console.error(err);
       addToast("Error updating team", "err");
     }
-  }, [myTeam]);
+  }, [myTeam, addToast]);
 
   const deleteTeam = useCallback(async (id) => {
     try {
@@ -203,7 +210,7 @@ export function SIHProvider({ children }) {
       console.error(err);
       addToast("Error deleting team", "err");
     }
-  }, [myTeam]);
+  }, [myTeam, addToast]);
 
   const addSeeker = useCallback(async (seeker) => {
     try {
@@ -229,7 +236,7 @@ export function SIHProvider({ children }) {
       addToast("Error listing yourself", "err");
       throw err;
     }
-  }, [user]);
+  }, [user, addToast]);
 
   const updateSeeker = useCallback(async (id, data) => {
     try {
@@ -241,7 +248,7 @@ export function SIHProvider({ children }) {
       console.error(err);
       addToast("Error updating profile", "err");
     }
-  }, [mySeekerProfile]);
+  }, [mySeekerProfile, addToast]);
 
   const deleteSeeker = useCallback(async (id) => {
     try {
@@ -253,7 +260,7 @@ export function SIHProvider({ children }) {
       console.error(err);
       addToast("Error deleting profile", "err");
     }
-  }, [mySeekerProfile]);
+  }, [mySeekerProfile, addToast]);
 
   const requestToJoin = useCallback(async (teamId) => {
     try {
@@ -288,7 +295,7 @@ export function SIHProvider({ children }) {
       addToast(err.message || "Error sending request", "err");
       throw err;
     }
-  }, [user, mySeekerProfile]);
+  }, [user, mySeekerProfile, addToast]);
 
   const acceptRequest = useCallback(async (requestId, seekerProfile) => {
     try {
@@ -338,7 +345,7 @@ export function SIHProvider({ children }) {
       console.error(err);
       addToast(err.message || "Error accepting student", "err");
     }
-  }, [myTeam, updateTeam]);
+  }, [myTeam, updateTeam, addToast]);
 
   const rejectRequest = useCallback(async (requestId) => {
     try {
@@ -350,7 +357,7 @@ export function SIHProvider({ children }) {
       console.error(err);
       addToast("Error rejecting request", "err");
     }
-  }, []);
+  }, [addToast]);
 
   const removeMember = useCallback(async (teamId, memberUserId) => {
     try {
@@ -364,15 +371,9 @@ export function SIHProvider({ children }) {
       console.error("Error releasing member:", err);
       addToast("Failed to release member in database", "err");
     }
-  }, []);
+  }, [addToast]);
 
-  const addToast = useCallback((msg, kind = "ok") => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, msg, kind }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4500);
-  }, []);
+
 
   const value = {
     college, setCollege,
@@ -388,7 +389,7 @@ export function SIHProvider({ children }) {
     isLoading,
     session, user, isAuthLoading,
     signOut: () => supabase.auth.signOut(),
-    myTeam, mySeekerProfile, myRequests, myAcceptedRequests,
+    myTeam, mySeekerProfile, myRequests,
     requestToJoin, acceptRequest, rejectRequest, removeMember
   };
 

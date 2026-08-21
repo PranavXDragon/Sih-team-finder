@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useSIH } from "../../hooks/useSIH";
-import { SIH_THEMES, SKILLS, DEPARTMENTS, YEARS, PROGRAMS_DATA } from "../../data/constants";
+import { SIH_THEMES, SKILLS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 
 import CustomSelect from "../CustomSelect";
 
@@ -22,7 +22,6 @@ const MEMBER_GENDER_OPTIONS = [
 export default function TeamModal({ onClose, initialData, onSuccess }) {
   const { addTeam, updateTeam, college, addToast, user, removeMember } = useSIH();
   const [submitting, setSubmitting] = useState(false);
-  const [step, setStep] = useState(1);
     const leader = initialData?.members?.[0] || {};
   const emptyMembers = [
     { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }, { ...EMPTY_MEMBER }
@@ -61,7 +60,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     psId: initialData?.psId || "", 
     psTitle: initialData?.psTitle || "", 
     pitch: initialData?.pitch || "",
-    leaderName: leader.name || "", 
+    leaderName: leader.name || (!initialData && user ? user.user_metadata?.full_name : ""), 
     leaderProgram: leader.program || "UG", 
     leaderBranch: leader.dept || "Computer Engineering", 
     leaderYear: leader.year || "3rd Year", 
@@ -71,19 +70,9 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     wantsSkills: initialData?.wantsSkills || [], 
     hasMentor: initialData?.hasMentor || false,
     phone: initPhone, 
-    email: initEmail,
+    email: initEmail || (!initialData && user ? user.email : ""),
   });
   const [errs, setErrs] = useState({});
-  
-  useEffect(() => {
-    if (!initialData && user) {
-      setForm(p => ({
-        ...p,
-        email: p.email || user.email || "",
-        leaderName: p.leaderName || user.user_metadata?.full_name || "",
-      }));
-    }
-  }, [user, initialData]);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 

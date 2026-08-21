@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useSIH } from "../../hooks/useSIH";
-import { SKILLS, DEPARTMENTS, YEARS, PROGRAMS_DATA } from "../../data/constants";
+import { SKILLS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 import CustomSelect from "../CustomSelect";
 
 const GENDER_OPTIONS = [
@@ -23,10 +23,10 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
   }
 
   const [form, setForm] = useState({
-    name: initialData?.name || "",
+    name: initialData?.name || (!initialData && user ? user.user_metadata?.full_name : ""),
     program: initialData?.program || "UG",
-    branch: initialData?.dept || "Computer Engineering",
-    year: initialData?.year || "3rd Year",
+    branch: initialData?.branch || "Computer Engineering",
+    year: initialData?.year || "1st Year",
     gender: initialData?.gender || "na",
     skills: initialData?.skills || [],
     bio: initialData?.bio || "",
@@ -37,26 +37,9 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
   });
   const [errs, setErrs] = useState({});
 
-  useEffect(() => {
-    if (!initialData && user) {
-      setForm(p => ({
-        ...p,
-        name: p.name || user.user_metadata?.full_name || "",
-        email: p.email || user.email || "",
-      }));
-    }
-  }, [user, initialData]);
-
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  const toggleSkill = (s) => {
-    setForm((f) => ({
-      ...f,
-      skills: f.skills.includes(s)
-        ? f.skills.filter((x) => x !== s)
-        : [...f.skills, s],
-    }));
-  };
+
 
   const validate = () => {
     const e = {};
@@ -95,7 +78,8 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
         if (onSuccess) onSuccess();
       }
       onClose();
-    } catch (e) { } finally {
+    } catch { 
+    } finally {
       setSubmitting(false);
     }
   };
