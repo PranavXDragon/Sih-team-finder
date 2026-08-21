@@ -12,6 +12,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
   const [psId, setPsId] = useState(team.psId || "");
   const [psTitle, setPsTitle] = useState(team.psTitle || "");
   const [pitch, setPitch] = useState(team.pitch || "");
+  const [members, setMembers] = useState(team.members || []);
   
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -29,7 +30,9 @@ export default function AdminEditTeamModal({ team, onClose }) {
         theme,
         psId,
         psTitle,
-        pitch
+        pitch,
+        members,
+        seatsOpen: team.totalSeats - members.length
       });
       onClose(); // close on success
     } catch (err) {
@@ -117,6 +120,78 @@ export default function AdminEditTeamModal({ team, onClose }) {
               rows={4}
               style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'var(--text)', outline: 'none' }}
             />
+          </div>
+
+          <div style={{ marginTop: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <label>Team Members ({members.length}/{team.totalSeats})</label>
+              {members.length < team.totalSeats && (
+                <button 
+                  type="button" 
+                  onClick={() => setMembers([...members, { name: "", email: "", phone: "", dept: "", gender: "m" }])}
+                  style={{ background: 'var(--accent)', color: '#fff', border: 'none', padding: '4px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}
+                >
+                  + Add Member
+                </button>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {members.map((m, idx) => (
+                <div key={idx} style={{ padding: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <b style={{ fontSize: 14 }}>Member {idx + 1} {idx === 0 ? "(Leader)" : ""}</b>
+                    <button 
+                      type="button"
+                      onClick={() => setMembers(members.filter((_, i) => i !== idx))}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--stop)', cursor: 'pointer', fontSize: 12, textDecoration: 'underline' }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    <input 
+                      type="text" 
+                      placeholder="Name" 
+                      value={m.name} 
+                      onChange={(e) => { const newM = [...members]; newM[idx].name = e.target.value; setMembers(newM); }}
+                      style={{ padding: 6, fontSize: 13 }}
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Email" 
+                      value={m.email} 
+                      onChange={(e) => { const newM = [...members]; newM[idx].email = e.target.value; setMembers(newM); }}
+                      style={{ padding: 6, fontSize: 13 }}
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Phone" 
+                      value={m.phone} 
+                      onChange={(e) => { const newM = [...members]; newM[idx].phone = e.target.value; setMembers(newM); }}
+                      style={{ padding: 6, fontSize: 13 }}
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Department" 
+                      value={m.dept} 
+                      onChange={(e) => { const newM = [...members]; newM[idx].dept = e.target.value; setMembers(newM); }}
+                      style={{ padding: 6, fontSize: 13 }}
+                    />
+                    <select 
+                      value={m.gender} 
+                      onChange={(e) => { const newM = [...members]; newM[idx].gender = e.target.value; setMembers(newM); }}
+                      style={{ padding: 6, fontSize: 13 }}
+                    >
+                      <option value="m">Male</option>
+                      <option value="f">Female</option>
+                      <option value="o">Other</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+              {members.length === 0 && <p style={{ color: 'var(--dim)', fontSize: 13 }}>No members added.</p>}
+            </div>
           </div>
 
           {errorMsg && (
