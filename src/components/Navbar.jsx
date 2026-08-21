@@ -19,10 +19,6 @@ export default function Navbar() {
             <img src="/Society.png" alt="Society Logo" />
           </a>
           <img src="/Academic.png" alt="Academic Logo" />
-          <div style={{ width: 1, height: 32, background: "#ddd", margin: "0 4px" }} />
-
-          <img src="/AICTE.png" alt="AICTE" style={{ height: "40px" }} />
-          <img src="/MoE.png" alt="MoE Innovation Cell" style={{ height: "40px" }} />
         </div>
 
         <span className="sp" />

@@ -62,9 +62,6 @@ export default function LandingScreen({ onEnter }) {
           <div className="hero-text-side">
             <div className="kicker-group">
               <span className="kicker">SMART INDIA HACKATHON <i>2026</i></span>
-              <div className="countdown-timer" style={{ display: "inline-flex", gap: "8px", background: "rgba(255, 171, 61, 0.15)", padding: "4px 12px", borderRadius: "100px", color: "var(--accent-2)", fontWeight: "800", fontSize: "0.85rem", border: "1px solid rgba(255,171,61,0.3)", alignItems: "center" }}>
-                <span>⏳ {timeLeft.d}d {timeLeft.h}h {timeLeft.m}m {timeLeft.s}s</span>
-              </div>
             </div>
             <h1 className="ph">
               <span className="l1">NO TEAM</span>
