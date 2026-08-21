@@ -218,8 +218,10 @@ export function SIHProvider({ children }) {
 
   const deleteTeam = useCallback(async (id) => {
     try {
-      const { error } = await supabase.from('teams').delete().eq('id', id);
+      const { data, error } = await supabase.from('teams').delete().eq('id', id).select();
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error("Permission denied. Could not delete from Supabase (Check RLS Policies).");
+      
       setTeams((prev) => prev.filter((t) => t.id !== id));
       if (myTeam && myTeam.id === id) {
         setMyTeam(null);
@@ -271,8 +273,10 @@ export function SIHProvider({ children }) {
 
   const deleteSeeker = useCallback(async (id) => {
     try {
-      const { error } = await supabase.from('seekers').delete().eq('id', id);
+      const { data, error } = await supabase.from('seekers').delete().eq('id', id).select();
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error("Permission denied. Could not delete from Supabase (Check RLS Policies).");
+      
       setSeekers((prev) => prev.filter((s) => s.id !== id));
       if (mySeekerProfile && mySeekerProfile.id === id) setMySeekerProfile(null);
     } catch (err) {
