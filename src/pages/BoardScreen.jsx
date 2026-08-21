@@ -27,7 +27,7 @@ export default function BoardScreen({ initialAction, onBack }) {
     const handleHashTeam = () => {
       const hash = window.location.hash;
       if (hash.includes('?team=')) {
-        setFilterTeamId(hash.split('?team=')[1]);
+        setFilterTeamId(decodeURIComponent(hash.split('?team=')[1]));
       } else {
         setFilterTeamId("");
       }
@@ -72,7 +72,11 @@ export default function BoardScreen({ initialAction, onBack }) {
 
   const filteredTeams = useMemo(() => {
     return teams.filter((t) => {
-      if (filterTeamId && t.id !== filterTeamId) return false;
+      if (filterTeamId) {
+        const cleanStr = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const isMatch = t.id === filterTeamId || cleanStr(t.teamName) === cleanStr(filterTeamId);
+        if (!isMatch) return false;
+      }
       if (filterTrack && t.track !== filterTrack) return false;
       if (filterTheme && t.theme !== filterTheme) return false;
       if (filterFemale && !t.needsFemale) return false;

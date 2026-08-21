@@ -33,7 +33,13 @@ export default function TeamCard({ team, onEdit }) {
   };
 
   const handleShare = () => {
-    const url = `${window.location.origin}${window.location.pathname}#board?team=${team.id}`;
+    const slug = team.teamName
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const url = `${window.location.origin}${window.location.pathname}#board?team=${slug}`;
     navigator.clipboard.writeText(url);
     addToast("Link copied!", "ok");
   };
