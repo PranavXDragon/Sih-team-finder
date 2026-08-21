@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 
 export default function AuthModal({ onClose, onSuccess }) {
@@ -32,11 +32,11 @@ export default function AuthModal({ onClose, onSuccess }) {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        onSuccess();
+        onSuccess(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        onSuccess();
+        onSuccess(false);
       }
     } catch (e) {
       setErrorMsg(e.message);

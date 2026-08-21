@@ -1,4 +1,4 @@
-﻿import './components/modals/Modals.css';
+import './components/modals/Modals.css';
 import { useState, useEffect } from "react";
 import { useSIH } from "./hooks/useSIH";
 import LandingScreen from "./pages/LandingScreen";
@@ -70,7 +70,18 @@ export default function App() {
       
       <Footer />
       
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} />}
+      {showAuth && (
+        <AuthModal 
+          onClose={() => setShowAuth(false)} 
+          onSuccess={(isSignUp) => {
+            setShowAuth(false);
+            if (isSignUp) {
+              setBoardAction("post-team");
+              setScreen("board");
+            }
+          }} 
+        />
+      )}
       
       <div className="toasts" aria-live="polite">
         {toasts.map((t) => (
