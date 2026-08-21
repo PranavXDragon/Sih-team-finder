@@ -167,6 +167,17 @@ export function SIHProvider({ children }) {
         setTeams((prev) => [data[0], ...prev]);
         setMyTeam(data[0]);
         
+        supabase.functions.invoke('send-email', {
+          body: {
+            to: user.email,
+            type: 'TEAM_CREATED',
+            payload: {
+              team_name: data[0].teamName || 'Your Team',
+              student_name: data[0].members?.[0]?.name || 'Team Leader'
+            }
+          }
+        }).catch(err => console.error("Failed to send team created email", err));
+        
         // Sync to Google Sheets if configured
         if (import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK) {
           fetch(import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK, {
@@ -298,8 +309,17 @@ export function SIHProvider({ children }) {
           supabase.functions.invoke('send-email', {
             body: {
               to: leaderEmail,
-              subject: `New Request to join ${targetTeam.teamName || 'your team'}!`,
-              html: `<p>Hi there,</p><p><strong>${mySeekerProfile.name}</strong> has just requested to join your SIH 2026 team!</p><p>Go to your dashboard to review their profile.</p>`
+              type: 'JOIN_REQUEST',
+              payload: {
+                team_leader_name: targetTeam.contact?.split('|')[0]?.trim() || 'Team Leader',
+                requester_name: mySeekerProfile.name,
+                branch: mySeekerProfile.dept || 'N/A',
+                year: mySeekerProfile.year || 'N/A',
+                skills: mySeekerProfile.skills?.join(', ') || 'Various',
+                email: mySeekerProfile.whatsapp?.split('|')[1]?.trim() || 'N/A',
+                request_message: 'I would love to join your team! Please review my profile on the board.',
+                team_name: targetTeam.teamName || 'your team'
+              }
             }
           }).catch(err => console.error("Failed to send email to leader", err));
         }
@@ -361,8 +381,13 @@ export function SIHProvider({ children }) {
         supabase.functions.invoke('send-email', {
           body: {
             to: email,
-            subject: `Request Accepted: Welcome to ${myTeam.teamName || 'the team'}!`,
-            html: `<p>Hi ${seekerProfile.name},</p><p>Great news! Your request to join <strong>${myTeam.teamName}</strong> has been accepted.</p><p>You can contact your new team leader at <strong>${myTeam.contact || 'their provided contact info'}</strong>.</p>`
+            type: 'ACCEPTED',
+            payload: {
+              student_name: seekerProfile.name,
+              team_name: myTeam.teamName || 'the team',
+              team_leader: myTeam.contact?.split('|')[0]?.trim() || 'Team Leader',
+              member_count: myTeam.members.length + 1
+            }
           }
         }).catch(err => console.error("Failed to send acceptance email", err));
       }
@@ -386,8 +411,13 @@ export function SIHProvider({ children }) {
           supabase.functions.invoke('send-email', {
             body: {
               to: seekerEmail,
-              subject: `Update on your team request for ${myTeam?.teamName || 'the team'}`,
-              html: `<p>Hi ${req.seekers.name},</p><p>Unfortunately, your request to join <strong>${myTeam?.teamName || 'the team'}</strong> was declined.</p><p>Don't worry, there are many other teams looking for your skills! Keep applying on the board.</p>`
+              type: 'REJECTED',
+              payload: {
+                student_name: req.seekers.name,
+                team_name: myTeam?.teamName || 'the team',
+                team_leader: myTeam?.contact?.split('|')[0]?.trim() || 'Team Leader',
+                removal_reason: 'Your profile did not match the current requirements for the team.'
+              }
             }
           }).catch(err => console.error("Failed to send rejection email", err));
         }

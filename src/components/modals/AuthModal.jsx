@@ -223,6 +223,17 @@ export default function AuthModal({ onClose, onSuccess, defaultIsSignUp }) {
           }
         });
         if (error) throw error;
+
+        supabase.functions.invoke('send-email', {
+          body: {
+            to: email,
+            type: 'REGISTERED',
+            payload: {
+              student_name: name || 'Student'
+            }
+          }
+        }).catch(err => console.error("Failed to send welcome email", err));
+
         onSuccess(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
