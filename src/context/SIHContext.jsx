@@ -368,8 +368,6 @@ export function SIHProvider({ children }) {
         setMyApplications(prev => [newApp, ...prev]);
       }
       
-      addToast("Request sent successfully!", "ok");
-      
       // Notify team leader via email
       const targetTeam = teams.find(t => t.id === teamId);
       if (targetTeam) {
