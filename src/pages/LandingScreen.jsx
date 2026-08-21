@@ -73,6 +73,8 @@ export default function LandingScreen({ onEnter }) {
               look like right now, and it is why good ideas die before the
               deadline. <b>Put your name up.</b> Free, and your number stays
               hidden until someone says yes.
+              <br/><br/>
+              <span style={{ color: "var(--accent)", fontWeight: 600 }}>Note:</span> Please make sure to use the latest problem statements from the SIH 2026 website when registering your team.
             </p>
             <div className="landcta">
               <button className="big orange" type="button" onClick={() => handleAction("post-team")}>

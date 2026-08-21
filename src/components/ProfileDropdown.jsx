@@ -5,7 +5,7 @@ import SeekerModal from "./modals/SeekerModal";
 import RequestsModal from "./modals/RequestsModal";
 
 export default function ProfileDropdown() {
-  const { user, myTeam, mySeekerProfile, signOut, myRequests } = useSIH();
+  const { user, myTeam, mySeekerProfile, signOut, myRequests, myApplications } = useSIH();
   const [open, setOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const ref = useRef(null);
@@ -76,7 +76,13 @@ export default function ProfileDropdown() {
             )}
             
             {mySeekerProfile && (
-              <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')}>Edit Seeker Profile</button>
+              <>
+                <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')}>Edit Seeker Profile</button>
+                <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  My Applications
+                  {myApplications?.length > 0 && <span style={{ background: "var(--accent)", color: "#fff", fontSize: 10, padding: "2px 6px", borderRadius: 100, fontWeight: 700 }}>{myApplications.length}</span>}
+                </button>
+              </>
             )}
 
             {!myTeam && !mySeekerProfile && (

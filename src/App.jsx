@@ -12,7 +12,7 @@ import TeamModal from "./components/modals/TeamModal";
 import SeekerModal from "./components/modals/SeekerModal";
 
 export default function App() {
-  const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile, addToast } = useSIH();
+  const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile, addToast, requestToJoin } = useSIH();
   
   const [screen, setScreenState] = useState(() => {
     const hash = window.location.hash;
@@ -167,9 +167,21 @@ export default function App() {
       {globalListSeeker && (
         <SeekerModal 
           onClose={() => setGlobalListSeeker(false)} 
-          onSuccess={() => {
+          onSuccess={async () => {
             setGlobalListSeeker(false);
             setScreen("board");
+            
+            // Check if there was an intent to join a specific team
+            const joinTeamId = localStorage.getItem("sih_join_team_id");
+            if (joinTeamId) {
+              localStorage.removeItem("sih_join_team_id");
+              try {
+                await requestToJoin(joinTeamId);
+                // We don't need to show a success toast here because requestToJoin handles it!
+              } catch (err) {
+                // Ignore, requestToJoin handles errors
+              }
+            }
           }}
         />
       )}

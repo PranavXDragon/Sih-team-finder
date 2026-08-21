@@ -11,7 +11,7 @@ const GENDER_OPTIONS = [
 ];
 
 export default function SeekerModal({ initialData, onClose, onSuccess }) {
-  const { addSeeker, updateSeeker, college, addToast, user } = useSIH();
+  const { addSeeker, updateSeeker, college, addToast, user, myApplications } = useSIH();
   const [submitting, setSubmitting] = useState(false);
 
   let initPhone = "";
@@ -56,12 +56,22 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = true;
-    if (!form.skills.length) e.skills = true;
-    if (!form.bio.trim()) e.bio = true;
-    if (!form.phone.trim()) e.phone = true;
+    if (!form.name.trim()) e.name = "Full Name is required";
+    if (!form.program) e.program = "Program is required";
+    if (!form.branch) e.branch = "Branch is required";
+    if (!form.year) e.year = "Year is required";
+    if (!form.gender || form.gender === "na") e.gender = "Gender is required";
+    if (!form.skills.length) e.skills = "At least one skill is required";
+    if (!form.bio.trim()) e.bio = "Bio is required";
+    if (!form.phone.trim()) e.phone = "WhatsApp number is required";
+    if (!form.email.trim()) e.email = "Email is required";
     setErrs(e);
-    return Object.keys(e).length === 0;
+    
+    if (Object.keys(e).length > 0) {
+      addToast("Please fill all mandatory fields: " + Object.keys(e).join(", "), "err");
+      return false;
+    }
+    return true;
   };
 
   const submit = async () => {
@@ -180,10 +190,11 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
             </div>
           </div>
 
-          <div className="fld">
-            <label htmlFor="sBio">Bio/Description (Optional)</label>
+          <div className={`fld${errs.bio ? " bad" : ""}`}>
+            <label htmlFor="sBio">Bio/Description<em>*</em></label>
             <textarea id="sBio" placeholder="Tell teams what you're interested in, what you've built, or your background..." maxLength={180}
               value={form.bio} onChange={(e) => set("bio", e.target.value)} />
+            <p className="err">Bio/Description is required.</p>
             <p className="hint">{form.bio.length}/180</p>
           </div>
 
@@ -210,7 +221,7 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
                   placeholder="Type your custom skill (e.g. GraphQL, Next.js)" 
                   value={form.customSkill}
                   onChange={(e) => set("customSkill", e.target.value)}
-                  maxLength={25}
+                  maxLength={100}
                   style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)" }}
                 />
               </div>
@@ -246,6 +257,34 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
           )}
 
         </form>
+        
+        {initialData && myApplications && myApplications.length > 0 && (
+          <div className="mbody" style={{ marginTop: -16, borderTop: "1px solid var(--border)", paddingTop: 20 }}>
+            <h3>Teams You Applied To</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 12 }}>
+              {myApplications.map(app => (
+                <div key={app.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "var(--surface-hover)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                  <div>
+                    <h4 style={{ margin: "0 0 4px", color: "var(--text)" }}>{app.teams?.teamName || 'Unknown Team'}</h4>
+                    <p style={{ margin: 0, fontSize: 13, color: "var(--text-dim)" }}>
+                      Status: <span style={{ 
+                        color: app.status === 'accepted' ? '#c8f24d' : app.status === 'rejected' ? '#ff4d4d' : '#ff9f1c',
+                        fontWeight: 600, textTransform: 'capitalize'
+                      }}>{app.status}</span>
+                    </p>
+                    {app.status === 'rejected' && app.rejection_reason && (
+                      <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-dim)" }}>Reason: {app.rejection_reason}</p>
+                    )}
+                  </div>
+                  {app.status === 'accepted' && app.teams?.contact && (
+                    <a href={`mailto:${app.teams.contact.split('|').pop().trim()}`} className="btn-primary" style={{ padding: "6px 12px", fontSize: 12, textDecoration: "none" }}>Contact Leader</a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mfoot">
           <span className="sp" />
           <button className="btn gho" type="button" onClick={onClose} disabled={submitting}>Cancel</button>

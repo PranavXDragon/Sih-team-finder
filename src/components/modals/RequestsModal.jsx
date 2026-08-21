@@ -39,7 +39,12 @@ export default function RequestsModal({ onClose }) {
 
                   <div style={{ display: "flex", gap: 8 }}>
                     <button className="btn sm pri" style={{ flex: 1 }} type="button" onClick={() => acceptRequest(req.id, req.seekers)}>Accept</button>
-                    <button className="btn sm" style={{ flex: 1, background: "transparent", border: "1px solid var(--border)", color: "var(--text)" }} type="button" onClick={() => rejectRequest(req.id)}>Reject</button>
+                    <button className="btn sm" style={{ flex: 1, background: "transparent", border: "1px solid var(--border)", color: "var(--text)" }} type="button" onClick={() => {
+                      const reason = window.prompt("Why are you rejecting this request? (This will be sent in the email)");
+                      if (reason !== null) {
+                        rejectRequest(req.id, reason);
+                      }
+                    }}>Reject</button>
                   </div>
                 </div>
               ))}

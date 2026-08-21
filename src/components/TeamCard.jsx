@@ -22,6 +22,8 @@ export default function TeamCard({ team, onEdit }) {
 
   const handleJoin = async () => {
     if (!user) {
+      localStorage.setItem('sih_intent', 'list-seeker');
+      localStorage.setItem('sih_join_team_id', team.id);
       window.location.hash = ""; // Redirect to landing page
       document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signup' }));
       return;

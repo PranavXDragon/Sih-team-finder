@@ -23,6 +23,7 @@ export function SIHProvider({ children }) {
   const [myTeam, setMyTeam] = useState(null);
   const [mySeekerProfile, setMySeekerProfile] = useState(null);
   const [myRequests, setMyRequests] = useState([]);
+  const [myApplications, setMyApplications] = useState([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -90,6 +91,7 @@ export function SIHProvider({ children }) {
       setMyTeam(null);
       setMySeekerProfile(null);
       setMyRequests([]);
+      setMyApplications([]);
       return;
     }
 
@@ -108,8 +110,14 @@ export function SIHProvider({ children }) {
         setMyTeam(null);
         setMyRequests([]);
       }
-      if (sRes.data) setMySeekerProfile(sRes.data);
-      else setMySeekerProfile(null);
+      if (sRes.data) {
+        setMySeekerProfile(sRes.data);
+        const appRes = await supabase.from('join_requests').select('*, teams(*)').eq('user_id', user.id);
+        if (appRes.data) setMyApplications(appRes.data);
+      } else {
+        setMySeekerProfile(null);
+        setMyApplications([]);
+      }
     } catch (err) {
       console.error("Error fetching roles:", err);
     }
@@ -290,16 +298,25 @@ export function SIHProvider({ children }) {
         throw new Error("You are already in a team. You can only join one team.");
       }
 
-      const { error } = await supabase.from('join_requests').insert([{
+      const { data, error } = await supabase.from('join_requests').insert([{
         team_id: teamId,
         user_id: user.id,
         seeker_id: mySeekerProfile.id,
         status: 'pending'
-      }]);
+      }]).select();
       if (error) {
         if (error.code === '23505') throw new Error("You have already applied for this team.");
         throw error;
       }
+      
+      if (data && data[0]) {
+        // Fetch the team data to match the join query shape
+        const { data: teamData } = await supabase.from('teams').select('*').eq('id', teamId).single();
+        const newApp = { ...data[0], teams: teamData };
+        setMyApplications(prev => [newApp, ...prev]);
+      }
+      
+      addToast("Request sent successfully!", "ok");
       
       // Notify team leader via email
       const targetTeam = teams.find(t => t.id === teamId);
@@ -399,7 +416,7 @@ export function SIHProvider({ children }) {
     }
   }, [myTeam, updateTeam, addToast]);
 
-  const rejectRequest = useCallback(async (requestId) => {
+  const rejectRequest = useCallback(async (requestId, reason = '') => {
     try {
       const { error } = await supabase.from('join_requests').update({ status: 'rejected' }).eq('id', requestId);
       if (error) throw error;
@@ -416,7 +433,7 @@ export function SIHProvider({ children }) {
                 student_name: req.seekers.name,
                 team_name: myTeam?.teamName || 'the team',
                 team_leader: myTeam?.contact?.split('|')[0]?.trim() || 'Team Leader',
-                removal_reason: 'Your profile did not match the current requirements for the team.'
+                removal_reason: reason || 'Team requirements were updated.'
               }
             }
           }).catch(err => console.error("Failed to send rejection email", err));
@@ -461,7 +478,7 @@ export function SIHProvider({ children }) {
     isLoading,
     session, user, isAuthLoading,
     signOut: () => supabase.auth.signOut(),
-    myTeam, mySeekerProfile, myRequests,
+    myTeam, mySeekerProfile, myRequests, myApplications,
     requestToJoin, acceptRequest, rejectRequest, removeMember
   };
 

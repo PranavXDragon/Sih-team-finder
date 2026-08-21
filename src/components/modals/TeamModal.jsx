@@ -126,7 +126,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     
     setErrs(e);
     if (Object.keys(e).length > 0) {
-      addToast("Please fill all mandatory fields correctly.", "err");
+      addToast("Please fill all mandatory fields: " + Object.keys(e).join(", "), "err");
       return false;
     }
 
@@ -284,6 +284,9 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                       value={form.psTitle} onChange={(e) => set("psTitle", e.target.value)} />
                   </div>
                 </div>
+                <p className="hint" style={{ marginTop: "-8px", marginBottom: "4px", color: "var(--mut)" }}>
+                  Use latest problem statement.
+                </p>
                 <div className="fld">
                   <label htmlFor="tPitch">One line about your idea</label>
                   <textarea id="tPitch" maxLength={180}
