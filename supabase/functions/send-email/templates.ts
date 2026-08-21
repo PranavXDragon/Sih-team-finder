@@ -1,4 +1,4 @@
-const escapeHtml = (unsafe) => {
+const escapeHtml = (unsafe: string) => {
   if (typeof unsafe !== 'string') return unsafe;
   return unsafe
     .replace(/&/g, "&amp;")

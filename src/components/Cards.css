@@ -55,7 +55,7 @@
 }
 .track[data-t="Hardware"] { background: rgba(200, 242, 77, 0.14); color: var(--lime); border-color: rgba(200, 242, 77, 0.34); }
 .track[data-t="Software"] { background: rgba(63, 116, 255, 0.16); color: #9db6ff; border-color: rgba(63, 116, 255, 0.36); }
-.pitch { margin: 0; color: var(--dim); font-size: 13.8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pitch { margin: 0; color: var(--dim); font-size: 13.8px; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .rowmeta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; color: var(--dim); }
 .rowmeta i { font-style: normal; color: var(--text); }
 .seats { display: flex; align-items: center; gap: 11px; padding-top: 3px; }
