@@ -104,34 +104,16 @@ export default function AdminScreen() {
     fullName: key
   })).sort((a, b) => b.count - a.count);
 
-  const exportTeamsCSV = () => {
-    if (!teams.length) return;
-    const header = ["ID", "Team Name", "Track", "Theme", "Open Seats", "Contact"];
-    const rows = teams.map(t => [t.id, t.teamName, t.track, t.theme, t.seatsOpen, t.contact]);
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [header.join(","), ...rows.map(e => e.map(String).map(s => '"' + s.replace(/"/g, '""') + '"').join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "sih_teams.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const exportSeekersCSV = () => {
-    if (!seekers.length) return;
-    const header = ["ID", "Name", "Dept", "Year", "Gender", "WhatsApp", "Bio"];
-    const rows = seekers.map(s => [s.id, s.name, s.dept, s.year, s.gender, s.whatsapp, s.bio]);
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [header.join(","), ...rows.map(e => e.map(String).map(s => '"' + s.replace(/"/g, '""') + '"').join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "sih_seekers.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const getRuleViolations = (t) => {
+    const flags = [];
+    if (!t.members || t.members.length < (t.totalSeats || 6)) {
+      flags.push("Incomplete Team");
+    }
+    if (t.members && t.members.length > 0) {
+      const hasFemale = t.members.some(m => m.gender === 'f');
+      if (!hasFemale) flags.push("No Female");
+    }
+    return flags;
   };
 
   const handleDeleteTeam = (id) => {
@@ -205,7 +187,6 @@ export default function AdminScreen() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginTop: 32 }}>
         <h2>Teams Database</h2>
-        <button className="btn sm pri" onClick={exportTeamsCSV}>Export CSV</button>
       </div>
       <div className="admin-table-container">
         <table className="admin-table">
@@ -222,12 +203,21 @@ export default function AdminScreen() {
             {teams.map(t => (
               <tr key={t.id} style={{ transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                 <td>
-                  <span 
-                    onClick={() => setViewingTeam(t)}
-                    style={{ fontWeight: 'bold', cursor: 'pointer', color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: 4 }}
-                  >
-                    {t.teamName}
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                    <span 
+                      onClick={() => setViewingTeam(t)}
+                      style={{ fontWeight: 'bold', cursor: 'pointer', color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: 4 }}
+                    >
+                      {t.teamName}
+                    </span>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {getRuleViolations(t).map((flag, idx) => (
+                        <span key={idx} style={{ fontSize: '10px', background: 'var(--stop)', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                          {flag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </td>
                 <td>{t.theme}</td>
                 <td>{t.track}</td>
@@ -246,7 +236,6 @@ export default function AdminScreen() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginTop: 32 }}>
         <h2>Seekers Database</h2>
-        <button className="btn sm pri" onClick={exportSeekersCSV}>Export CSV</button>
       </div>
       <div className="admin-table-container">
         <table className="admin-table">
