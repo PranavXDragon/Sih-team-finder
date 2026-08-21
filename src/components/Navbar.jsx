@@ -9,18 +9,14 @@ export default function Navbar() {
     <>
       <header className="top nav-top">
         <div className="nav-logos">
-          <img src="/Society.png" alt="Society Logo" />
+          <a href="#" title="Suryodaya Home" style={{ display: 'flex' }}>
+            <img src="/Society.png" alt="Society Logo" />
+          </a>
           <img src="/Academic.png" alt="Academic Logo" />
           <div style={{ width: 1, height: 32, background: "var(--border)", margin: "0 4px" }} />
           <img src="/SIH2026-logo.png" alt="SIH 2026 Logo" className="sih-logo-img" />
         </div>
-        <div className="nav-brand-text">
-          <div className="brand-sih-row">
-            <a className="brand" href="#">
-              <span>SIH <b>2026</b></span>
-            </a>
-          </div>
-        </div>
+
         <span className="sp" />
         {!user ? (
           <div style={{ display: 'flex', gap: '8px', marginRight: '12px' }}>
