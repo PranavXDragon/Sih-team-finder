@@ -260,6 +260,18 @@ export function SIHProvider({ children }) {
       if (!user) throw new Error("Not logged in");
       if (!mySeekerProfile) throw new Error("You must list yourself as a seeker first!");
       
+      // Check if user is already accepted into a team
+      const { data: acceptedData } = await supabase
+        .from('join_requests')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('status', 'accepted')
+        .maybeSingle();
+        
+      if (acceptedData) {
+        throw new Error("You are already in a team. You can only join one team.");
+      }
+
       const { error } = await supabase.from('join_requests').insert([{
         team_id: teamId,
         user_id: user.id,
@@ -267,7 +279,7 @@ export function SIHProvider({ children }) {
         status: 'pending'
       }]);
       if (error) {
-        if (error.code === '23505') throw new Error("You have already requested to join this team.");
+        if (error.code === '23505') throw new Error("You have already applied for this team.");
         throw error;
       }
       addToast("Request sent to Team Leader!", "ok");
@@ -285,7 +297,7 @@ export function SIHProvider({ children }) {
       const { error: rError } = await supabase.from('join_requests').update({ status: 'accepted' }).eq('id', requestId);
       if (rError) {
         if (rError.code === "23505") {
-          throw new Error("This student has already joined another team.");
+          throw new Error("This student has already joined another team (each student can only join one team).");
         }
         throw rError;
       }
