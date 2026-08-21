@@ -260,7 +260,14 @@ export default function SeekerModal({ initialData, onClose, onSuccess }) {
         
         {initialData && myApplications && myApplications.length > 0 && (
           <div className="mbody" style={{ marginTop: -16, borderTop: "1px solid var(--border)", paddingTop: 20 }}>
-            <h3>Teams You Applied To</h3>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+              <h3 style={{ margin: 0 }}>Teams You Applied To</h3>
+              <div style={{ display: "flex", gap: 8, fontSize: 12, flexWrap: "wrap" }}>
+                <span style={{ padding: "4px 8px", background: "var(--surface)", borderRadius: 12, color: "var(--text)", border: "1px solid var(--border)" }}>Total: {myApplications.length}</span>
+                <span style={{ padding: "4px 8px", background: "#c8f24d20", borderRadius: 12, color: "#c8f24d", border: "1px solid #c8f24d40" }}>Accepted: {myApplications.filter(a => a.status === 'accepted').length}</span>
+                <span style={{ padding: "4px 8px", background: "#ff4d4d20", borderRadius: 12, color: "#ff4d4d", border: "1px solid #ff4d4d40" }}>Rejected: {myApplications.filter(a => a.status === 'rejected').length}</span>
+              </div>
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 12 }}>
               {myApplications.map(app => (
                 <div key={app.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "var(--surface-hover)", borderRadius: 8, border: "1px solid var(--border)" }}>
