@@ -1,5 +1,5 @@
 import './BoardScreen.css';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSIH } from "../hooks/useSIH";
 import { SIH_THEMES } from "../data/constants";
 import TeamCard from "../components/TeamCard";
