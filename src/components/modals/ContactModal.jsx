@@ -1,6 +1,5 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useSIH } from "../../hooks/useSIH";
-import { WA_LINK } from "../../data/constants";
 
 export default function ContactModal({ team, onClose }) {
   const { toast } = useSIH();

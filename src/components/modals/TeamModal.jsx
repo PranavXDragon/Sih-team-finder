@@ -154,6 +154,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       finalWantsSkills.push(form.customSkill.trim());
     }
 
+    const hasFemale = (form.leaderGender === 'f') || filledMembers.some(m => m.gender === 'f');
     const payload = {
       teamName: (form.teamName || "").trim(),
       college: form.college || college,
@@ -164,7 +165,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       psTitle: (form.psTitle || "").trim(),
       pitch: (form.pitch || "").trim(),
       contact: (form.phone || "").trim() + ' | ' + (form.email || "").trim(),
-      needsFemale: true, // simplified
+      needsFemale: !hasFemale,
       wantsSkills: finalWantsSkills,
       seatsOpen,
       totalSeats: 6,

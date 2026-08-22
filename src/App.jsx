@@ -65,7 +65,7 @@ export default function App() {
         }
       }
     }
-  }, [session, isLoading, myTeam, mySeekerProfile]);
+  }, [session, isLoading, myTeam, mySeekerProfile, addToast]);
 
   useEffect(() => {
     const handleAuthEvent = (e) => {
@@ -138,7 +138,7 @@ export default function App() {
         <AuthModal
           onClose={() => setShowAuth(false)}
           defaultIsSignUp={authDefaultSignUp}
-          onSuccess={(isSignUp) => {
+          onSuccess={() => {
             setShowAuth(false);
             // Onboarding is automatically handled by the useEffect for new users
           }}

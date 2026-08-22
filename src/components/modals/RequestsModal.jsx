@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { useSIH } from "../../hooks/useSIH";
 
 export default function RequestsModal({ onClose }) {
-  const { myRequests, acceptRequest, rejectRequest, addToast } = useSIH();
+  const { myRequests, acceptRequest, rejectRequest } = useSIH();
   const [rejectingId, setRejectingId] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
 

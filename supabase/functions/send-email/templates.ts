@@ -1,21 +1,5 @@
-const escapeHtml = (unsafe: string) => {
-  if (typeof unsafe !== 'string') return unsafe;
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-};
 
-export const generateEmailHTML = (type: string, rawPayload: any) => {
-  // Sanitize all payload strings to prevent XSS injections in emails
-  const payload = { ...rawPayload };
-  for (const key in payload) {
-    if (Object.prototype.hasOwnProperty.call(payload, key)) {
-      payload[key] = escapeHtml(payload[key]);
-    }
-  }
+export const generateEmailHTML = (type: string, payload: any) => {
   const head = `
 <!DOCTYPE html>
 <html lang="en">
@@ -584,7 +568,7 @@ export const generateEmailHTML = (type: string, rawPayload: any) => {
                     </tr>
                   </table>
                   <h1 class="email-header-title" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 22px; color: #f7f3ea; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">SIH 2026 SCET</h1>
-                  <div class="email-header-subtitle" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9ba2b4; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.12em;">Application Status Update</div>
+                  <div class="email-header-subtitle" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9ba2b4; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.12em;">Team Membership Update</div>
                 </td>
               </tr>
             </table>
@@ -595,20 +579,22 @@ export const generateEmailHTML = (type: string, rawPayload: any) => {
         <tr>
           <td class="email-body" style="padding: 32px; color: #f7f3ea; font-size: 15px; line-height: 1.65;">
             <h2 class="email-heading" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 20px; color: #f7f3ea; margin-top: 0; margin-bottom: 18px; line-height: 1.25;">
-              Application Status Update
+              Team Membership Update
             </h2>
 
             <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{student_name}},</p>
 
-            <p style="margin: 0 0 16px; color: #f7f3ea;">This is to inform you that your request to join <strong style="color: #ff456b;">{{team_name}}</strong> has been declined.</p>
+            <p style="margin: 0 0 16px; color: #f7f3ea;">This is to inform you that you have been <strong style="color: #ff456b;">removed from {{team_name}}</strong> on the SIH 2026 SCET Platform.</p>
 
             <!-- Removal Details Card -->
             <div class="details-card" style="background-color: #212533; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 20px; margin: 22px 0;">
               <span class="details-label" style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: #ff456b; text-transform: uppercase; letter-spacing: 0.18em; display: inline-block; margin-bottom: 10px; background: rgba(255, 69, 107, 0.12); border: 1px solid rgba(255, 69, 107, 0.25); padding: 3px 8px; border-radius: 4px;">Update Details</span>
               <p style="margin: 6px 0; color: #f7f3ea;"><strong style="color: #9ba2b4;">Team:</strong> {{team_name}}</p>
-              <p style="margin: 6px 0; color: #f7f3ea;"><strong style="color: #9ba2b4;">Reviewed By:</strong> {{team_leader}}</p>
+              <p style="margin: 6px 0; color: #f7f3ea;"><strong style="color: #9ba2b4;">Action Taken By:</strong> {{team_leader}}</p>
               <p style="margin: 6px 0; color: #f7f3ea;"><strong style="color: #9ba2b4;">Reason:</strong> {{removal_reason}}</p>
             </div>
+
+            <p style="margin: 0 0 16px; color: #9ba2b4;">You are no longer listed as a member of this team.</p>
 
             <p style="margin: 0 0 16px; color: #9ba2b4;">If you are still looking for a team, you can explore other available teams and connect with students looking for teammates through the platform.</p>
 
@@ -727,72 +713,7 @@ export const generateEmailHTML = (type: string, rawPayload: any) => {
       .replace(/{{skills}}/g, payload.skills || 'N/A')
       .replace(/{{email}}/g, payload.email || 'N/A')
       .replace(/{{request_message}}/g, payload.request_message || 'I would love to join your team!')
-      .replace(/{{request_link}}/g, 'https://sih.scetngp.com/#requests');
-  } else if (type === 'TEAM_INVITE') {
-    body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
-        <!-- Header -->
-        <tr>
-          <td class="email-header" style="background-color: #151721; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding: 24px 32px;">
-            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td>
-                  <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 8px;">
-                    <tr>
-                      <td style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: #00d2ff; background-color: rgba(0, 210, 255, 0.12); border: 1px solid rgba(0, 210, 255, 0.25); padding: 3px 8px; border-radius: 4px; letter-spacing: 0.16em; text-transform: uppercase;">
-                        SIH 2026 • TEAM INVITATION
-                      </td>
-                    </tr>
-                  </table>
-                  <h1 class="email-header-title" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 22px; color: #f7f3ea; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">SIH 2026 SCET</h1>
-                  <div class="email-header-subtitle" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9ba2b4; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.12em;">You're Invited!</div>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <!-- Content -->
-        <tr>
-          <td class="email-body" style="padding: 32px; color: #f7f3ea; font-size: 15px; line-height: 1.65;">
-            <h2 class="email-heading" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 20px; color: #f7f3ea; margin-top: 0; margin-bottom: 18px; line-height: 1.25;">
-              You have been invited to join {{team_name}}
-            </h2>
-
-            <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{seeker_name}},</p>
-
-            <p style="margin: 0 0 16px; color: #f7f3ea;">The team leader <strong>{{team_leader_name}}</strong> has found your profile and thinks you'd be a great fit for their team!</p>
-
-            <p style="margin: 18px 0 8px; color: #f7f3ea; font-weight: 600;">Message from the Team Leader:</p>
-
-            <!-- Quote Block -->
-            <div class="quote-box" style="background-color: rgba(0, 210, 255, 0.08); border-left: 3px solid #00d2ff; border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 12px 0 20px; color: #f4efe2; font-style: italic;">
-              {{invite_message}}
-            </div>
-
-            <!-- CTA Button -->
-            <table cellpadding="0" cellspacing="0" border="0" style="margin: 16px 0 20px;">
-              <tr>
-                <td style="border-radius: 100px; background-color: #c8f24d;">
-                  <a class="btn-primary" href="{{platform_link}}" style="display: inline-block; background-color: #c8f24d; color: #101a05 !important; font-family: 'Space Grotesk', Arial, sans-serif; font-weight: 700; font-size: 14.5px; text-decoration: none; padding: 12px 26px; border-radius: 100px; text-align: center;">View Team Details →</a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td class="email-footer" style="background-color: #12141c; border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 22px 32px; font-size: 12.5px; color: #9ba2b4;">
-            Best regards,<br>
-            <strong style="color: #f7f3ea; font-size: 13.5px;">SIH 2026 SCET Team</strong>
-          </td>
-        </tr>
-      </table>`
-      .replace(/{{seeker_name}}/g, payload.seeker_name || 'Student')
-      .replace(/{{team_name}}/g, payload.team_name || 'the team')
-      .replace(/{{team_leader_name}}/g, payload.team_leader_name || 'The Team Leader')
-      .replace(/{{invite_message}}/g, payload.invite_message || 'We would love to have you on our team!')
-      .replace(/{{platform_link}}/g, 'https://sih.scetngp.com/#board');
+      .replace(/{{request_link}}/g, 'https://sih.scetngp.com/#board');
   } else {
     body = '<p>Notification from SIH SCET Platform.</p>';
   }

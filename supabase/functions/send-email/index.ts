@@ -41,16 +41,16 @@ serve(async (req) => {
       })
     }
 
-    const { to, subject: fallbackSubject, type, payload, html } = await req.json()
+    const { to, subject: fallbackSubject, type, payload } = await req.json()
 
-    if (!to || (!html && !type)) {
-      return new Response(JSON.stringify({ error: 'Missing parameters' }), {
+    if (!to || !type) {
+      return new Response(JSON.stringify({ error: 'Missing parameters: to and type are required' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       })
     }
 
-    let finalHtml = html;
+    let finalHtml = '';
     let finalSubject = fallbackSubject || 'SIH 2026 Notification';
 
     if (type) {

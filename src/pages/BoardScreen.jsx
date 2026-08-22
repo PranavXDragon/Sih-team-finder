@@ -45,15 +45,14 @@ export default function BoardScreen({ initialAction, onBack }) {
     }
   }, [initialAction]);
 
-  // Clear team filter if they start typing other filters
-  if ((query || filterTrack || filterTheme || filterFemale || filterHasPs || activeSkills.length > 0) && filterTeamId) {
-    setFilterTeamId("");
-    if (window.location.hash.includes("?team=")) {
-      window.location.hash = "board";
+  useEffect(() => {
+    if ((query || filterTrack || filterTheme || filterFemale || filterHasPs || activeSkills.length > 0) && filterTeamId) {
+      setFilterTeamId("");
+      if (window.location.hash.includes("?team=")) {
+        window.history.replaceState(null, "", "#board");
+      }
     }
-  }
-
-
+  }, [query, filterTrack, filterTheme, filterFemale, filterHasPs, activeSkills, filterTeamId]);
 
   const clearAll = () => {
     setQuery(""); setFilterTrack(""); setFilterTheme("");

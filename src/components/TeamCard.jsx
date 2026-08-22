@@ -12,9 +12,9 @@ function timeAgo(ts) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-export default function TeamCard({ team, onEdit }) {
+export default function TeamCard({ team }) {
   const [isJoining, setIsJoining] = useState(false);
-  const { user, myTeam, mySeekerProfile, myAcceptedRequests, myApplications, requestToJoin, addToast } = useSIH();
+  const { user, myTeam, myAcceptedRequests, myApplications, requestToJoin } = useSIH();
   const actualSeatsOpen = Math.max(0, (team.totalSeats || 6) - (team.members?.length || 1));
   const filled = (team.totalSeats || 6) - actualSeatsOpen;
   const isFull = actualSeatsOpen === 0;

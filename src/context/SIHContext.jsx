@@ -401,6 +401,10 @@ export function SIHProvider({ children }) {
     try {
       if (!myTeam) return;
 
+      if (myTeam.members?.length >= 6) {
+        throw new Error("Your team is already full (max 6 members).");
+      }
+
       // SIH Rule Check: A complete team of 6 members must include at least one female member
       const tempMembers = [...(myTeam.members || []), {
         name: seekerProfile.name,
@@ -499,6 +503,7 @@ export function SIHProvider({ children }) {
   const sendTeamInvite = useCallback(async (seeker, message) => {
     try {
       if (!myTeam) throw new Error("You must have a team to send invites.");
+      if (myTeam.members?.length >= 6) throw new Error("Your team is already full (max 6 members).");
 
       let seekerEmail = seeker.email;
       if (!seekerEmail && seeker.whatsapp) {

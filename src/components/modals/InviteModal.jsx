@@ -17,7 +17,7 @@ export default function InviteModal({ seeker, onClose }) {
       await sendTeamInvite(seeker, msg);
       toast(`Invite sent to ${seeker.name}!`, "ok");
       onClose();
-    } catch (error) {
+    } catch (_err) {
       // Error is handled by context toast
     } finally {
       setLoading(false);
