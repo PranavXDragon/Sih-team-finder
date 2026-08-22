@@ -42,28 +42,28 @@ export const generateEmailHTML = (type: string, payload: any) => {
   if (type === 'REGISTERED') {
     body = \`${template1}\`
       .replace(/{{student_name}}/g, payload.student_name || 'Student')
-      .replace(/{{platform_link}}/g, 'https://sih2026.tech/');
+      .replace(/{{platform_link}}/g, 'https://sih.scetngp.com/');
   } else if (type === 'TEAM_CREATED') {
     body = \`${template1}\`
       .replace(/Template 1 • Registration Confirmation/g, 'Template • Team Created')
       .replace(/You’re Registered on the SIH 2026 SCET Platform 🎉/g, 'Your Team has been Created 🎉')
       .replace(/Your registration has been successfully completed./g, 'You have successfully created your team on the platform!')
       .replace(/{{student_name}}/g, payload.student_name || 'Team Leader')
-      .replace(/{{platform_link}}/g, 'https://sih2026.tech/#board');
+      .replace(/{{platform_link}}/g, 'https://sih.scetngp.com/#board');
   } else if (type === 'ACCEPTED') {
     body = \`${template4}\`
       .replace(/{{student_name}}/g, payload.student_name || 'Student')
       .replace(/{{team_name}}/g, payload.team_name || 'the team')
       .replace(/{{team_leader}}/g, payload.team_leader || 'Team Leader')
       .replace(/{{member_count}}/g, payload.member_count || 'Several')
-      .replace(/{{team_link}}/g, 'https://sih2026.tech/#board');
+      .replace(/{{team_link}}/g, 'https://sih.scetngp.com/#board');
   } else if (type === 'REJECTED') {
     body = \`${template5}\`
       .replace(/{{student_name}}/g, payload.student_name || 'Student')
       .replace(/{{team_name}}/g, payload.team_name || 'the team')
       .replace(/{{team_leader}}/g, payload.team_leader || 'Team Leader')
       .replace(/{{removal_reason}}/g, payload.removal_reason || 'Team requirements were updated.')
-      .replace(/{{platform_link}}/g, 'https://sih2026.tech/');
+      .replace(/{{platform_link}}/g, 'https://sih.scetngp.com/');
   } else if (type === 'JOIN_REQUEST') {
     body = \`${template6}\`
       .replace(/{{team_leader_name}}/g, payload.team_leader_name || 'Team Leader')
@@ -73,7 +73,7 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/{{skills}}/g, payload.skills || 'N/A')
       .replace(/{{email}}/g, payload.email || 'N/A')
       .replace(/{{request_message}}/g, payload.request_message || 'I would love to join your team!')
-      .replace(/{{request_link}}/g, 'https://sih2026.tech/#board');
+      .replace(/{{request_link}}/g, 'https://sih.scetngp.com/#board');
   } else {
     body = '<p>Notification from SIH SCET Platform.</p>';
   }
