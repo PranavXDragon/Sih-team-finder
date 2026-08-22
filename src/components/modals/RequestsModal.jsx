@@ -24,7 +24,14 @@ export default function RequestsModal({ onClose }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
               {myRequests.map((req) => (
                 <div key={req.id} style={{ border: "1px solid var(--border)", padding: 16, borderRadius: 8, background: "var(--card)", width: "100%", minWidth: 0 }}>
-                  <h4 style={{ margin: "0 0 8px 0" }}>{req.seekers.name}</h4>
+                  <h4 style={{ margin: "0 0 8px 0", display: "flex", alignItems: "center", gap: 8 }}>
+                    {req.seekers.name}
+                    {req.reapply_count > 0 && (
+                      <span style={{ fontSize: "0.75rem", padding: "2px 6px", background: "var(--warn-dim)", color: "var(--warn)", borderRadius: 4, fontWeight: 600, border: "1px solid rgba(255, 159, 28, 0.4)" }}>
+                        Re-applied (Attempt {req.reapply_count + 1}/2)
+                      </span>
+                    )}
+                  </h4>
                   <div style={{ display: "flex", gap: 8, fontSize: "0.85rem", color: "var(--mut)", marginBottom: 12, flexWrap: "wrap" }}>
                     <span>{req.seekers.dept}</span> &bull;
                     <span>{req.seekers.year}</span> &bull;

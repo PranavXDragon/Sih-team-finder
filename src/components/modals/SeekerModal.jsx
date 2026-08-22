@@ -287,7 +287,11 @@ export default function SeekerModal({ initialData, onClose, onSuccess, showAppli
                         Status: <span style={{
                           color: app.status === 'accepted' ? '#c8f24d' : app.status === 'rejected' ? '#ff4d4d' : '#ff9f1c',
                           fontWeight: 600, textTransform: 'capitalize'
-                        }}>{app.status}</span>
+                        }}>
+                          {app.status}
+                          {app.status === 'rejected' ? ` (Attempt ${(app.reapply_count || 0) + 1}/2)` : ''}
+                          {app.status === 'pending' && app.reapply_count > 0 ? ` (Re-application)` : ''}
+                        </span>
                       </p>
                       {app.status === 'rejected' && app.rejection_reason && (
                         <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-dim)" }}>Reason: {app.rejection_reason}</p>
