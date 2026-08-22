@@ -47,7 +47,7 @@ export default function TeamCard({ team, onEdit }) {
   };
 
   const handleShare = () => {
-    const slug = team.teamName
+    const slug = (team.teamName || "")
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, "")
@@ -69,7 +69,7 @@ export default function TeamCard({ team, onEdit }) {
       </div>
       {team.pitch && <p className="pitch">{team.pitch}</p>}
       <div className="rowmeta">
-        <span>College <i>{team.college.split(",")[0]}</i></span>
+        <span>College <i>{team.college?.split(",")[0] || "Unknown"}</i></span>
         <span>Theme <i>{team.theme}</i></span>
         {team.psId && <span>PS <i>{team.psId}</i></span>}
         {team.hasMentor && <span style={{ color: "var(--open)" }}>✓ Has mentor</span>}

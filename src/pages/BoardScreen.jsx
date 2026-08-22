@@ -68,14 +68,14 @@ export default function BoardScreen({ initialAction, onBack }) {
     return teams.filter((t) => {
       if (filterTeamId) {
         const cleanStr = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, "");
-        const isMatch = t.id === filterTeamId || cleanStr(t.teamName) === cleanStr(filterTeamId);
+        const isMatch = t.id === filterTeamId || cleanStr(t.teamName || "") === cleanStr(filterTeamId);
         if (!isMatch) return false;
       }
       if (filterTrack && t.track !== filterTrack) return false;
       if (filterTheme && t.theme !== filterTheme) return false;
       if (filterFemale && !t.needsFemale) return false;
       if (filterHasPs && !t.psId) return false;
-      if (query && !t.teamName.toLowerCase().includes(query.toLowerCase()) && !t.psId?.toLowerCase().includes(query.toLowerCase())) return false;
+      if (query && !t.teamName?.toLowerCase().includes(query.toLowerCase()) && !t.psId?.toLowerCase().includes(query.toLowerCase())) return false;
       if (activeSkills.length > 0) {
         if (!t.wantsSkills) return false;
         if (!activeSkills.some((s) => t.wantsSkills.includes(s))) return false;
@@ -87,7 +87,7 @@ export default function BoardScreen({ initialAction, onBack }) {
   const filteredSeekers = useMemo(() => {
     return seekers.filter((s) => {
       if (!s.listed) return false;
-      if (query && !s.name.toLowerCase().includes(query.toLowerCase())) return false;
+      if (query && !s.name?.toLowerCase().includes(query.toLowerCase())) return false;
       if (activeSkills.length > 0) {
         if (!s.skills) return false;
         if (!activeSkills.some((sk) => s.skills.includes(sk))) return false;

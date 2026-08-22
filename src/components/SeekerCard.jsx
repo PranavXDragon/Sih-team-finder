@@ -10,7 +10,7 @@ function timeAgo(ts) {
 }
 
 export default function SeekerCard({ seeker, onInvite }) {
-  const initials = seeker.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+  const initials = (seeker.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
   const isFemale = seeker.gender === "f";
 
   return (
@@ -18,8 +18,8 @@ export default function SeekerCard({ seeker, onInvite }) {
       <div className="scard-head">
         <div className={`scard-av${isFemale ? " f" : ""}`}>{initials}</div>
         <div className="scard-info">
-          <b>{seeker.name}</b>
-          <small>{seeker.program ? `${seeker.program} - ` : ""}{seeker.dept} · {seeker.year} · {seeker.college.split(",")[0]}</small>
+          <b>{seeker.name || "Unknown"}</b>
+          <small>{seeker.program ? `${seeker.program} - ` : ""}{seeker.dept} · {seeker.year} · {seeker.college?.split(",")[0] || "Unknown"}</small>
         </div>
         {isFemale && (
           <span className="chip mini" style={{ background: "rgba(219,39,119,0.15)", borderColor: "rgba(219,39,119,0.4)", color: "#f9a8d4", cursor: "default" }}>
