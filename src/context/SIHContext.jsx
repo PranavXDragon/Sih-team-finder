@@ -330,10 +330,14 @@ export function SIHProvider({ children }) {
         if (existingRequest.status === 'accepted') {
           throw new Error("You are already in this team.");
         }
-        // If they were rejected, allow them to re-apply
+        // If they were rejected, allow them to re-apply (max 1 reapplication)
         if (existingRequest.status === 'rejected') {
+          if ((existingRequest.reapply_count || 0) >= 1) {
+            throw new Error("You have reached the maximum number of reapplications for this team.");
+          }
+
           const { data, error } = await supabase.from('join_requests')
-            .update({ status: 'pending' })
+            .update({ status: 'pending', reapply_count: (existingRequest.reapply_count || 0) + 1 })
             .eq('id', existingRequest.id)
             .select();
 
