@@ -514,6 +514,28 @@ export function SIHProvider({ children }) {
         seekerEmail = seeker.whatsapp.split('|')[1]?.trim();
       }
 
+      // Check if there is already a request or invite
+      const { data: existing } = await supabase.from('join_requests')
+        .select('*')
+        .eq('team_id', myTeam.id)
+        .eq('user_id', seeker.user_id)
+        .maybeSingle();
+
+      if (existing) {
+        throw new Error("This student has already requested to join or you have already invited them.");
+      }
+
+      // Insert invite into database
+      const { error: dbErr } = await supabase.from('join_requests').insert({
+        team_id: myTeam.id,
+        user_id: seeker.user_id,
+        seeker_id: seeker.id,
+        status: 'invited'
+      });
+
+      if (dbErr) throw dbErr;
+
+      // Send Email
       const { error: fnErr } = await supabase.functions.invoke('send-email', {
         body: {
           to: seekerEmail || seeker.email,

@@ -110,6 +110,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     if (!form.track) e.track = true;
     if (!form.theme) e.theme = true;
     if (!form.leaderName.trim()) e.leaderName = true;
+    if (!form.leaderGender || form.leaderGender === "na") e.leaderGender = true;
     if (!form.wantsSkills.length) e.wantsSkills = true;
     if (!form.phone.trim()) e.phone = true;
 
@@ -117,7 +118,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     let membersValid = true;
     form.members.forEach((m) => {
       if (m.name.trim()) {
-        if (!m.email.trim() || !m.phone.trim() || !m.program || !m.branch || !m.year || !m.gender) {
+        if (!m.email.trim() || !m.phone.trim() || !m.program || !m.branch || !m.year || !m.gender || m.gender === "na") {
           membersValid = false;
         }
       }
@@ -126,7 +127,18 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
 
     setErrs(e);
     if (Object.keys(e).length > 0) {
-      addToast("Please fill all mandatory fields: " + Object.keys(e).join(", "), "err");
+      const friendlyNames = {
+        teamName: "team name",
+        track: "track",
+        theme: "theme",
+        leaderName: "leader name",
+        leaderGender: "gender",
+        wantsSkills: "skills needed",
+        phone: "contact number",
+        members: "member details"
+      };
+      const missingFields = Object.keys(e).map(key => friendlyNames[key] || key);
+      addToast("Please fill all mandatory fields: " + missingFields.join(", "), "err");
       return false;
     }
 
@@ -343,8 +355,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                   options={YEARS}
                 />
               </div>
-              <div className="fld">
-                <label>Gender</label>
+              <div className={`fld${errs.leaderGender ? " bad" : ""}`}>
+                <label>Gender<em>*</em></label>
                 <CustomSelect
                   value={form.leaderGender}
                   onChange={(val) => set("leaderGender", val)}

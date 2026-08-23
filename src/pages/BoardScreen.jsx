@@ -6,10 +6,11 @@ import TeamCard from "../components/TeamCard";
 import SeekerCard from "../components/SeekerCard";
 import TeamModal from "../components/modals/TeamModal";
 import SeekerModal from "../components/modals/SeekerModal";
+import InviteModal from "../components/modals/InviteModal";
 import CustomSelect from "../components/CustomSelect";
 
 export default function BoardScreen({ initialAction, onBack }) {
-  const { teams, seekers, stats, isLoading } = useSIH();
+  const { teams, seekers, stats, isLoading, session, myTeam, addToast } = useSIH();
 
   const [tab, setTab] = useState(initialAction === "list-seeker" ? "seekers" : "teams");
   const [query, setQuery] = useState("");
@@ -17,7 +18,6 @@ export default function BoardScreen({ initialAction, onBack }) {
   const [filterTheme, setFilterTheme] = useState("");
   const [filterFemale, setFilterFemale] = useState(false);
   const [filterHasPs, setFilterHasPs] = useState(false);
-  const [filterHideFull, setFilterHideFull] = useState(true);
   const [activeSkills, setActiveSkills] = useState([]);
 
   // Initialize filterTeamId directly from window.location.hash
@@ -28,6 +28,7 @@ export default function BoardScreen({ initialAction, onBack }) {
 
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [showSeekerModal, setShowSeekerModal] = useState(false);
+  const [inviteSeeker, setInviteSeeker] = useState(null);
 
   useEffect(() => {
     const handleHashTeam = () => {
@@ -47,21 +48,39 @@ export default function BoardScreen({ initialAction, onBack }) {
   }, [initialAction]);
 
   useEffect(() => {
-    if ((query || filterTrack || filterTheme || filterFemale || filterHasPs || !filterHideFull || activeSkills.length > 0) && filterTeamId) {
+    if ((query || filterTrack || filterTheme || filterFemale || filterHasPs || activeSkills.length > 0) && filterTeamId) {
       setFilterTeamId("");
       if (window.location.hash.includes("?team=")) {
         window.history.replaceState(null, "", "#board");
       }
     }
-  }, [query, filterTrack, filterTheme, filterFemale, filterHasPs, filterHideFull, activeSkills, filterTeamId]);
+  }, [query, filterTrack, filterTheme, filterFemale, filterHasPs, activeSkills, filterTeamId]);
 
   const clearAll = () => {
     setQuery(""); setFilterTrack(""); setFilterTheme("");
-    setFilterFemale(false); setFilterHasPs(false); setFilterHideFull(true); setActiveSkills([]);
+    setFilterFemale(false); setFilterHasPs(false); setActiveSkills([]);
     setFilterTeamId("");
     if (window.location.hash.includes("?team=")) {
       window.location.hash = "board";
     }
+  };
+
+  const handleInvite = (seeker) => {
+    if (!session?.user) {
+      addToast("Please create an account to invite members.", "err");
+      localStorage.setItem("sih_intent", "post-team");
+      window.location.hash = ""; // Redirect to landing
+      setTimeout(() => {
+        document.dispatchEvent(new CustomEvent("triggerAuth", { detail: "signup" }));
+      }, 100);
+      return;
+    }
+    if (!myTeam) {
+      addToast("You need to register a team first before you can invite members.", "err");
+      setShowTeamModal(true);
+      return;
+    }
+    setInviteSeeker(seeker);
   };
 
   const filteredTeams = useMemo(() => {
@@ -75,10 +94,6 @@ export default function BoardScreen({ initialAction, onBack }) {
       if (filterTheme && t.theme !== filterTheme) return false;
       if (filterFemale && !t.needsFemale) return false;
       if (filterHasPs && !t.psId) return false;
-      if (filterHideFull && !filterTeamId) {
-        const actualSeatsOpen = Math.max(0, (t.totalSeats || 6) - (t.members?.length || 1));
-        if (actualSeatsOpen === 0) return false;
-      }
       if (query && !t.teamName?.toLowerCase().includes(query.toLowerCase()) && !t.psId?.toLowerCase().includes(query.toLowerCase())) return false;
       if (activeSkills.length > 0) {
         if (!t.wantsSkills) return false;
@@ -86,7 +101,7 @@ export default function BoardScreen({ initialAction, onBack }) {
       }
       return true;
     });
-  }, [teams, filterTrack, filterTheme, filterFemale, filterHasPs, filterHideFull, query, activeSkills, filterTeamId]);
+  }, [teams, filterTrack, filterTheme, filterFemale, filterHasPs, query, activeSkills, filterTeamId]);
 
   const filteredSeekers = useMemo(() => {
     return seekers.filter((s) => {
@@ -140,7 +155,12 @@ export default function BoardScreen({ initialAction, onBack }) {
         <div className="boardbar">
           <div className="bb-txt">
             <b>{tab === "teams" ? "Teams looking for members" : "Students looking for teams"}</b>
-            <span>{tab === "teams" ? `${teams.length} Teams up` : `${seekers.length} Seekers free`}</span>
+            <span>
+              {tab === "teams" ? (() => {
+                const openCount = teams.filter(t => Math.max(0, (t.totalSeats || 6) - (t.members?.length || 1)) > 0).length;
+                return `${openCount} looking for members (${teams.length} total on board)`;
+              })() : `${seekers.length} Seekers free`}
+            </span>
           </div>
           <span className="sp" />
 
@@ -188,10 +208,6 @@ export default function BoardScreen({ initialAction, onBack }) {
                     <input type="checkbox" checked={filterHasPs} onChange={(e) => setFilterHasPs(e.target.checked)} />
                     Has PS
                   </label>
-                  <label style={{ display: "flex", gap: 6, alignItems: "center", cursor: "pointer", fontWeight: 600 }}>
-                    <input type="checkbox" checked={filterHideFull} onChange={(e) => setFilterHideFull(e.target.checked)} />
-                    Hide Full Teams
-                  </label>
                 </div>
               )}
 
@@ -216,7 +232,7 @@ export default function BoardScreen({ initialAction, onBack }) {
         ) : (
           <div className="grid">
             {filteredSeekers.map((s) => (
-              <SeekerCard key={s.id} seeker={s} />
+              <SeekerCard key={s.id} seeker={s} onInvite={handleInvite} />
             ))}
             {filteredSeekers.length === 0 && (
               <div className="empty" style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px" }}>
@@ -231,6 +247,7 @@ export default function BoardScreen({ initialAction, onBack }) {
       {/* Modals */}
       {showTeamModal && <TeamModal onClose={() => setShowTeamModal(false)} />}
       {showSeekerModal && <SeekerModal onClose={() => setShowSeekerModal(false)} />}
+      {inviteSeeker && <InviteModal seeker={inviteSeeker} onClose={() => setInviteSeeker(null)} />}
     </>
   );
 }
