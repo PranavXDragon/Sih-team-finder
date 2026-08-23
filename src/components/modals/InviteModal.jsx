@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSIH } from "../../hooks/useSIH";
 
 export default function InviteModal({ seeker, onClose }) {
-  const { toast, sendTeamInvite } = useSIH();
+  const { addToast, sendTeamInvite } = useSIH();
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ export default function InviteModal({ seeker, onClose }) {
     setLoading(true);
     try {
       await sendTeamInvite(seeker, msg);
-      toast(`Invite sent to ${seeker.name}!`, "ok");
+      addToast(`Invite sent to ${seeker.name}!`, "ok");
       onClose();
     } catch (_err) {
       // Error is handled by context toast

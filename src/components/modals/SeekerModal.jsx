@@ -11,7 +11,7 @@ const GENDER_OPTIONS = [
 ];
 
 export default function SeekerModal({ initialData, onClose, onSuccess, showApplicationsOnly }) {
-  const { addSeeker, updateSeeker, college, addToast, user, myApplications } = useSIH();
+  const { addSeeker, updateSeeker, college, addToast, user, myApplications, respondToInvite } = useSIH();
   const [submitting, setSubmitting] = useState(false);
 
   let initPhone = "";
@@ -299,6 +299,12 @@ export default function SeekerModal({ initialData, onClose, onSuccess, showAppli
                     </div>
                     {app.status === 'accepted' && app.teams?.contact && (
                       <a href={`mailto:${app.teams.contact.split('|').pop().trim()}`} className="btn-primary" style={{ padding: "6px 12px", fontSize: 12, textDecoration: "none" }}>Contact Leader</a>
+                    )}
+                    {app.status === 'invited' && (
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button className="btn sm gho" type="button" onClick={() => respondToInvite(app.id, false)} style={{ color: "var(--text-dim)" }}>Decline</button>
+                        <button className="btn sm pri" type="button" onClick={() => respondToInvite(app.id, true)}>Apply Now</button>
+                      </div>
                     )}
                   </div>
                 ))}
