@@ -17,6 +17,7 @@ export default function BoardScreen({ initialAction, onBack }) {
   const [filterTheme, setFilterTheme] = useState("");
   const [filterFemale, setFilterFemale] = useState(false);
   const [filterHasPs, setFilterHasPs] = useState(false);
+  const [filterHideFull, setFilterHideFull] = useState(true);
   const [activeSkills, setActiveSkills] = useState([]);
 
   // Initialize filterTeamId directly from window.location.hash
@@ -46,17 +47,17 @@ export default function BoardScreen({ initialAction, onBack }) {
   }, [initialAction]);
 
   useEffect(() => {
-    if ((query || filterTrack || filterTheme || filterFemale || filterHasPs || activeSkills.length > 0) && filterTeamId) {
+    if ((query || filterTrack || filterTheme || filterFemale || filterHasPs || !filterHideFull || activeSkills.length > 0) && filterTeamId) {
       setFilterTeamId("");
       if (window.location.hash.includes("?team=")) {
         window.history.replaceState(null, "", "#board");
       }
     }
-  }, [query, filterTrack, filterTheme, filterFemale, filterHasPs, activeSkills, filterTeamId]);
+  }, [query, filterTrack, filterTheme, filterFemale, filterHasPs, filterHideFull, activeSkills, filterTeamId]);
 
   const clearAll = () => {
     setQuery(""); setFilterTrack(""); setFilterTheme("");
-    setFilterFemale(false); setFilterHasPs(false); setActiveSkills([]);
+    setFilterFemale(false); setFilterHasPs(false); setFilterHideFull(true); setActiveSkills([]);
     setFilterTeamId("");
     if (window.location.hash.includes("?team=")) {
       window.location.hash = "board";
@@ -74,6 +75,10 @@ export default function BoardScreen({ initialAction, onBack }) {
       if (filterTheme && t.theme !== filterTheme) return false;
       if (filterFemale && !t.needsFemale) return false;
       if (filterHasPs && !t.psId) return false;
+      if (filterHideFull && !filterTeamId) {
+        const actualSeatsOpen = Math.max(0, (t.totalSeats || 6) - (t.members?.length || 1));
+        if (actualSeatsOpen === 0) return false;
+      }
       if (query && !t.teamName?.toLowerCase().includes(query.toLowerCase()) && !t.psId?.toLowerCase().includes(query.toLowerCase())) return false;
       if (activeSkills.length > 0) {
         if (!t.wantsSkills) return false;
@@ -81,7 +86,7 @@ export default function BoardScreen({ initialAction, onBack }) {
       }
       return true;
     });
-  }, [teams, filterTrack, filterTheme, filterFemale, filterHasPs, query, activeSkills, filterTeamId]);
+  }, [teams, filterTrack, filterTheme, filterFemale, filterHasPs, filterHideFull, query, activeSkills, filterTeamId]);
 
   const filteredSeekers = useMemo(() => {
     return seekers.filter((s) => {
@@ -182,6 +187,10 @@ export default function BoardScreen({ initialAction, onBack }) {
                   <label style={{ display: "flex", gap: 6, alignItems: "center", cursor: "pointer", fontWeight: 600 }}>
                     <input type="checkbox" checked={filterHasPs} onChange={(e) => setFilterHasPs(e.target.checked)} />
                     Has PS
+                  </label>
+                  <label style={{ display: "flex", gap: 6, alignItems: "center", cursor: "pointer", fontWeight: 600 }}>
+                    <input type="checkbox" checked={filterHideFull} onChange={(e) => setFilterHideFull(e.target.checked)} />
+                    Hide Full Teams
                   </label>
                 </div>
               )}
