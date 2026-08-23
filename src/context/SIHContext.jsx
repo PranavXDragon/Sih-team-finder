@@ -557,6 +557,60 @@ export function SIHProvider({ children }) {
     }
   }, [myTeam, addToast]);
 
+  const respondToInvite = useCallback(async (app, accept) => {
+    try {
+      const requestId = app.id;
+      if (accept) {
+        const { error } = await supabase.from('join_requests').update({ status: 'pending' }).eq('id', requestId);
+        if (error) throw error;
+        addToast("Invite accepted! Your request is now pending with the team leader.", "ok");
+        
+        const leaderEmail = app.teams?.contact?.split('|')[1]?.trim();
+        if (leaderEmail) {
+          supabase.functions.invoke('send-email', {
+            body: {
+              to: leaderEmail,
+              subject: `${app.seekers?.name || 'A student'} accepted your team invite!`,
+              type: 'REQUEST',
+              payload: {
+                student_name: app.seekers?.name || 'A student',
+                team_name: app.teams?.teamName || 'your team',
+                request_message: 'I have accepted your invite and applied to join your team! Please finalize my request on your dashboard.'
+              }
+            }
+          }).catch(console.error);
+        }
+      } else {
+        const { error } = await supabase.from('join_requests').delete().eq('id', requestId);
+        if (error) throw error;
+        addToast("Invite declined.", "ok");
+        
+        const leaderEmail = app.teams?.contact?.split('|')[1]?.trim();
+        if (leaderEmail) {
+          supabase.functions.invoke('send-email', {
+            body: {
+              to: leaderEmail,
+              subject: `${app.seekers?.name || 'A student'} declined your team invite`,
+              type: 'DECLINED_INVITE',
+              payload: {
+                student_name: app.seekers?.name || 'A student',
+                team_name: app.teams?.teamName || 'your team',
+                team_leader_name: app.teams?.members?.[0]?.name || 'Team Leader'
+              }
+            }
+          }).catch(console.error);
+        }
+      }
+      setMyApplications(prev => accept 
+        ? prev.map(a => a.id === requestId ? { ...a, status: 'pending' } : a)
+        : prev.filter(a => a.id !== requestId)
+      );
+    } catch (err) {
+      console.error(err);
+      addToast(err.message || "Error responding to invite", "err");
+    }
+  }, [addToast]);
+
   const removeMember = useCallback(async (teamId, memberUserId) => {
     try {
       const { error } = await supabase
@@ -588,13 +642,8 @@ export function SIHProvider({ children }) {
     session, user, isAuthLoading,
     signOut: () => supabase.auth.signOut(),
     myTeam, mySeekerProfile, myRequests, myApplications,
-    requestToJoin, acceptRequest, rejectRequest, removeMember, sendTeamInvite
+    requestToJoin, acceptRequest, rejectRequest, sendTeamInvite, respondToInvite, removeMember
   };
 
   return <SIHContext.Provider value={value}>{children}</SIHContext.Provider>;
 }
-
-
-
-
-

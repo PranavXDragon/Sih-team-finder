@@ -781,6 +781,33 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/{{team_leader_name}}/g, payload.team_leader_name || 'The Team Leader')
       .replace(/{{invite_message}}/g, payload.invite_message || "We'd love for you to join our team!")
       .replace(/{{platform_link}}/g, 'https://sih.scetngp.com/#board');
+  } else if (type === 'DECLINED_INVITE') {
+    body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
+        <!-- Header -->
+        <tr>
+          <td class="email-header" style="background-color: #151721; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding: 24px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+                  <h1 class="email-header-title" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 22px; color: #f7f3ea; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">SIH 2026 SCET</h1>
+                  <div class="email-header-subtitle" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9ba2b4; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.12em;">Invite Declined</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- Content -->
+        <tr>
+          <td class="email-body" style="padding: 32px; color: #f7f3ea; font-size: 15px; line-height: 1.65;">
+            <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{team_leader_name}},</p>
+            <p style="margin: 0 0 16px; color: #f7f3ea;"><strong>{{student_name}}</strong> has declined your invitation to join your team <strong>{{team_name}}</strong>.</p>
+            <p style="margin: 0 0 16px; color: #9ba2b4;">You can continue exploring other students on the platform.</p>
+          </td>
+        </tr>
+      </table>`
+      .replace(/{{team_leader_name}}/g, payload.team_leader_name || 'Team Leader')
+      .replace(/{{student_name}}/g, payload.student_name || 'A student')
+      .replace(/{{team_name}}/g, payload.team_name || 'your team');
   } else {
     body = '<p>Notification from SIH SCET Platform.</p>';
   }

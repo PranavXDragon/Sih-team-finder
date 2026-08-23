@@ -302,8 +302,8 @@ export default function SeekerModal({ initialData, onClose, onSuccess, showAppli
                     )}
                     {app.status === 'invited' && (
                       <div style={{ display: 'flex', gap: 8 }}>
-                        <button className="btn sm gho" type="button" onClick={() => respondToInvite(app.id, false)} style={{ color: "var(--text-dim)" }}>Decline</button>
-                        <button className="btn sm pri" type="button" onClick={() => respondToInvite(app.id, true)}>Apply Now</button>
+                        <button className="btn sm gho" type="button" onClick={() => respondToInvite(app, false)} style={{ color: "var(--text-dim)" }}>Decline</button>
+                        <button className="btn sm pri" type="button" onClick={() => respondToInvite(app, true)}>Apply Now</button>
                       </div>
                     )}
                   </div>
