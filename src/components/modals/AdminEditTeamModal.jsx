@@ -32,7 +32,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
         psTitle,
         pitch,
         members,
-        seatsOpen: team.totalSeats - members.length
+        seatsOpen: Math.max(0, (team.totalSeats || 6) - members.length)
       });
       onClose(); // close on success
     } catch (err) {
@@ -124,11 +124,11 @@ export default function AdminEditTeamModal({ team, onClose }) {
 
           <div style={{ marginTop: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <label>Team Members ({members.length}/{team.totalSeats})</label>
-              {members.length < team.totalSeats && (
+              <label>Team Members ({members.length}/{team.totalSeats || 6})</label>
+              {members.length < (team.totalSeats || 6) && (
                 <button
                   type="button"
-                  onClick={() => setMembers([...members, { name: "", email: "", phone: "", dept: "", gender: "m" }])}
+                  onClick={() => setMembers([...members, { name: "", email: "", phone: "", dept: "", gender: "m", year: "" }])}
                   style={{ background: 'var(--accent)', color: '#fff', border: 'none', padding: '4px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}
                 >
                   + Add Member
@@ -186,6 +186,18 @@ export default function AdminEditTeamModal({ team, onClose }) {
                       <option value="m">Male</option>
                       <option value="f">Female</option>
                       <option value="o">Other</option>
+                    </select>
+                    <select
+                      value={m.year || ""}
+                      onChange={(e) => { const newM = [...members]; newM[idx].year = e.target.value; setMembers(newM); }}
+                      style={{ padding: 6, fontSize: 13 }}
+                    >
+                      <option value="">Select Year</option>
+                      <option value="1st Year">1st Year</option>
+                      <option value="2nd Year">2nd Year</option>
+                      <option value="3rd Year">3rd Year</option>
+                      <option value="4th Year">4th Year</option>
+                      <option value="5th Year">5th Year</option>
                     </select>
                   </div>
                 </div>

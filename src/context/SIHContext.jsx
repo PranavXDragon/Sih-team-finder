@@ -203,13 +203,17 @@ export function SIHProvider({ children }) {
 
   const updateTeam = useCallback(async (id, data) => {
     try {
-      const { error } = await supabase.from('teams').update(data).eq('id', id);
+      const { data: resData, error } = await supabase.from('teams').update(data).eq('id', id).select();
       if (error) throw error;
+      if (!resData || resData.length === 0) {
+        throw new Error("Permission denied. Could not update team in database (Check RLS Policies).");
+      }
       setTeams((prev) => prev.map((t) => (t.id === id ? { ...t, ...data } : t)));
       if (myTeam && myTeam.id === id) setMyTeam((prev) => ({ ...prev, ...data }));
     } catch (err) {
       console.error(err);
-      addToast("Error updating team", "err");
+      addToast(err.message || "Error updating team", "err");
+      throw err;
     }
   }, [myTeam, addToast]);
 
