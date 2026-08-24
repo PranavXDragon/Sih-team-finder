@@ -11,7 +11,7 @@ export default function Footer() {
         Your phone number and email stay hidden until you accept a request.
       </p>
       <div className="dev-credit">
-        Designed & Developed by <span className="dev-name">Pranav Navgahre</span>, <span className="dev-name">Piyush Chafle</span> and <span className="dev-name">Kunal Panche</span>
+        Designed & Developed by New <span className="dev-name">HACKHORIZON</span>
       </div>
     </footer>
   );
