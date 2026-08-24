@@ -57,6 +57,7 @@ export default function AdminViewTeamModal({ team, onClose }) {
                       <p><span style={{ color: 'var(--dim)' }}>Phone:</span> {m.phone || 'N/A'}</p>
                       <p><span style={{ color: 'var(--dim)' }}>Dept:</span> {m.dept || 'N/A'}</p>
                       <p><span style={{ color: 'var(--dim)' }}>Gender:</span> {m.gender === 'f' ? 'Female' : m.gender === 'm' ? 'Male' : 'N/A'}</p>
+                      <p><span style={{ color: 'var(--dim)' }}>Year:</span> {m.year || 'N/A'}</p>
                     </div>
                   </div>
                 ))}
