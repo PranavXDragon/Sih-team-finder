@@ -69,17 +69,18 @@ export default function TeamCard({ team }) {
       </div>
       {team.pitch && <p className="pitch">{team.pitch}</p>}
       <div className="rowmeta">
-        <span>College <i>{team.college?.split(",")[0] || "Unknown"}</i></span>
-        <span>Theme <i>{team.theme}</i></span>
         {team.psId && <span>PS <i>{team.psId}</i></span>}
         {team.hasMentor && <span style={{ color: "var(--open)" }}>✓ Has mentor</span>}
       </div>
 
-      {team.wantsSkills?.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-          {team.wantsSkills.map((s) => (
-            <span key={s} className="chip mini" style={{ cursor: "default" }}>{s}</span>
-          ))}
+      {team.members?.length > 0 && (
+        <div style={{ marginTop: 12 }}>
+          <p style={{ fontSize: 11, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Team Members</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+            {team.members.map((m, i) => (
+              <span key={i} className="chip mini" style={{ cursor: "default" }}>{m.name}</span>
+            ))}
+          </div>
         </div>
       )}
 
