@@ -6,6 +6,8 @@ import { Eye, EyeOff } from "lucide-react";
 import AdminEditTeamModal from "../components/modals/AdminEditTeamModal";
 import AdminViewTeamModal from "../components/modals/AdminViewTeamModal";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, TableLayoutType } from "docx";
+import { saveAs } from "file-saver";
 
 export default function AdminScreen() {
   const { teams, seekers, stats, deleteTeam, deleteSeeker, user } = useSIH();
@@ -125,6 +127,92 @@ export default function AdminScreen() {
     setConfirmDelete({ type: 'seeker', id: s.id, name: s.name });
   };
 
+  const handleDownloadDocx = async (team) => {
+    // Add empty paragraphs at the top for letterhead
+    const topSpacing = Array(8).fill(new Paragraph({ text: "" }));
+
+    const today = new Date().toLocaleDateString("en-GB");
+    const members = [...(team.members || [])];
+    const seats = team.totalSeats || 6;
+    while (members.length < seats) {
+      members.push({});
+    }
+
+    const colWidths = [10, 16, 8, 24, 12, 18, 12]; // percentages
+
+    const tableRows = [
+      new TableRow({
+        children: ["", "Name", "Gender", "Email id", "Mobile no.", "Stream", "Academic Year"].map(
+          (text, idx) => new TableCell({
+            children: [new Paragraph({ children: [new TextRun({ text, bold: true, size: 18 })], alignment: AlignmentType.CENTER })],
+            width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
+            margins: { top: 100, bottom: 100, left: 100, right: 100 },
+          })
+        ),
+      }),
+      ...members.map((m, i) => {
+        const role = i === 0 ? "Team Leader" : "Team Member";
+        const gender = m.gender === 'f' ? "Female" : m.gender === 'm' ? "Male" : m.name ? "N/A" : "";
+        const year = m.year || "";
+        const stream = m.dept || m.branch || "";
+        return new TableRow({
+          children: [role, m.name || "", gender, m.email || "", m.phone || "", stream, year].map(
+            (text, idx) => new TableCell({
+              children: [new Paragraph({ children: [new TextRun({ text, size: 18 })], alignment: idx === 0 || idx === 2 || idx === 4 || idx === 6 ? AlignmentType.CENTER : AlignmentType.LEFT })],
+              width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
+              margins: { top: 100, bottom: 100, left: 100, right: 100 },
+            })
+          ),
+        });
+      })
+    ];
+
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: [
+          ...topSpacing,
+          new Paragraph({
+            children: [new TextRun({ text: `Date: ${today}`, size: 24 })],
+            spacing: { after: 400 },
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: "Sub: Smart India Hackathon 2026 – Nomination", bold: true, size: 24 })],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 400 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "I am pleased to nominate the below team from our college to participate in Smart India Hackathon 2026. AICTE Application No. for our college is West/1-6595181/2010/.",
+                size: 24,
+              }),
+            ],
+            spacing: { after: 600 },
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: `Team 1: ${team.teamName || ""}`, bold: true, size: 24 })],
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: `Problem Statement ID: ${team.psId || ""} (${team.psTitle || ""})`, bold: true, size: 24 })],
+            spacing: { after: 400 },
+          }),
+          new Table({
+            rows: tableRows,
+            width: { size: 100, type: WidthType.PERCENTAGE },
+          }),
+          new Paragraph({ text: "", spacing: { before: 1200 } }), // Adjusted gap for signature to fit on page 1
+          new Paragraph({ children: [new TextRun({ text: "Sincerely,", size: 24 })], spacing: { after: 800 } }),
+          new Paragraph({ children: [new TextRun({ text: "Dr. V. G. Araipure", bold: true, size: 24 })] }),
+          new Paragraph({ children: [new TextRun({ text: "Principal SCET, Nagpur", bold: true, size: 24 })] }),
+        ],
+      }],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `SIH_Nomination_${team.teamName || "Team"}.docx`);
+  };
+
   return (
     <div className="admin-container">
       <div className="admin-head">
@@ -222,6 +310,7 @@ export default function AdminScreen() {
                 <td style={{ display: 'flex', gap: '8px' }}>
                   <button className="btn sm" onClick={() => setViewingTeam(t)}>View</button>
                   <button className="btn sm sec" onClick={() => setEditingTeam(t)}>Edit</button>
+                  <button className="btn sm" style={{ background: '#3b82f6', color: '#fff', border: 'none' }} onClick={() => handleDownloadDocx(t)}>Download</button>
                   <button className="btn sm danger" onClick={() => handleDeleteTeam(t)}>Delete</button>
                 </td>
               </tr>
