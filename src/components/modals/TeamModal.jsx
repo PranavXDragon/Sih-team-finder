@@ -488,7 +488,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
             <label className="check">
               <input type="checkbox" checked={form.hasMentor} onChange={(e) => set("hasMentor", e.target.checked)} />
               <span className="check-box" aria-hidden="true" />
-              <span className="check-txt">We already have a mentor</span>
+              <span className="check-txt">We already have a Faculty/Industry Mentor</span>
               <span className="check-state" data-off="Not yet" data-on="Yes" />
             </label>
           </div>
