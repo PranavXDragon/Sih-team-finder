@@ -302,10 +302,10 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                 </p>
                 <div className="fld">
                   <label htmlFor="tPitch">One line about your idea</label>
-                  <textarea id="tPitch" maxLength={180}
+                  <textarea id="tPitch" maxLength={500}
                     placeholder="e.g. A low cost IoT node that spots water leaks in campus pipelines and alerts on WhatsApp."
                     value={form.pitch} onChange={(e) => set("pitch", e.target.value)} />
-                  <p className="hint">{form.pitch.length}/180</p>
+                  <p className="hint">{form.pitch.length}/500</p>
                 </div>
               </div>
             )}
