@@ -40,12 +40,16 @@ export default function App() {
         if (intent === "post-team") {
           if (myTeam) {
             addToast("You already have a registered team!", "err");
+          } else if (mySeekerProfile) {
+            addToast("You are already listed as a Seeker. Seekers cannot create teams.", "err");
           } else {
             setGlobalPostTeam(true);
           }
         } else if (intent === "list-seeker") {
           if (mySeekerProfile) {
             addToast("You already have a listed profile!", "err");
+          } else if (myTeam) {
+            addToast("You lead a team! Team Leaders cannot list themselves as seekers.", "err");
           } else {
             setGlobalListSeeker(true);
           }
