@@ -80,6 +80,10 @@ export default function BoardScreen({ initialAction, onBack }) {
       setShowTeamModal(true);
       return;
     }
+    if (myTeam.members?.length >= 6) {
+      addToast("Your team is already full (max 6 members).", "err");
+      return;
+    }
     setInviteSeeker(seeker);
   };
 
