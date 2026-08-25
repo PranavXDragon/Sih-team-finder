@@ -177,6 +177,7 @@ svg {
   border-radius: 100px;
   font-weight: 600;
   font-size: 14px;
+  min-height: 44px;
   transition: transform 0.16s, border-color 0.16s, background 0.16s, box-shadow 0.16s;
   white-space: nowrap;
 }
@@ -619,6 +620,7 @@ svg {
   background: var(--bg);
   color: var(--text);
   outline: none;
+  min-height: 44px;
   transition: border-color 0.16s, box-shadow 0.16s;
 }
 

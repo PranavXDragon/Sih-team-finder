@@ -52,6 +52,7 @@
   background: var(--surface);
   color: var(--text);
   outline: none;
+  min-height: 44px;
   transition: border-color 0.16s;
 }
 
