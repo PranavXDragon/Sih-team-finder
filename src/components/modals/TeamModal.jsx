@@ -396,7 +396,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                         onClick={async () => {
                           if (confirm(`Are you sure you want to remove ${m.name} from the team?`)) {
                             if (m.user_id && initialData) {
-                              await removeMember(initialData.id, m.user_id);
+                              await removeMember(initialData.id, m.user_id, m.email, m.name, initialData.teamName);
                             }
                             // Clear local state fields for this member
                             const updated = [...form.members];

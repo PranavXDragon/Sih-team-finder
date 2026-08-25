@@ -620,7 +620,7 @@ export function SIHProvider({ children }) {
     }
   }, [addToast]);
 
-  const removeMember = useCallback(async (teamId, memberUserId) => {
+  const removeMember = useCallback(async (teamId, memberUserId, memberEmail, memberName, teamName) => {
     try {
       const { error } = await supabase
         .from('join_requests')
@@ -628,6 +628,20 @@ export function SIHProvider({ children }) {
         .eq('team_id', teamId)
         .eq('user_id', memberUserId);
       if (error) throw error;
+      
+      if (memberEmail) {
+        supabase.functions.invoke('send-email', {
+          body: {
+            to: memberEmail,
+            subject: `You have been removed from the team ${teamName || ''}`,
+            type: 'REMOVED',
+            payload: {
+              student_name: memberName || 'Student',
+              team_name: teamName || 'the team',
+            }
+          }
+        }).catch(err => console.error("Failed to send removal email", err));
+      }
     } catch (err) {
       console.error("Error releasing member:", err);
       addToast("Failed to release member in database", "err");
