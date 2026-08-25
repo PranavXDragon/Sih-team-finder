@@ -453,6 +453,11 @@ export function SIHProvider({ children }) {
 
       setMyRequests((prev) => prev.filter(r => r.id !== requestId));
 
+      // Optimistically hide the seeker from the board
+      if (seekerProfile?.user_id) {
+        setSeekers(prev => prev.map(s => s.user_id === seekerProfile.user_id ? { ...s, listed: false } : s));
+      }
+
       if (email) {
         supabase.functions.invoke('send-email', {
           body: {
