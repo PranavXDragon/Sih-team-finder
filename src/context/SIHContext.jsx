@@ -629,6 +629,9 @@ export function SIHProvider({ children }) {
         .eq('user_id', memberUserId);
       if (error) throw error;
       
+      // Optimistically update the UI so they reappear on the board
+      setSeekers(prev => prev.map(s => s.user_id === memberUserId ? { ...s, listed: true } : s));
+
       if (memberEmail) {
         supabase.functions.invoke('send-email', {
           body: {
