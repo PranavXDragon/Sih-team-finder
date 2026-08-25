@@ -36,6 +36,22 @@ export default function AdminViewTeamModal({ team, onClose }) {
               <p style={{ fontSize: 12, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 1 }}>Seats</p>
               <p style={{ fontWeight: 500 }}>{team.seatsOpen} open (out of {team.totalSeats})</p>
             </div>
+            <div>
+              <p style={{ fontSize: 12, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 1 }}>Skills Needed</p>
+              <p style={{ fontWeight: 500 }}>
+                {team.wantsSkills && team.wantsSkills.length > 0 
+                  ? team.wantsSkills.map(s => s === "Other (Custom)" && team.customSkill ? team.customSkill : s).join(", ") 
+                  : 'None specified'}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: 12, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 1 }}>Needs Female</p>
+              <p style={{ fontWeight: 500 }}>{team.needsFemale ? "Yes" : "No"}</p>
+            </div>
+            <div>
+              <p style={{ fontSize: 12, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 1 }}>Has Mentor</p>
+              <p style={{ fontWeight: 500 }}>{team.hasMentor ? "Yes" : "No"}</p>
+            </div>
           </div>
 
           <div>
