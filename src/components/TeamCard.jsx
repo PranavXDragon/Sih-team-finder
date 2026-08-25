@@ -116,7 +116,7 @@ export default function TeamCard({ team }) {
           <button className="btn sm sec" type="button" disabled style={{ opacity: 0.7, cursor: "not-allowed", color: "var(--text)" }}>
             Applied
           </button>
-        ) : !isFull ? (
+        ) : !isFull && !myTeam ? (
           <button className="btn sm pri" type="button" onClick={handleJoin} disabled={isJoining}>
             {isJoining ? "Sending..." : "Request to join"}
           </button>
