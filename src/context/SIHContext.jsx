@@ -448,8 +448,11 @@ export function SIHProvider({ children }) {
         user_id: seekerProfile.user_id
       }];
       const newSeatsOpen = Math.max(0, myTeam.seatsOpen - 1);
+      
+      const hasFemale = (myTeam.members?.[0]?.gender === 'f') || newMembers.some(m => m.gender === 'f');
+      const newNeedsFemale = !hasFemale;
 
-      await updateTeam(myTeam.id, { members: newMembers, seatsOpen: newSeatsOpen });
+      await updateTeam(myTeam.id, { members: newMembers, seatsOpen: newSeatsOpen, needsFemale: newNeedsFemale });
 
       setMyRequests((prev) => prev.filter(r => r.id !== requestId));
 

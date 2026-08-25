@@ -91,7 +91,7 @@ export default function TeamCard({ team }) {
           ))}
         </div>
         <b>{isFull ? "Team full" : `${actualSeatsOpen} seat${actualSeatsOpen > 1 ? "s" : ""} open`}</b>
-        {team.needsFemale && !isFull && (
+        {team.needsFemale && (
           <span className="chip mini" style={{ background: "var(--warn-dim)", borderColor: "rgba(255, 159, 28, 0.4)", color: "var(--warn)", cursor: "default" }}>
             Needs ♀
           </span>
