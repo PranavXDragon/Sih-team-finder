@@ -280,8 +280,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
             <label className="check">
               <input type="checkbox" checked={form.hasIdea} onChange={(e) => set("hasIdea", e.target.checked)} />
               <span className="check-box" aria-hidden="true" />
-              <span className="check-txt">We already have an idea</span>
-              <span className="check-state" data-off="No idea yet" data-on="Yes" />
+              <span className="check-txt">We already have an SIH PS (Problem Statement) & idea</span>
+              <span className="check-state" data-off="No PS/Idea yet" data-on="Yes" />
             </label>
             {form.hasIdea && (
               <div style={{ display: "grid", gap: 13 }}>
@@ -499,13 +499,13 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
             <p className="hint" style={{ margin: 0 }}>Never shown on the board. Shared only after you accept a request.</p>
             <div className="two">
               <div className={`fld${errs.phone ? " bad" : ""}`}>
-                <label htmlFor="tPhone">WhatsApp number<em>*</em></label>
+                <label htmlFor="tPhone">Team Leader WhatsApp number<em>*</em></label>
                 <input id="tPhone" inputMode="tel" maxLength={18} placeholder="10 digit number"
                   value={form.phone} onChange={(e) => set("phone", e.target.value)} />
                 <p className="err">Enter a valid number.</p>
               </div>
               <div className="fld">
-                <label htmlFor="tEmail">Email</label>
+                <label htmlFor="tEmail">Team Leader Email</label>
                 <input id="tEmail" type="email" maxLength={70}
                   value={form.email} onChange={(e) => set("email", e.target.value)} />
               </div>
