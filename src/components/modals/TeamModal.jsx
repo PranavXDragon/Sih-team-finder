@@ -111,7 +111,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     if (form.hasIdea && !form.theme) e.theme = true;
     if (!form.leaderName.trim()) e.leaderName = true;
     if (!form.leaderGender || form.leaderGender === "na") e.leaderGender = true;
-    if (!form.wantsSkills.length) e.wantsSkills = true;
+    if (form.hasIdea && !form.wantsSkills.length) e.wantsSkills = true;
     if (!form.phone.trim()) e.phone = true;
 
     // Member validation: if name is entered, all other fields are required
@@ -463,7 +463,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           <div className="fset">
             <span className="mono">4 · What you still need</span>
             <div className={`fld${errs.wantsSkills ? " bad" : ""}`}>
-              <label>Skills you are looking for<em>*</em></label>
+              <label>Skills you are looking for{form.hasIdea && <em>*</em>}</label>
               <div className="chipbar" style={{ margin: 0 }}>
                 {SKILLS.map((s) => (
                   <button key={s} type="button"
