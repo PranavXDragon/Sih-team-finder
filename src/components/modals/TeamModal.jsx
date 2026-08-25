@@ -280,7 +280,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
             <label className="check">
               <input type="checkbox" checked={form.hasIdea} onChange={(e) => set("hasIdea", e.target.checked)} />
               <span className="check-box" aria-hidden="true" />
-              <span className="check-txt">We already have an SIH PS (Problem Statement) & idea</span>
+              <span className="check-txt">We already have an SIH Problem Statement</span>
               <span className="check-state" data-off="No PS/Idea yet" data-on="Yes" />
             </label>
             {form.hasIdea && (
@@ -488,7 +488,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
             <label className="check">
               <input type="checkbox" checked={form.hasMentor} onChange={(e) => set("hasMentor", e.target.checked)} />
               <span className="check-box" aria-hidden="true" />
-              <span className="check-txt">We already have a Faculty/Industry Mentor</span>
+              <span className="check-txt">Do you already have a mentor for your SIH team?</span>
               <span className="check-state" data-off="Not yet" data-on="Yes" />
             </label>
           </div>
