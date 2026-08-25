@@ -67,11 +67,11 @@ export default function TeamCard({ team }) {
         <h3>{team.teamName}</h3>
         <span className="track" data-t={team.track}>{team.track}</span>
       </div>
-      {team.pitch && <p className="pitch">{team.pitch}</p>}
-      <div className="rowmeta">
-        {team.psId && <span>PS <i>{team.psId}</i></span>}
-        {team.hasMentor && <span style={{ color: "var(--open)" }}>✓ Has mentor</span>}
-      </div>
+      {team.hasMentor && (
+        <div className="rowmeta">
+          <span style={{ color: "var(--open)" }}>✓ Has mentor</span>
+        </div>
+      )}
 
       {team.members?.length > 0 && (
         <div style={{ marginTop: 12 }}>
