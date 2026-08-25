@@ -108,7 +108,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     const e = {};
     if (!form.teamName.trim()) e.teamName = true;
     if (!form.track) e.track = true;
-    if (!form.theme) e.theme = true;
+    if (form.hasIdea && !form.theme) e.theme = true;
     if (!form.leaderName.trim()) e.leaderName = true;
     if (!form.leaderGender || form.leaderGender === "na") e.leaderGender = true;
     if (!form.wantsSkills.length) e.wantsSkills = true;
@@ -267,16 +267,6 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
               </div>
               <p className="err">Pick one track.</p>
             </div>
-            <div className={`fld${errs.theme ? " bad" : ""}`}>
-              <label>Theme<em>*</em></label>
-              <CustomSelect
-                value={form.theme}
-                onChange={(val) => set("theme", val)}
-                options={SIH_THEMES}
-                placeholder="Select a theme…"
-              />
-              <p className="err">Pick the theme you are going for.</p>
-            </div>
             <label className="check">
               <input type="checkbox" checked={form.hasIdea} onChange={(e) => set("hasIdea", e.target.checked)} />
               <span className="check-box" aria-hidden="true" />
@@ -285,6 +275,16 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
             </label>
             {form.hasIdea && (
               <div style={{ display: "grid", gap: 13 }}>
+                <div className={`fld${errs.theme ? " bad" : ""}`}>
+                  <label>Theme<em>*</em></label>
+                  <CustomSelect
+                    value={form.theme}
+                    onChange={(val) => set("theme", val)}
+                    options={SIH_THEMES}
+                    placeholder="Select a theme…"
+                  />
+                  <p className="err">Pick the theme you are going for.</p>
+                </div>
                 <div className="two">
                   <div className="fld">
                     <label htmlFor="tPsId">Problem statement ID</label>
