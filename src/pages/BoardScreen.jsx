@@ -145,14 +145,14 @@ export default function BoardScreen({ initialAction, onBack }) {
         <section className="stamps" style={{ marginBottom: "30px" }}>
           <div className="stamp"><b>{stats.teams}</b><span>Teams up</span></div>
           <div className="stamp"><b>{stats.seats}</b><span>Seats open</span></div>
-          <div className="stamp"><b>{stats.seekers}</b><span>Students free</span></div>
-          <div className="stamp"><b>{stats.teams + stats.seekers}</b><span>Active Users</span></div>
+          <div className="stamp"><b>{stats.seekers}</b><span>Students ready to join a team</span></div>
+          <div className="stamp"><b>{stats.totalUsers}</b><span>Active Users</span></div>
         </section>
 
         {/* TABS */}
         <div className="tabs">
           <button className={`tab ${tab === "teams" ? "on" : ""}`} onClick={() => setTab("teams")}>Teams <span className="cnt">{teams.length}</span></button>
-          <button className={`tab ${tab === "seekers" ? "on" : ""}`} onClick={() => setTab("seekers")}>Seekers <span className="cnt">{seekers.length}</span></button>
+          <button className={`tab ${tab === "seekers" ? "on" : ""}`} onClick={() => setTab("seekers")}>Seekers <span className="cnt">{stats.seekers}</span></button>
         </div>
 
         {/* BOARD BAR */}
@@ -163,7 +163,7 @@ export default function BoardScreen({ initialAction, onBack }) {
               {tab === "teams" ? (() => {
                 const openCount = teams.filter(t => Math.max(0, (t.totalSeats || 6) - (t.members?.length || 1)) > 0).length;
                 return `${openCount} looking for members (${teams.length} total on board)`;
-              })() : `${seekers.length} Seekers free`}
+              })() : `${stats.seekers} Seekers ready to join a team`}
             </span>
           </div>
           <span className="sp" />

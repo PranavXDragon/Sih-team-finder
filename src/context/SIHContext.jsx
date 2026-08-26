@@ -666,6 +666,7 @@ export function SIHProvider({ children }) {
       teams: teams.length,
       seats: teams.reduce((acc, t) => acc + Math.max(0, 6 - (t.members || []).length), 0),
       seekers: seekers.filter((s) => s.listed).length,
+      totalUsers: teams.reduce((acc, t) => acc + (t.members || []).length, 0) + seekers.filter((s) => s.listed).length,
     },
     isLoading,
     session, user, isAuthLoading,

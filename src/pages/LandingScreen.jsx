@@ -100,8 +100,8 @@ export default function LandingScreen({ onEnter }) {
       <section className="stamps">
         <div className="stamp"><b>{stats.teams}</b><span>Teams up</span></div>
         <div className="stamp"><b>{stats.seats}</b><span>Seats open</span></div>
-        <div className="stamp"><b>{stats.seekers}</b><span>Students free</span></div>
-        <div className="stamp"><b>{stats.teams + stats.seekers}</b><span>Active Users</span></div>
+        <div className="stamp"><b>{stats.seekers}</b><span>Students ready to join a team</span></div>
+        <div className="stamp"><b>{stats.totalUsers}</b><span>Active Users</span></div>
       </section>
 
       {/* 3-STEP BEATS */}
