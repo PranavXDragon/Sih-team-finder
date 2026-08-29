@@ -808,6 +808,77 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/{{team_leader_name}}/g, payload.team_leader_name || 'Team Leader')
       .replace(/{{student_name}}/g, payload.student_name || 'A student')
       .replace(/{{team_name}}/g, payload.team_name || 'your team');
+  } else if (type === 'WHATSAPP_GROUP_INVITE') {
+    body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
+        <!-- Header -->
+        <tr>
+          <td class="email-header" style="background-color: #151721; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding: 24px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 8px;">
+                    <tr>
+                      <td style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: #c8f24d; background-color: rgba(200, 242, 77, 0.12); border: 1px solid rgba(200, 242, 77, 0.25); padding: 3px 8px; border-radius: 4px; letter-spacing: 0.16em; text-transform: uppercase;">
+                        SIH 2026 • MANDATORY ACTION
+                      </td>
+                    </tr>
+                  </table>
+                  <h1 class="email-header-title" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 22px; color: #f7f3ea; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">SIH 2026 SCET</h1>
+                  <div class="email-header-subtitle" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9ba2b4; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.12em;">Official Participant Group</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Content -->
+        <tr>
+          <td class="email-body" style="padding: 32px; color: #f7f3ea; font-size: 15px; line-height: 1.65;">
+            <h2 class="email-heading" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 20px; color: #f7f3ea; margin-top: 0; margin-bottom: 18px; line-height: 1.25;">
+              Join the Official SIH Participants Group 🚀
+            </h2>
+
+            <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{participant_name}},</p>
+
+            <p style="margin: 0 0 16px; color: #f7f3ea;">Congratulations to you and <strong style="color: #c8f24d;">{{team_name}}</strong> on confirming your participation in the <strong style="color: #c8f24d;">Smart India Hackathon 2026</strong>! We are thrilled to have your team on board for this incredible journey.</p>
+
+            <p style="margin: 0 0 16px; color: #9ba2b4;">To ensure seamless communication, fast updates, and important announcements from the SCET SIH coordination committee, we have created an exclusive, official WhatsApp group for all registered participants.</p>
+
+
+            <div class="details-card" style="background-color: #212533; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 20px; margin: 22px 0;">
+              <span class="details-label" style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: #ff7a1a; text-transform: uppercase; letter-spacing: 0.18em; display: inline-block; margin-bottom: 10px; background: rgba(255, 122, 26, 0.12); border: 1px solid rgba(255, 122, 26, 0.25); padding: 3px 8px; border-radius: 4px;">Important Note</span>
+              <p style="margin: 6px 0 0 0; color: #f7f3ea;"><strong>Your presence in this group is mandatory.</strong> All critical updates regarding internal hackathons, submission deadlines, technical resources, and guidelines will be shared exclusively here.</p>
+            </div>
+
+            <!-- CTA Button -->
+            <table cellpadding="0" cellspacing="0" border="0" style="margin: 16px 0 20px;">
+              <tr>
+                <td style="border-radius: 100px; background-color: #c8f24d;" align="center">
+                  <a class="btn-primary" href="{{group_link}}" target="_blank" style="display: inline-block; background-color: #c8f24d; color: #101a05; font-family: 'Space Grotesk', Arial, sans-serif; font-weight: bold; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 100px; text-align: center;">Join WhatsApp Group →</a>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin: 16px 0 4px; color: #c8f24d; font-weight: 700;">Let's build something amazing! 💡</p>
+            <p style="margin: 0; color: #9ba2b4; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.05em;">Innovate. Code. Conquer.</p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td class="email-footer" style="background-color: #12141c; border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 22px 32px; font-size: 12.5px; color: #9ba2b4;">
+            Best regards,<br>
+            <strong style="color: #f7f3ea; font-size: 13.5px;">SIH 2026 SCET Organizing Committee</strong>
+            
+            <div class="dev-credits" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.1); font-size: 11px; color: #9ba2b4;">
+              Designed & Developed by <span class="dev-name" style="color: #c8f24d; font-weight: 600;">Pranav Navgahre</span>, <span class="dev-name" style="color: #c8f24d; font-weight: 600;">Piyush Chafle</span> and <span class="dev-name" style="color: #c8f24d; font-weight: 600;">Kunal Panche</span>
+            </div>
+          </td>
+        </tr>
+      </table>`
+      .replace(/{{participant_name}}/g, payload.participant_name || 'Participant')
+      .replace(/{{team_name}}/g, payload.team_name || 'your team')
+      .replace(/{{group_link}}/g, payload.group_link || 'https://chat.whatsapp.com/BpuL99pHOtqBNkENibp40s?s=cl&p=a&ilr=1');
   } else {
     body = '<p>Notification from SIH SCET Platform.</p>';
   }

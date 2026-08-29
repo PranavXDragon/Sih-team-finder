@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { useSIH } from "../hooks/useSIH";
 
 const RULES = [
-  "6 members", "\u00B7", "1 must be female", "\u00B7", "one institute", "\u00B7", "17 themes", "\u00B7",
+  "6 members", "\u00B7", "1 must be female", "\u00B7", "one institute", "\u00B7", "18 themes", "\u00B7",
   "software or hardware", "\u00B7", "one problem statement", "\u00B7",
-  "6 members", "\u00B7", "1 must be female", "\u00B7", "one institute", "\u00B7", "17 themes", "\u00B7",
+  "6 members", "\u00B7", "1 must be female", "\u00B7", "one institute", "\u00B7", "18 themes", "\u00B7",
   "software or hardware", "\u00B7", "one problem statement", "\u00B7",
 ];
 
@@ -14,7 +14,7 @@ export default function LandingScreen({ onEnter }) {
   const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
   useEffect(() => {
-    const target = new Date("2026-08-30T23:59:59").getTime();
+    const target = new Date("2026-08-31T00:00:00").getTime();
 
     const tick = () => {
       const now = new Date().getTime();
@@ -37,6 +37,12 @@ export default function LandingScreen({ onEnter }) {
   }, []);
 
   const handleAction = (action) => {
+    const isClosed = new Date().getTime() >= new Date("2026-08-31T00:00:00").getTime();
+    if (isClosed && (action === "post-team" || action === "list-seeker")) {
+      document.dispatchEvent(new CustomEvent('triggerClosed'));
+      return;
+    }
+
     if (session) {
       if (action === "post-team") {
         if (myTeam) return addToast("You already have a team!", "err");
@@ -160,7 +166,7 @@ export default function LandingScreen({ onEnter }) {
             <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0 }}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg> <span><b style={{ color: 'var(--accent)' }}>Team Size:</b> Exactly 6 members (1 Team Leader + 5 Members).</span></p>
             <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0 }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg> <span><b style={{ color: 'var(--accent)' }}>Diversity:</b> At least one member MUST be female.</span></p>
             <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0 }}><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><path d="M9 22v-4h6v4" /><path d="M8 6h.01" /><path d="M16 6h.01" /><path d="M12 6h.01" /><path d="M12 10h.01" /><path d="M12 14h.01" /><path d="M16 10h.01" /><path d="M16 14h.01" /><path d="M8 10h.01" /><path d="M8 14h.01" /></svg> <span><b style={{ color: 'var(--accent)' }}>Institution:</b> All members must be from the same institute.</span></p>
-            <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0 }}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5" /><path d="M9 18h6" /><path d="M10 22h4" /></svg> <span><b style={{ color: 'var(--accent)' }}>Problem Statements:</b> Teams can choose from 17 distinct themes across Hardware and Software.</span></p>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0 }}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5" /><path d="M9 18h6" /><path d="M10 22h4" /></svg> <span><b style={{ color: 'var(--accent)' }}>Problem Statements:</b> Teams can choose from 18 distinct themes across Hardware and Software.</span></p>
             <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text)', display: 'flex', alignItems: 'flex-start' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 12, marginTop: 2, color: "var(--accent)", flexShrink: 0 }}><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /><path d="M9 14h6" /><path d="M9 10h6" /></svg> <span><b style={{ color: 'var(--accent)' }}>Registration:</b> Team Leaders register the team and specify skills needed. Other members can list themselves as Seekers.</span></p>
             <div style={{ marginTop: 16, padding: '16px', background: 'var(--open-dim)', borderRadius: '12px', border: '1px solid var(--open)' }}>
               <p style={{ fontSize: 15, color: 'var(--text)', margin: 0 }}>

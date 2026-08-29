@@ -183,6 +183,23 @@ export function SIHProvider({ children }) {
           }
         }).catch(err => console.error("Failed to send team created email", err));
 
+        // Automatically send WhatsApp Group Invites if the team was somehow registered as FULL
+        if (data[0].seatsOpen === 0) {
+          const leader = data[0].members?.[0];
+          if (leader && leader.email) {
+            supabase.functions.invoke('send-email', {
+              body: {
+                to: leader.email,
+                type: 'WHATSAPP_GROUP_INVITE',
+                payload: {
+                  participant_name: leader.name,
+                  team_name: data[0].teamName || 'your team'
+                }
+              }
+            }).catch(err => console.error("Failed to send WhatsApp invite", err));
+          }
+        }
+
         // Sync to Google Sheets if configured
         if (import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK) {
           fetch(import.meta.env.VITE_GOOGLE_SHEET_WEBHOOK, {
@@ -474,6 +491,23 @@ export function SIHProvider({ children }) {
             }
           }
         }).catch(err => console.error("Failed to send acceptance email", err));
+      }
+
+      // Automatically send WhatsApp Group Invites to ONLY the Team Leader if the team just became FULL
+      if (newSeatsOpen === 0) {
+        const leader = myTeam.members?.[0];
+        if (leader && leader.email) {
+          supabase.functions.invoke('send-email', {
+            body: {
+              to: leader.email,
+              type: 'WHATSAPP_GROUP_INVITE',
+              payload: {
+                participant_name: leader.name,
+                team_name: myTeam.teamName || 'your team'
+              }
+            }
+          }).catch(err => console.error("Failed to send WhatsApp invite", err));
+        }
       }
 
       addToast("Student accepted into team!", "ok");

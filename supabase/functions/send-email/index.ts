@@ -66,6 +66,8 @@ serve(async (req) => {
         finalSubject = `Update on your team request for ${payload?.team_name || 'the team'}`;
       } else if (type === 'JOIN_REQUEST') {
         finalSubject = `New Request to join ${payload?.team_name || 'your team'}!`;
+      } else if (type === 'WHATSAPP_GROUP_INVITE') {
+        finalSubject = `Action Required: Join the Official SIH WhatsApp Group`;
       }
     }
 

@@ -5,19 +5,20 @@ export const SIH_THEMES = [
   "Blockchain & Cybersecurity",
   "Clean & Green Technology",
   "Disaster Management",
-  "Education & Skill Development",
-  "Finance & Banking",
   "Fitness & Sports",
-  "Food Technology",
-  "Healthcare & Biomedical Devices",
   "Heritage & Culture",
   "MedTech / BioTech / HealthTech",
   "Miscellaneous",
   "Renewable / Sustainable Energy",
-  "Robotics & Drones",
+  "Robotics and Drones",
   "Smart Automation",
   "Smart Education",
+  "Smart Vehicles",
+  "Space Technology",
+  "Toys & Games",
   "Transportation & Logistics",
+  "Travel & Tourism",
+  "Smart Cities / Urban Development"
 ];
 
 export const SKILLS = [

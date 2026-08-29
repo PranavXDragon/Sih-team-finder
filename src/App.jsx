@@ -25,6 +25,7 @@ export default function App() {
   const [showAuth, setShowAuth] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [authDefaultSignUp, setAuthDefaultSignUp] = useState(false);
+  const [showClosedModal, setShowClosedModal] = useState(false);
   const [globalPostTeam, setGlobalPostTeam] = useState(false);
   const [globalListSeeker, setGlobalListSeeker] = useState(false);
   const [globalShowRequests, setGlobalShowRequests] = useState(false);
@@ -73,11 +74,24 @@ export default function App() {
 
   useEffect(() => {
     const handleAuthEvent = (e) => {
+      if (e.detail === 'signup') {
+        const isClosed = new Date().getTime() >= new Date("2026-08-31T00:00:00").getTime();
+        if (isClosed) {
+          setShowClosedModal(true);
+          return;
+        }
+      }
       setAuthDefaultSignUp(e.detail === 'signup');
       setShowAuth(true);
     };
+    const handleClosedEvent = () => setShowClosedModal(true);
+
     document.addEventListener("triggerAuth", handleAuthEvent);
-    return () => document.removeEventListener("triggerAuth", handleAuthEvent);
+    document.addEventListener("triggerClosed", handleClosedEvent);
+    return () => {
+      document.removeEventListener("triggerAuth", handleAuthEvent);
+      document.removeEventListener("triggerClosed", handleClosedEvent);
+    };
   }, []);
 
   useEffect(() => {
@@ -199,6 +213,21 @@ export default function App() {
 
       {globalShowRequests && (
         <RequestsModal onClose={() => setGlobalShowRequests(false)} />
+      )}
+
+      {showClosedModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(6, 3, 2, 0.76)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div style={{ background: 'var(--bg-2)', border: '1px solid var(--border)', width: '100%', maxWidth: 440, padding: '40px 24px', borderRadius: 18, display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 40px 90px -30px var(--shadow-2)', animation: 'rise 0.28s cubic-bezier(0.2, 0.9, 0.3, 1)' }}>
+            <div style={{ width: 72, height: 72, borderRadius: '50%', border: '3px solid var(--stop)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+              <span style={{ color: 'var(--stop)', fontSize: 36, fontWeight: 800, lineHeight: 1 }}>!</span>
+            </div>
+            <h1 style={{ color: 'var(--text)', fontSize: 26, fontWeight: 800, margin: '0 0 12px 0', textTransform: 'uppercase', letterSpacing: '0.5px' }}>CLOSED!</h1>
+            <p style={{ color: 'var(--dim)', fontSize: 14, margin: '0 0 32px 0', fontWeight: 500, textAlign: 'center', letterSpacing: '0.5px' }}>REGISTRATIONS ARE CLOSED</p>
+            <button className="btn" style={{ background: 'var(--stop)', color: '#fff', border: 'none', padding: '10px 32px', fontSize: 15, fontWeight: 700, borderRadius: 8, cursor: 'pointer' }} onClick={() => setShowClosedModal(false)}>
+              OK
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="toasts" aria-live="polite">
