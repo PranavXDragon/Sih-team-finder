@@ -12,6 +12,8 @@ import TeamModal from "./components/modals/TeamModal";
 import SeekerModal from "./components/modals/SeekerModal";
 import RequestsModal from "./components/modals/RequestsModal";
 
+const CLOSING_INSTANT = Date.parse("2026-08-31T00:00:00+05:30");
+
 export default function App() {
   const { toasts, session, isAuthLoading, isLoading, myTeam, mySeekerProfile, addToast, requestToJoin } = useSIH();
 
