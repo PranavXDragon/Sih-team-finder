@@ -34,11 +34,14 @@ export default function App() {
     if (session?.user && !isLoading) {
       if (session.user.email === "admin@sih2026.com") return; // Admin skips all onboarding
       const intent = localStorage.getItem('sih_intent');
+      const isClosed = Date.now() >= CLOSING_INSTANT;
 
       // Always process intent if present, regardless of whether they are a new user
       if (intent) {
         localStorage.removeItem('sih_intent');
-        if (intent === "post-team") {
+        if (isClosed) {
+          setShowClosedModal(true);
+        } else if (intent === "post-team") {
           if (myTeam) {
             addToast("You already have a registered team!", "err");
           } else if (mySeekerProfile) {
@@ -64,7 +67,11 @@ export default function App() {
         } else if (!intent) {
           // Default to post-team if no intent was found (e.g. they just clicked sign up)
           localStorage.setItem(key, "true");
-          setGlobalPostTeam(true);
+          if (isClosed) {
+            setShowClosedModal(true);
+          } else {
+            setGlobalPostTeam(true);
+          }
         } else {
           localStorage.setItem(key, "true");
         }
@@ -75,7 +82,7 @@ export default function App() {
   useEffect(() => {
     const handleAuthEvent = (e) => {
       if (e.detail === 'signup') {
-        const isClosed = new Date().getTime() >= new Date("2026-08-31T00:00:00").getTime();
+        const isClosed = Date.now() >= CLOSING_INSTANT;
         if (isClosed) {
           setShowClosedModal(true);
           return;

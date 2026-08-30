@@ -879,6 +879,91 @@ export const generateEmailHTML = (type: string, payload: any) => {
       .replace(/{{participant_name}}/g, payload.participant_name || 'Participant')
       .replace(/{{team_name}}/g, payload.team_name || 'your team')
       .replace(/{{group_link}}/g, payload.group_link || 'https://chat.whatsapp.com/BpuL99pHOtqBNkENibp40s?s=cl&p=a&ilr=1');
+  } else if (type === 'TEAM_SELECTED') {
+    body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
+        <tr>
+          <td class="email-header" style="background-color: #151721; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding: 24px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 8px;">
+                    <tr>
+                      <td style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: #4ade80; background-color: rgba(74, 222, 128, 0.12); border: 1px solid rgba(74, 222, 128, 0.25); padding: 3px 8px; border-radius: 4px; letter-spacing: 0.16em; text-transform: uppercase;">
+                        SIH 2026 • OFFICIAL SELECTION
+                      </td>
+                    </tr>
+                  </table>
+                  <h1 class="email-header-title" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 22px; color: #f7f3ea; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">Congratulations!</h1>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td class="email-body" style="padding: 32px; color: #f7f3ea; font-size: 15px; line-height: 1.65;">
+            <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{team_leader_name}},</p>
+            <p style="margin: 0 0 16px; color: #f7f3ea;">We are thrilled to inform you that your team <strong style="color: #4ade80;">{{team_name}}</strong> has been officially <strong style="color: #4ade80;">SELECTED</strong> to advance in the Smart India Hackathon 2026!</p>
+            <p style="margin: 0 0 16px; color: #9ba2b4;">Your team is among the top 45 shortlisted teams from our college. Please check the official WhatsApp group for further mandatory instructions regarding the next phases of the competition.</p>
+            <p style="margin: 16px 0 4px; color: #4ade80; font-weight: 700;">Let's build something amazing! 💡</p>
+          </td>
+        </tr>
+      </table>`
+      .replace(/{{team_leader_name}}/g, payload.team_leader_name || 'Team Leader')
+      .replace(/{{team_name}}/g, payload.team_name || 'your team');
+  } else if (type === 'TEAM_WAITLISTED') {
+    body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
+        <tr>
+          <td class="email-header" style="background-color: #151721; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding: 24px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 8px;">
+                    <tr>
+                      <td style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: #facc15; background-color: rgba(250, 204, 21, 0.12); border: 1px solid rgba(250, 204, 21, 0.25); padding: 3px 8px; border-radius: 4px; letter-spacing: 0.16em; text-transform: uppercase;">
+                        SIH 2026 • OFFICIAL SELECTION
+                      </td>
+                    </tr>
+                  </table>
+                  <h1 class="email-header-title" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 22px; color: #f7f3ea; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">Update on your Team</h1>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td class="email-body" style="padding: 32px; color: #f7f3ea; font-size: 15px; line-height: 1.65;">
+            <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{team_leader_name}},</p>
+            <p style="margin: 0 0 16px; color: #f7f3ea;">Your team <strong style="color: #facc15;">{{team_name}}</strong> has been placed on the <strong style="color: #facc15;">WAITLIST</strong> (Top 50) for the Smart India Hackathon 2026.</p>
+            <p style="margin: 0 0 16px; color: #9ba2b4;">If any of the primary selected teams drop out or fail to meet the next round's criteria, waitlisted teams will be promoted. We will notify you immediately if your status changes. Please continue to monitor the official WhatsApp group.</p>
+          </td>
+        </tr>
+      </table>`
+      .replace(/{{team_leader_name}}/g, payload.team_leader_name || 'Team Leader')
+      .replace(/{{team_name}}/g, payload.team_name || 'your team');
+  } else if (type === 'TEAM_REJECTED') {
+    body = `<table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1a1d28; border: 1px solid rgba(255, 255, 255, 0.13); border-radius: 14px; overflow: hidden; width: 100%;">
+        <tr>
+          <td class="email-header" style="background-color: #151721; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding: 24px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+                  <h1 class="email-header-title" style="font-family: 'Archivo Black', Arial, sans-serif; font-size: 22px; color: #f7f3ea; margin: 0; line-height: 1.1; letter-spacing: -0.02em;">SIH 2026 Update</h1>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td class="email-body" style="padding: 32px; color: #f7f3ea; font-size: 15px; line-height: 1.65;">
+            <p style="margin: 0 0 16px; color: #f7f3ea;">Hello {{team_leader_name}},</p>
+            <p style="margin: 0 0 16px; color: #f7f3ea;">Thank you for registering your team <strong style="color: #f87171;">{{team_name}}</strong> for the Smart India Hackathon 2026.</p>
+            <p style="margin: 0 0 16px; color: #9ba2b4;">We received a massive number of highly competitive applications this year. Unfortunately, we are unable to advance your team to the next round at this time.</p>
+            <p style="margin: 0 0 16px; color: #9ba2b4;">We appreciate the effort and enthusiasm you and your team put into your application. Keep innovating and building, and we hope to see you in future hackathons!</p>
+          </td>
+        </tr>
+      </table>`
+      .replace(/{{team_leader_name}}/g, payload.team_leader_name || 'Team Leader')
+      .replace(/{{team_name}}/g, payload.team_name || 'your team');
   } else {
     body = '<p>Notification from SIH SCET Platform.</p>';
   }

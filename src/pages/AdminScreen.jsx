@@ -10,7 +10,7 @@ import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, Width
 import { saveAs } from "file-saver";
 
 export default function AdminScreen() {
-  const { teams, seekers, stats, deleteTeam, deleteSeeker, user } = useSIH();
+  const { teams, seekers, stats, deleteTeam, deleteSeeker, updateTeam, user } = useSIH();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +18,60 @@ export default function AdminScreen() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
   const [viewingTeam, setViewingTeam] = useState(null);
+  const [isSendingEmails, setIsSendingEmails] = useState(false);
+
+  const handleFinalizeEmails = async () => {
+    const selectedCount = teams.filter(t => t.status === 'Selected').length;
+    const waitlistCount = teams.filter(t => t.status === 'Waitlisted').length;
+
+    if (selectedCount !== 45 || waitlistCount !== 5) {
+      alert(`Validation Failed: You must select exactly 45 teams (currently ${selectedCount}) and waitlist exactly 5 teams (currently ${waitlistCount}) before finalizing.`);
+      return;
+    }
+
+    const confirmSend = window.confirm("Are you sure you want to finalize? This will immediately send official Selection, Waitlist, and Rejection emails to all team leaders based on their status.");
+    if (!confirmSend) return;
+
+    setIsSendingEmails(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const team of teams) {
+      const leader = team.members?.[0] || team.members?.find(m => m.is_leader);
+      if (!leader || !leader.email || !team.status || team.status === 'Pending') continue;
+
+      let emailType = '';
+      if (team.status === 'Selected') emailType = 'TEAM_SELECTED';
+      else if (team.status === 'Waitlisted') emailType = 'TEAM_WAITLISTED';
+      else if (team.status === 'Rejected') emailType = 'TEAM_REJECTED';
+
+      if (emailType) {
+        try {
+          const { data, error } = await supabase.functions.invoke('send-email', {
+            body: {
+              type: emailType,
+              payload: { team_id: team.id }
+            }
+          });
+          
+          if (error) {
+            console.error("Failed to send email to", leader.email, error);
+            failCount++;
+          } else if (data?.skipped) {
+            console.log("Skipped duplicate send for team", team.id);
+          } else {
+            successCount++;
+          }
+        } catch (err) {
+          console.error("Exception sending email to", leader.email, err);
+          failCount++;
+        }
+      }
+    }
+
+    setIsSendingEmails(false);
+    alert(`Done! Successfully sent ${successCount} emails. (${failCount} failed).`);
+  };
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   const handleAdminLogin = async (e) => {
@@ -270,8 +324,22 @@ export default function AdminScreen() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginTop: 32 }}>
-        <h2>Teams Database</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16, marginTop: 32 }}>
+        <div>
+          <h2 style={{ marginBottom: 4 }}>Teams Database</h2>
+          <p style={{ color: 'var(--dim)', fontSize: 14 }}>
+            Selected: <span style={{ color: teams.filter(t => t.status === 'Selected').length > 45 ? 'var(--stop)' : 'var(--accent)', fontWeight: 'bold' }}>{teams.filter(t => t.status === 'Selected').length}/45</span> | 
+            Waitlisted: <span style={{ color: teams.filter(t => t.status === 'Waitlisted').length > 5 ? 'var(--stop)' : 'var(--accent)', fontWeight: 'bold' }}>{teams.filter(t => t.status === 'Waitlisted').length}/5</span>
+          </p>
+        </div>
+        <button 
+          className="btn" 
+          disabled={isSendingEmails}
+          style={{ background: 'var(--accent)', color: 'var(--ink)', padding: '10px 20px', borderRadius: 8, fontWeight: 'bold', cursor: isSendingEmails ? 'not-allowed' : 'pointer', opacity: isSendingEmails ? 0.7 : 1 }}
+          onClick={handleFinalizeEmails}
+        >
+          {isSendingEmails ? 'Sending Emails...' : 'Finalize & Send Emails'}
+        </button>
       </div>
       <div className="admin-table-container">
         <table className="admin-table">
@@ -281,6 +349,7 @@ export default function AdminScreen() {
               <th>Theme</th>
               <th>Track</th>
               <th>Open Seats</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -307,6 +376,27 @@ export default function AdminScreen() {
                 <td>{t.theme}</td>
                 <td>{t.track}</td>
                 <td>{t.seatsOpen}/{t.totalSeats}</td>
+                <td>
+                  <select 
+                    value={t.status || 'Pending'} 
+                    onChange={(e) => updateTeam(t.id, { status: e.target.value })}
+                    style={{ 
+                      padding: '4px 8px', 
+                      borderRadius: 4, 
+                      background: t.status === 'Selected' ? 'rgba(34, 197, 94, 0.15)' : t.status === 'Waitlisted' ? 'rgba(234, 179, 8, 0.15)' : t.status === 'Rejected' ? 'rgba(239, 68, 68, 0.15)' : 'var(--surface-2)',
+                      color: t.status === 'Selected' ? '#4ade80' : t.status === 'Waitlisted' ? '#facc15' : t.status === 'Rejected' ? '#f87171' : 'var(--text)',
+                      border: '1px solid var(--border)',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      fontSize: 13
+                    }}
+                  >
+                    <option value="Pending" style={{ color: '#000' }}>Pending</option>
+                    <option value="Selected" style={{ color: '#000' }}>Selected</option>
+                    <option value="Waitlisted" style={{ color: '#000' }}>Waitlisted</option>
+                    <option value="Rejected" style={{ color: '#000' }}>Rejected</option>
+                  </select>
+                </td>
                 <td style={{ display: 'flex', gap: '8px' }}>
                   <button className="btn sm" onClick={() => setViewingTeam(t)}>View</button>
                   <button className="btn sm sec" onClick={() => setEditingTeam(t)}>Edit</button>
