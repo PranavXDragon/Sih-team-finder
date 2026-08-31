@@ -34,13 +34,24 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // 1. Verify Caller is Admin using their Anon Key session
-    const authHeader = req.headers.get('Authorization')!
+    // 1. Verify Caller is Admin using Service Role client
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing Authorization header' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      })
+    }
+
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
 
     if (userError || !user || user.email !== 'admin@sih2026.com') {
-      return new Response(JSON.stringify({ error: 'Unauthorized SPOC action' }), {
+      console.error('SPOC Auth check failed:', { userEmail: user?.email, userError });
+      return new Response(JSON.stringify({ 
+        error: `Unauthorized SPOC action: Current session is ${user?.email || 'Logged Out'}. Please sign in as admin@sih2026.com.`,
+        details: { currentUser: user?.email, error: userError }
+      }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       })
