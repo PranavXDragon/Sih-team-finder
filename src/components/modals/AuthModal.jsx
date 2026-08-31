@@ -3,6 +3,8 @@ import { supabase } from "../../lib/supabase";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import "./AuthModal.css";
 
+const CLOSING_INSTANT = Date.parse("2026-08-31T00:00:00+05:30");
+
 const AnimatedFormField = ({
   type,
   placeholder,
@@ -180,7 +182,13 @@ export default function AuthModal({ onClose, onSuccess, defaultIsSignUp }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState(""); // Optionally track name from the new design
-  const [isSignUp, setIsSignUp] = useState(defaultIsSignUp || false);
+  
+  const isClosed = Date.now() >= CLOSING_INSTANT;
+  const [isSignUp, setIsSignUp] = useState(() => {
+    if (isClosed) return false;
+    return defaultIsSignUp || false;
+  });
+  
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -381,14 +389,19 @@ export default function AuthModal({ onClose, onSuccess, defaultIsSignUp }) {
         </div>
 
         <div className="auth-flo-footer">
-          {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button
-            type="button"
-            onClick={toggleMode}
-            disabled={loading}
-          >
-            {isSignUp ? 'Sign in' : 'Sign up'}
-          </button>
+          {isSignUp ? (
+            <>
+              Already have an account?{' '}
+              <button type="button" onClick={toggleMode} disabled={loading}>Sign in</button>
+            </>
+          ) : (
+            !isClosed && (
+              <>
+                Don't have an account?{' '}
+                <button type="button" onClick={toggleMode} disabled={loading}>Sign up</button>
+              </>
+            )
+          )}
         </div>
       </div>
     </div>

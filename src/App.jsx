@@ -69,9 +69,7 @@ export default function App() {
         } else if (!intent) {
           // Default to post-team if no intent was found (e.g. they just clicked sign up)
           localStorage.setItem(key, "true");
-          if (isClosed) {
-            setShowClosedModal(true);
-          } else {
+          if (!isClosed) {
             setGlobalPostTeam(true);
           }
         } else {

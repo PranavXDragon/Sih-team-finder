@@ -8,9 +8,10 @@ import AdminViewTeamModal from "../components/modals/AdminViewTeamModal";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, TableLayoutType } from "docx";
 import { saveAs } from "file-saver";
+import { PROGRAMS_DATA } from "../data/constants";
 
 export default function AdminScreen() {
-  const { teams, seekers, stats, deleteTeam, deleteSeeker, updateTeam, user } = useSIH();
+  const { teams, seekers, stats, deleteTeam, deleteSeeker, updateTeam, user, addToast, fetchSupabaseData } = useSIH();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +20,13 @@ export default function AdminScreen() {
   const [editingTeam, setEditingTeam] = useState(null);
   const [viewingTeam, setViewingTeam] = useState(null);
   const [isSendingEmails, setIsSendingEmails] = useState(false);
+
+  // Manual Add Team States
+  const [showAddTeamModal, setShowAddTeamModal] = useState(false);
+  const [isAddingTeam, setIsAddingTeam] = useState(false);
+  const [addTeamForm, setAddTeamForm] = useState({
+    teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
+  });
 
   const handleFinalizeEmails = async () => {
     const selectedCount = teams.filter(t => t.status === 'Selected').length;
@@ -72,6 +80,34 @@ export default function AdminScreen() {
     setIsSendingEmails(false);
     alert(`Done! Successfully sent ${successCount} emails. (${failCount} failed).`);
   };
+
+  const handleAddTeamSubmit = async (e) => {
+    e.preventDefault();
+    setIsAddingTeam(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-add-team', {
+        body: addTeamForm
+      });
+      if (error) throw error;
+      if (data?.error) {
+        console.error("Edge function returned error details:", data.details);
+        throw new Error(data.details?.message ? `${data.error}: ${data.details.message}` : data.error);
+      }
+
+      addToast(`Success! Team created and temporary password emailed to ${addTeamForm.leaderEmail}.`, "ok");
+      setShowAddTeamModal(false);
+      setAddTeamForm({
+        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
+      });
+      fetchSupabaseData(); // Refresh table
+    } catch (err) {
+      console.error(err);
+      addToast("Error adding team: " + err.message, "err");
+    } finally {
+      setIsAddingTeam(false);
+    }
+  };
+
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   const handleAdminLogin = async (e) => {
@@ -269,9 +305,14 @@ export default function AdminScreen() {
 
   return (
     <div className="admin-container">
-      <div className="admin-head">
-        <h1>SIH 2026 SPOC Portal</h1>
-        <p style={{ color: 'var(--dim)' }}>Live analytics and data tables.</p>
+      <div className="admin-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1>SIH 2026 SPOC Portal</h1>
+          <p style={{ color: 'var(--dim)' }}>Live analytics and data tables.</p>
+        </div>
+        <button className="btn pri" onClick={() => setShowAddTeamModal(true)} style={{ margin: 0 }}>
+          + Add Team & Leader
+        </button>
       </div>
 
       <div className="admin-stats">
@@ -453,6 +494,102 @@ export default function AdminScreen() {
           team={viewingTeam}
           onClose={() => setViewingTeam(null)}
         />
+      )}
+
+      {showAddTeamModal && (
+        <div className="veil open" style={{ zIndex: 9999 }} onClick={(e) => e.target === e.currentTarget && setShowAddTeamModal(false)}>
+          <div className="modal" style={{ maxWidth: 500, width: '100%' }}>
+            <div className="mhead">
+              <div>
+                <h2 style={{ margin: 0 }}>Manually Add Team & Leader</h2>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setShowAddTeamModal(false)} 
+                disabled={isAddingTeam} 
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--dim)' }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <div className="mbody" style={{ padding: '24px' }}>
+              <form onSubmit={handleAddTeamSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div className="fld">
+                    <label>Team Name *</label>
+                    <input type="text" value={addTeamForm.teamName} onChange={e => setAddTeamForm({...addTeamForm, teamName: e.target.value})} required disabled={isAddingTeam} />
+                  </div>
+                  <div className="fld">
+                    <label>Theme *</label>
+                    <select value={addTeamForm.theme} onChange={e => setAddTeamForm({...addTeamForm, theme: e.target.value})} required disabled={isAddingTeam}>
+                      <option>Software</option>
+                      <option>Hardware</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <h3 style={{ marginTop: '8px', fontSize: '14px', color: 'var(--dim)', textTransform: 'uppercase' }}>Leader Details</h3>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div className="fld">
+                    <label>Leader Name *</label>
+                    <input type="text" value={addTeamForm.leaderName} onChange={e => setAddTeamForm({...addTeamForm, leaderName: e.target.value})} required disabled={isAddingTeam} />
+                  </div>
+                  <div className="fld">
+                    <label>Leader Email *</label>
+                    <input type="email" value={addTeamForm.leaderEmail} onChange={e => setAddTeamForm({...addTeamForm, leaderEmail: e.target.value})} required disabled={isAddingTeam} />
+                  </div>
+                  <div className="fld">
+                    <label>Leader Phone</label>
+                    <input type="text" value={addTeamForm.leaderPhone} onChange={e => setAddTeamForm({...addTeamForm, leaderPhone: e.target.value})} disabled={isAddingTeam} />
+                  </div>
+                  <div className="fld">
+                    <label>Gender</label>
+                    <select value={addTeamForm.leaderGender} onChange={e => setAddTeamForm({...addTeamForm, leaderGender: e.target.value})} disabled={isAddingTeam}>
+                      <option>Male</option><option>Female</option><option>Other</option>
+                    </select>
+                  </div>
+                  <div className="fld">
+                    <label>Program</label>
+                    <select 
+                      value={addTeamForm.leaderProgram} 
+                      onChange={e => setAddTeamForm({
+                        ...addTeamForm, 
+                        leaderProgram: e.target.value, 
+                        leaderBranch: PROGRAMS_DATA[e.target.value]?.[0] || ''
+                      })} 
+                      disabled={isAddingTeam}
+                    >
+                      {Object.keys(PROGRAMS_DATA).map(prog => (
+                        <option key={prog} value={prog}>{prog}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="fld">
+                    <label>Branch/Dept</label>
+                    <select value={addTeamForm.leaderBranch} onChange={e => setAddTeamForm({...addTeamForm, leaderBranch: e.target.value})} disabled={isAddingTeam}>
+                      {(PROGRAMS_DATA[addTeamForm.leaderProgram] || []).map(b => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="fld">
+                    <label>Year</label>
+                    <select value={addTeamForm.leaderYear} onChange={e => setAddTeamForm({...addTeamForm, leaderYear: e.target.value})} disabled={isAddingTeam}>
+                      <option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="modal-footer" style={{ marginTop: '16px' }}>
+                  <button type="submit" className="btn pri" disabled={isAddingTeam} style={{ width: '100%', margin: 0 }}>
+                    {isAddingTeam ? 'Provisioning Account...' : 'Add Team & Send Credentials'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
 
       {confirmDelete && (

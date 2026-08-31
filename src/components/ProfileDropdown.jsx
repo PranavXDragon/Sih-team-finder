@@ -3,11 +3,13 @@ import { useSIH } from "../hooks/useSIH";
 import TeamModal from "./modals/TeamModal";
 import SeekerModal from "./modals/SeekerModal";
 import RequestsModal from "./modals/RequestsModal";
+import PasswordModal from "./modals/PasswordModal";
 
 export default function ProfileDropdown() {
   const { user, myTeam, mySeekerProfile, signOut, myRequests, myApplications } = useSIH();
   const [open, setOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -75,7 +77,7 @@ export default function ProfileDropdown() {
               </>
             )}
 
-            {mySeekerProfile && (
+            {mySeekerProfile && !myTeam && (
               <>
                 <button type="button" className="cs-opt" onClick={() => handleOpenModal('seeker')}>Edit Seeker Profile</button>
                 <button type="button" className="cs-opt" onClick={() => handleOpenModal('apps')} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -93,11 +95,18 @@ export default function ProfileDropdown() {
 
             <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
 
+            <button type="button" className="cs-opt" onClick={() => { setShowPasswordModal(true); setOpen(false); }}>
+              Change Password
+            </button>
             <button type="button" className="cs-opt" onClick={handleSignOut} style={{ color: "var(--stop)" }}>
               Sign Out
             </button>
           </div>
         </div>
+      )}
+
+      {showPasswordModal && (
+        <PasswordModal onClose={() => setShowPasswordModal(false)} />
       )}
 
       {activeModal === 'team' && <TeamModal initialData={myTeam} onClose={() => setActiveModal(null)} />}
