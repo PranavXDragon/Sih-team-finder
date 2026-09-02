@@ -1,6 +1,8 @@
 import './Navbar.css';
 import { useSIH } from "../hooks/useSIH";
 import ProfileDropdown from "./ProfileDropdown";
+import { StarButton } from "./ui/StarButton";
+import { PartyPopper } from "./ui/PartyPopper";
 
 export default function Navbar() {
   const { theme, toggleTheme, user } = useSIH();
@@ -21,12 +23,18 @@ export default function Navbar() {
 
         <span className="sp" />
         {!user ? (
-          <div style={{ display: 'flex', gap: '8px', marginRight: '12px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginRight: '12px', alignItems: 'center' }}>
+            <PartyPopper direction="down">
+              <StarButton as="a" href="#results" style={{ margin: 0, '--btn-height': '32px', fontSize: '13px', padding: '0 12px' }}>Results</StarButton>
+            </PartyPopper>
             <button className="btn sm profile-btn" type="button" onClick={() => document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signin' }))} style={{ margin: 0 }}>Sign In</button>
             <button className="btn sm" type="button" onClick={() => document.dispatchEvent(new CustomEvent('triggerAuth', { detail: 'signup' }))} style={{ margin: 0 }}>Sign Up</button>
           </div>
         ) : (
-          <div style={{ marginRight: '12px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginRight: '12px', alignItems: 'center' }}>
+            <PartyPopper direction="down">
+              <StarButton as="a" href="#results" style={{ margin: 0, '--btn-height': '32px', fontSize: '13px', padding: '0 12px' }}>Results</StarButton>
+            </PartyPopper>
             <ProfileDropdown />
           </div>
         )}

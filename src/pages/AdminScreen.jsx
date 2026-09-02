@@ -142,326 +142,44 @@ export default function AdminScreen() {
       ];
 
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "SIH 2026 Teams");
-      XLSX.writeFile(wb, "SIH_2026_All_Teams_Data.xlsx");
-      addToast("Excel report downloaded successfully!", "ok");
-    } catch (err) {
-      console.error("Excel Export Error:", err);
-      addToast("Failed to export Excel file: " + err.message, "err");
-    }
-  };
-
-  // --- 2. Calculate SPOC KPIs and Visualizations ---
-  const {
-    totalParticipants,
-    totalGirls,
-    totalBoys,
-    girlPercent,
-    boyPercent,
-    allGirlTeamsCount,
-    allBoyTeamsCount,
-    genderPieData,
-    yearChartData,
-    branchChartData,
-    trackPieData,
-    themeBarData,
-    ruleViolationTeamsCount
-  } = useMemo(() => {
-    let participants = 0;
-    let girls = 0;
-    let boys = 0;
-    let allGirlTeams = 0;
-    let allBoyTeams = 0;
-    let ruleViolations = 0;
-
-    const yearMap = {
-      "1st Year": { name: "1st Year", boys: 0, girls: 0, total: 0 },
-      "2nd Year": { name: "2nd Year", boys: 0, girls: 0, total: 0 },
-      "3rd Year": { name: "3rd Year", boys: 0, girls: 0, total: 0 },
-      "4th Year": { name: "4th Year", boys: 0, girls: 0, total: 0 },
-      "PG / Other": { name: "PG / Other", boys: 0, girls: 0, total: 0 }
-    };
-
-    const branchMap = {};
-    const tracksMap = { "Software": 0, "Hardware": 0 };
-    const themesMap = {};
-
-    teams.forEach(t => {
-      // Track
-      const track = t.track === "Hardware" ? "Hardware" : "Software";
-      tracksMap[track] = (tracksMap[track] || 0) + 1;
-
-      // Theme
-      if (t.theme) {
-        themesMap[t.theme] = (themesMap[t.theme] || 0) + 1;
-      }
-
-      const members = t.members || [];
-      const teamSize = members.length;
-      let teamGirls = 0;
-      let teamBoys = 0;
-
-      members.forEach(m => {
-        participants++;
-        const g = (m.gender || '').toLowerCase();
-        const isFemale = g === 'f' || g === 'female';
-
-        if (isFemale) {
-          girls++;
-          teamGirls++;
-        } else {
-          boys++;
-          teamBoys++;
-        }
-
-        // Year classification
-        const y = (m.year || '').trim();
-        let yearKey = "PG / Other";
-        if (y.includes("1st") || y.includes("1")) yearKey = "1st Year";
-        else if (y.includes("2nd") || y.includes("2")) yearKey = "2nd Year";
-        else if (y.includes("3rd") || y.includes("3")) yearKey = "3rd Year";
-        else if (y.includes("4th") || y.includes("Final") || y.includes("4")) yearKey = "4th Year";
-
-        if (yearMap[yearKey]) {
-          yearMap[yearKey].total++;
-          if (isFemale) yearMap[yearKey].girls++;
-          else yearMap[yearKey].boys++;
-        }
-
-        // Branch distribution
-        const branch = (m.dept || m.branch || 'Other').trim();
-        if (branch) {
-          branchMap[branch] = (branchMap[branch] || 0) + 1;
-        }
-      });
-
-      // Team gender classification
-      if (teamSize > 0) {
-        if (teamGirls === teamSize) {
-          allGirlTeams++;
-        } else if (teamBoys === teamSize) {
-          allBoyTeams++;
-          ruleViolations++;
-        }
-      } else {
-        ruleViolations++;
-      }
-    });
-
-    const gPct = participants > 0 ? Math.round((girls / participants) * 100) : 0;
-    const bPct = participants > 0 ? Math.round((boys / participants) * 100) : 0;
-
-    const gPie = [
-      { name: 'Female (Girls)', value: girls, color: '#ec4899' },
-      { name: 'Male (Boys)', value: boys, color: '#3b82f6' }
-    ].filter(d => d.value > 0);
-
-    const yData = Object.values(yearMap).filter(y => y.total > 0 || y.boys > 0 || y.girls > 0);
-
-    const bData = Object.keys(branchMap).map(k => ({
-      name: k.length > 18 ? k.substring(0, 18) + '...' : k,
-      fullName: k,
-      count: branchMap[k]
-    })).sort((a, b) => b.count - a.count).slice(0, 8);
-
-    const trPie = [
-      { name: 'Software Track', value: tracksMap['Software'] || 0, color: '#10b981' },
-      { name: 'Hardware Track', value: tracksMap['Hardware'] || 0, color: '#f59e0b' }
-    ].filter(d => d.value > 0);
-
-    const thData = Object.keys(themesMap).map(key => ({
-      name: key.length > 15 ? key.substring(0, 15) + '...' : key,
-      count: themesMap[key],
-      fullName: key
-    })).sort((a, b) => b.count - a.count);
-
-    return {
-      totalParticipants: participants,
-      totalGirls: girls,
-      totalBoys: boys,
-      girlPercent: gPct,
-      boyPercent: bPct,
-      allGirlTeamsCount: allGirlTeams,
-      allBoyTeamsCount: allBoyTeams,
-      genderPieData: gPie,
-      yearChartData: yData,
-      branchChartData: bData,
-      trackPieData: trPie,
-      themeBarData: thData,
-      ruleViolationTeamsCount: ruleViolations
-    };
-  }, [teams]);
-
-  // Rule violation checking helper
-  const getRuleViolations = (t) => {
-    const flags = [];
-    if (!t.members || t.members.length < (t.totalSeats || 6)) {
-      flags.push("Incomplete Team");
-    }
-    if (t.members && t.members.length > 0) {
-      const hasFemale = t.members.some(m => (m.gender || '').toLowerCase() === 'f' || (m.gender || '').toLowerCase() === 'female');
-      if (!hasFemale) flags.push("No Female");
-    }
-    return flags;
-  };
-
-  // Filtered Teams List
-  const filteredTeams = useMemo(() => {
-    return teams.filter(t => {
-      // Search term filter
-      if (searchTerm.trim()) {
-        const q = searchTerm.toLowerCase();
-        const matchesName = (t.teamName || '').toLowerCase().includes(q);
-        const matchesTheme = (t.theme || '').toLowerCase().includes(q);
-        const matchesPsId = (t.psId || '').toLowerCase().includes(q);
-        const matchesLeader = (t.contact || '').toLowerCase().includes(q) || (t.members?.[0]?.name || '').toLowerCase().includes(q);
-        if (!matchesName && !matchesTheme && !matchesPsId && !matchesLeader) return false;
-      }
-
-      // Tab filter
-      if (activeFilter === 'selected') return t.status === 'Selected';
-      if (activeFilter === 'waitlisted') return t.status === 'Waitlisted';
-      if (activeFilter === 'pending') return !t.status || t.status === 'Pending';
-      if (activeFilter === 'rejected') return t.status === 'Rejected';
-      if (activeFilter === 'software') return t.track === 'Software';
-      if (activeFilter === 'hardware') return t.track === 'Hardware';
-      if (activeFilter === 'allgirls') {
-        const members = t.members || [];
-        return members.length > 0 && members.every(m => (m.gender || '').toLowerCase() === 'f' || (m.gender || '').toLowerCase() === 'female');
-      }
-      if (activeFilter === 'violations') {
-        return getRuleViolations(t).length > 0;
-      }
-
-      return true;
-    });
-  }, [teams, searchTerm, activeFilter]);
-
-  const handleFinalizeEmails = async () => {
-    const selectedCount = teams.filter(t => t.status === 'Selected').length;
-    const waitlistCount = teams.filter(t => t.status === 'Waitlisted').length;
-
-    if (selectedCount !== 45 || waitlistCount !== 5) {
-      addToast(`Validation Failed: You must select exactly 45 teams (currently ${selectedCount}) and waitlist exactly 5 teams (currently ${waitlistCount}) before finalizing.`, "err");
-      return;
-    }
-
-    const confirmSend = window.confirm("Are you sure you want to finalize? This will immediately send official Selection, Waitlist, and Rejection emails to all team leaders based on their status.");
-    if (!confirmSend) return;
-
-    setIsSendingEmails(true);
-    let successCount = 0;
-    let failCount = 0;
-
-    for (const team of teams) {
-      const leader = team.members?.[0] || team.members?.find(m => m.is_leader);
-      if (!leader || !leader.email || !team.status || team.status === 'Pending') continue;
-
-      let emailType = '';
-      if (team.status === 'Selected') emailType = 'TEAM_SELECTED';
-      else if (team.status === 'Waitlisted') emailType = 'TEAM_WAITLISTED';
-      else if (team.status === 'Rejected') emailType = 'TEAM_REJECTED';
-
-      if (emailType) {
-        try {
-          const { data, error } = await supabase.functions.invoke('send-email', {
-            body: {
-              type: emailType,
-              payload: { team_id: team.id }
-            }
-          });
-          
-          if (error) {
-            console.error("Failed to send email to", leader.email, error);
-            failCount++;
-          } else if (data?.skipped) {
-            console.log("Skipped duplicate send for team", team.id);
-          } else {
-            successCount++;
-          }
-        } catch (err) {
-          console.error("Exception sending email to", leader.email, err);
-          failCount++;
-        }
-      }
-    }
-
-    setIsSendingEmails(false);
-    addToast(`Done! Successfully sent ${successCount} emails. (${failCount} failed).`, "ok");
-  };
-
-  const handleAddTeamSubmit = async (e) => {
-    e.preventDefault();
-    setIsAddingTeam(true);
-    setAddTeamModalError("");
-    try {
-      const { data, error } = await supabase.functions.invoke('admin-add-team', {
-        body: addTeamForm
-      });
-      if (error) throw error;
-      if (data?.error) {
-        console.error("Edge function returned error details:", data.details);
-        throw new Error(data.details?.message ? `${data.error}: ${data.details.message}` : data.error);
-      }
-
-      addToast(`Success! Team created and temporary password emailed to ${addTeamForm.leaderEmail}.`, "ok");
-      setShowAddTeamModal(false);
-      setAddTeamModalError("");
-      setAddTeamForm({
-        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
-      });
-      fetchSupabaseData?.(); // Refresh table
+      XLSX.utils.book_append_sheet(wb, ws, "Teams");
+      
+      const fileName = activeFilter === "all" ? "SIH_All_Teams.xlsx" 
+        : activeFilter === "selected" ? "SIH_Selected_Teams.xlsx"
+        : activeFilter === "waitlisted" ? "SIH_Waitlisted_Teams.xlsx"
+        : "SIH_Rejected_Teams.xlsx";
+        
+      XLSX.writeFile(wb, fileName);
     } catch (err) {
       console.error(err);
-      setAddTeamModalError(err.message);
-      addToast("Error adding team: " + err.message, "err");
-    } finally {
-      setIsAddingTeam(false);
+      addToast("Failed to export Excel", "error");
     }
   };
 
-  const handleDeleteTeam = (t) => {
-    setConfirmDelete({ type: 'team', id: t.id, name: t.teamName });
-  };
-
-  const handleDeleteSeeker = (s) => {
-    setConfirmDelete({ type: 'seeker', id: s.id, name: s.name });
-  };
-
-  const handleDownloadDocx = async (team) => {
-    const topSpacing = Array(8).fill(new Paragraph({ text: "" }));
-    const today = new Date().toLocaleDateString("en-GB");
-    const members = [...(team.members || [])];
-    const seats = team.totalSeats || 6;
-    while (members.length < seats) {
-      members.push({});
+  const handleExportWord = async (team) => {
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const topSpacing = [new Paragraph({ text: "" }), new Paragraph({ text: "" })];
+    
+    let membersList = (team.members && team.members.length > 0) ? team.members : [];
+    if (membersList.length === 0) {
+      membersList = [{ name: team.contact?.split('|')[0] || "Team Leader", gender: "Male" }];
     }
-
-    const colWidths = [10, 16, 8, 24, 12, 18, 12]; // percentages
 
     const tableRows = [
       new TableRow({
-        children: ["", "Name", "Gender", "Email id", "Mobile no.", "Stream", "Academic Year"].map(
-          (text, idx) => new TableCell({
-            children: [new Paragraph({ children: [new TextRun({ text, bold: true, size: 18 })], alignment: AlignmentType.CENTER })],
-            width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
-            margins: { top: 100, bottom: 100, left: 100, right: 100 },
-          })
-        ),
+        children: [
+          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "S. No.", bold: true })] })] }),
+          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Name", bold: true })] })] }),
+          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Gender", bold: true })] })] }),
+        ]
       }),
-      ...members.map((m, i) => {
-        const role = i === 0 ? "Team Leader" : "Team Member";
-        const gender = (m.gender || '').toLowerCase() === 'f' || (m.gender || '').toLowerCase() === 'female' ? "Female" : (m.gender || '').toLowerCase() === 'm' || (m.gender || '').toLowerCase() === 'male' ? "Male" : m.name ? "N/A" : "";
-        const year = m.year || "";
-        const stream = m.dept || m.branch || "";
+      ...membersList.map((m, idx) => {
         return new TableRow({
-          children: [role, m.name || "", gender, m.email || "", m.phone || "", stream, year].map(
-            (text, idx) => new TableCell({
-              children: [new Paragraph({ children: [new TextRun({ text, size: 18 })], alignment: idx === 0 || idx === 2 || idx === 4 || idx === 6 ? AlignmentType.CENTER : AlignmentType.LEFT })],
-              width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
-              margins: { top: 100, bottom: 100, left: 100, right: 100 },
-            })
-          ),
+          children: [
+            new TableCell({ children: [new Paragraph(String(idx + 1))] }),
+            new TableCell({ children: [new Paragraph(m.name || "")] }),
+            new TableCell({ children: [new Paragraph(m.gender || "")] }),
+          ]
         });
       })
     ];

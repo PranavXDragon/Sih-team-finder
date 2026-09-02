@@ -3,15 +3,20 @@ import { useState, useEffect } from "react";
 import { useSIH } from "../hooks/useSIH";
 
 const RULES = [
-  "6 members", "\u00B7", "1 must be female", "\u00B7", "one institute", "\u00B7", "18 themes", "\u00B7",
-  "software or hardware", "\u00B7", "one problem statement", "\u00B7",
-  "6 members", "\u00B7", "1 must be female", "\u00B7", "one institute", "\u00B7", "18 themes", "\u00B7",
-  "software or hardware", "\u00B7", "one problem statement", "\u00B7",
+  "🎉 SIH 2026 FINALIST RESULTS ARE OUT! 🎉", "\u00B7", "CHECK THE RESULTS TAB", "\u00B7",
+  "🎉 SIH 2026 FINALIST RESULTS ARE OUT! 🎉", "\u00B7", "CHECK THE RESULTS TAB", "\u00B7",
+  "🎉 SIH 2026 FINALIST RESULTS ARE OUT! 🎉", "\u00B7", "CHECK THE RESULTS TAB", "\u00B7",
 ];
 
 export default function LandingScreen({ onEnter }) {
   const { stats, session, myTeam, mySeekerProfile, addToast } = useSIH();
   const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
+  const [showCongrats, setShowCongrats] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowCongrats(true), 1000);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     const target = new Date("2026-08-31T00:00:00").getTime();
@@ -61,6 +66,13 @@ export default function LandingScreen({ onEnter }) {
 
   return (
     <div>
+      {/* MARQUEE / TICKER */}
+      <div className="marquee" aria-hidden="true">
+        <div className="marquee-in">
+          {RULES.map((r, i) => <span key={i}>{r}</span>)}
+        </div>
+      </div>
+
       {/* POSTER HERO */}
       <section className="poster" style={{ position: 'relative' }}>
         <div className="hero-bg-img" aria-hidden="true" />
@@ -95,12 +107,7 @@ export default function LandingScreen({ onEnter }) {
         </div>
       </section>
 
-      {/* MARQUEE */}
-      <div className="marquee" aria-hidden="true">
-        <div className="marquee-in">
-          {RULES.map((r, i) => <span key={i}>{r}</span>)}
-        </div>
-      </div>
+
 
       {/* STAMPS */}
       <section className="stamps">
@@ -177,6 +184,21 @@ export default function LandingScreen({ onEnter }) {
           </div>
         </div>
       </section>
+
+      {showCongrats && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', display: 'grid', placeItems: 'center', padding: 20, animation: 'rise 0.3s ease-out' }}>
+          <div style={{ position: 'relative', background: 'var(--lime)', color: 'var(--ink)', padding: '32px', borderRadius: 16, border: '3px solid var(--ink)', boxShadow: '12px 12px 0 var(--ink)', width: '100%', maxWidth: 440 }}>
+            <button onClick={() => setShowCongrats(false)} style={{ position: 'absolute', top: 16, right: 20, background: 'transparent', border: 'none', color: 'var(--ink)', cursor: 'pointer', fontSize: 28, padding: 0, fontWeight: 'bold' }}>&times;</button>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: 32, fontFamily: 'var(--poster)', textTransform: 'uppercase' }}>🎉 Results are out!</h3>
+            <p style={{ margin: '0 0 24px 0', fontSize: 17, lineHeight: 1.5, fontWeight: 600 }}>
+              Congratulations to all SIH 2026 finalists!<br/>Check the list of selected and waitlisted teams.
+            </p>
+            <a href="#results" className="btn" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface)', color: 'var(--ink)', border: '2px solid var(--ink)', boxShadow: '4px 4px 0 var(--ink)', padding: '12px 24px', borderRadius: 100, fontWeight: 800, textDecoration: 'none', fontSize: 16 }} onClick={() => setShowCongrats(false)}>
+              View Results &rarr;
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

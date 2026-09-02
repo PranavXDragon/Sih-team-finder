@@ -4,6 +4,7 @@ import { useSIH } from "./hooks/useSIH";
 import LandingScreen from "./pages/LandingScreen";
 import BoardScreen from "./pages/BoardScreen";
 import AdminScreen from "./pages/AdminScreen";
+import ResultsScreen from "./pages/ResultsScreen";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AuthModal from "./components/modals/AuthModal";
@@ -21,6 +22,7 @@ export default function App() {
     const hash = window.location.hash;
     if (hash.startsWith("#board")) return "board";
     if (hash === "#spoc") return "admin";
+    if (hash === "#results") return "results";
     return "landing";
   });
   const [boardAction, setBoardAction] = useState(null);
@@ -111,6 +113,7 @@ export default function App() {
         window.location.hash = "board"; // clean url after reading
       }
       else if (hash === "#spoc") setScreenState("admin");
+      else if (hash === "#results") setScreenState("results");
       else setScreenState("landing");
     };
     window.addEventListener("hashchange", handleHash);
@@ -155,6 +158,10 @@ export default function App() {
 
       {screen === "admin" && (
         <AdminScreen />
+      )}
+
+      {screen === "results" && (
+        <ResultsScreen onBack={() => { setScreen("landing"); }} />
       )}
 
       <Footer />
