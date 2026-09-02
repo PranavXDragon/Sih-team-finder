@@ -78,7 +78,7 @@ export default function AdminScreen() {
         return;
       }
 
-      const headers = ["Team Name", "PS ID", "PS Title", "Description", "Track", "Team Details", "Email", "Mb. No."];
+      const headers = ["Team Name", "PS ID", "PS Title", "Description", "Track", "Team Details", "Email", "Mb. No.", "Status"];
       const rows = [headers];
       const merges = [];
 
@@ -87,6 +87,7 @@ export default function AdminScreen() {
         const description = t.pitch || t.theme || "";
         const track = t.track || (t.theme === "Hardware" ? "Hardware" : "Software");
         const psTitle = t.psTitle || "";
+        const status = t.status || "Pending";
         
         // Members list fallback
         let membersList = (t.members && t.members.length > 0) ? t.members : [];
@@ -107,21 +108,22 @@ export default function AdminScreen() {
             idx === 0 ? track : "",
             m.name || "",
             m.email || "",
-            m.phone || m.mobile || ""
+            m.phone || m.mobile || "",
+            idx === 0 ? status : ""
           ];
           rows.push(row);
         });
 
         const endRowIdx = rows.length - 1;
 
-        // If more than 1 member, merge columns A to E (cols 0 to 4)
+        // If more than 1 member, merge columns A to E (cols 0 to 4) and Status (col 8)
         if (endRowIdx > startRowIdx) {
-          for (let col = 0; col <= 4; col++) {
+          [0, 1, 2, 3, 4, 8].forEach(col => {
             merges.push({
               s: { r: startRowIdx, c: col },
               e: { r: endRowIdx, c: col }
             });
-          }
+          });
         }
       });
 
@@ -136,6 +138,7 @@ export default function AdminScreen() {
         { wch: 24 }, // Team Details
         { wch: 30 }, // Email
         { wch: 18 }, // Mb. No.
+        { wch: 12 }, // Status
       ];
 
       const wb = XLSX.utils.book_new();
