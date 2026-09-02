@@ -2,7 +2,7 @@ import './AdminScreen.css';
 import { useState, useMemo } from 'react';
 import { useSIH } from "../hooks/useSIH";
 import { supabase } from "../lib/supabase";
-import { Eye, EyeOff, FileSpreadsheet, Download, Users, Sparkles, Award } from "lucide-react";
+import { Eye, EyeOff, FileSpreadsheet, Download, Users, Sparkles, Award, AlertTriangle } from "lucide-react";
 import AdminEditTeamModal from "../components/modals/AdminEditTeamModal";
 import AdminViewTeamModal from "../components/modals/AdminViewTeamModal";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
@@ -65,6 +65,7 @@ export default function AdminScreen() {
   // Manual Add Team States
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
   const [isAddingTeam, setIsAddingTeam] = useState(false);
+  const [addTeamModalError, setAddTeamModalError] = useState("");
   const [addTeamForm, setAddTeamForm] = useState({
     teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
   });
@@ -72,7 +73,7 @@ export default function AdminScreen() {
   // --- 1. Export All Teams to Excel Matching Referance_Excel.xlsx ---
   const handleExportExcel = () => {
     try {
-      if (teams.length === 0) {
+      if (filteredTeams.length === 0) {
         addToast("No teams to export yet.", "err");
         return;
       }
@@ -81,7 +82,7 @@ export default function AdminScreen() {
       const rows = [headers];
       const merges = [];
 
-      teams.forEach(t => {
+      filteredTeams.forEach(t => {
         const formattedPsId = formatPsId(t.psId);
         const description = t.pitch || t.theme || "";
         const track = t.track || (t.theme === "Hardware" ? "Hardware" : "Software");
@@ -318,6 +319,7 @@ export default function AdminScreen() {
       if (activeFilter === 'selected') return t.status === 'Selected';
       if (activeFilter === 'waitlisted') return t.status === 'Waitlisted';
       if (activeFilter === 'pending') return !t.status || t.status === 'Pending';
+      if (activeFilter === 'rejected') return t.status === 'Rejected';
       if (activeFilter === 'software') return t.track === 'Software';
       if (activeFilter === 'hardware') return t.track === 'Hardware';
       if (activeFilter === 'allgirls') {
@@ -388,6 +390,7 @@ export default function AdminScreen() {
   const handleAddTeamSubmit = async (e) => {
     e.preventDefault();
     setIsAddingTeam(true);
+    setAddTeamModalError("");
     try {
       const { data, error } = await supabase.functions.invoke('admin-add-team', {
         body: addTeamForm
@@ -400,12 +403,14 @@ export default function AdminScreen() {
 
       addToast(`Success! Team created and temporary password emailed to ${addTeamForm.leaderEmail}.`, "ok");
       setShowAddTeamModal(false);
+      setAddTeamModalError("");
       setAddTeamForm({
         teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
       });
-      fetchSupabaseData(); // Refresh table
+      fetchSupabaseData?.(); // Refresh table
     } catch (err) {
       console.error(err);
+      setAddTeamModalError(err.message);
       addToast("Error adding team: " + err.message, "err");
     } finally {
       setIsAddingTeam(false);
@@ -803,6 +808,9 @@ export default function AdminScreen() {
           <button className={`admin-tab-btn ${activeFilter === 'pending' ? 'active' : ''}`} onClick={() => setActiveFilter('pending')}>
             Pending ({teams.filter(t => !t.status || t.status === 'Pending').length})
           </button>
+          <button className={`admin-tab-btn ${activeFilter === 'rejected' ? 'active' : ''}`} onClick={() => setActiveFilter('rejected')}>
+            Rejected ({teams.filter(t => t.status === 'Rejected').length})
+          </button>
           <button className={`admin-tab-btn ${activeFilter === 'allgirls' ? 'active' : ''}`} onClick={() => setActiveFilter('allgirls')}>
             ♀ All-Girls ({allGirlTeamsCount})
           </button>
@@ -1002,7 +1010,7 @@ export default function AdminScreen() {
       )}
 
       {showAddTeamModal && (
-        <div className="veil open" style={{ zIndex: 9999 }} onClick={(e) => e.target === e.currentTarget && setShowAddTeamModal(false)}>
+        <div className="veil open" style={{ zIndex: 9999 }} onClick={(e) => { if (e.target === e.currentTarget) { setShowAddTeamModal(false); setAddTeamModalError(""); } }}>
           <div className="modal" style={{ maxWidth: 500, width: '100%' }}>
             <div className="mhead">
               <div>
@@ -1010,7 +1018,7 @@ export default function AdminScreen() {
               </div>
               <button 
                 type="button"
-                onClick={() => setShowAddTeamModal(false)} 
+                onClick={() => { setShowAddTeamModal(false); setAddTeamModalError(""); }} 
                 disabled={isAddingTeam} 
                 style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--dim)' }}
               >
@@ -1085,6 +1093,25 @@ export default function AdminScreen() {
                     </select>
                   </div>
                 </div>
+
+                {addTeamModalError && (
+                  <div style={{
+                    background: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid rgba(239, 68, 68, 0.35)',
+                    borderRadius: 8,
+                    padding: '10px 14px',
+                    color: '#f87171',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    lineHeight: 1.4
+                  }}>
+                    <AlertTriangle size={18} style={{ flexShrink: 0, color: '#f87171' }} />
+                    <span>{addTeamModalError}</span>
+                  </div>
+                )}
 
                 <div className="modal-footer" style={{ marginTop: '16px' }}>
                   <button type="submit" className="btn pri" disabled={isAddingTeam} style={{ width: '100%', margin: 0 }}>

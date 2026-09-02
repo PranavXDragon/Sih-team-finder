@@ -706,7 +706,8 @@ export function SIHProvider({ children }) {
     session, user, isAuthLoading,
     signOut: () => supabase.auth.signOut(),
     myTeam, mySeekerProfile, myRequests, myApplications,
-    requestToJoin, acceptRequest, rejectRequest, sendTeamInvite, respondToInvite, removeMember
+    requestToJoin, acceptRequest, rejectRequest, sendTeamInvite, respondToInvite, removeMember,
+    fetchSupabaseData
   };
 
   return <SIHContext.Provider value={value}>{children}</SIHContext.Provider>;
