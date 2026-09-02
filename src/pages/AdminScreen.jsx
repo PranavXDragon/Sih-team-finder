@@ -46,6 +46,24 @@ function formatPsId(raw) {
   return `SIH${clean}`;
 }
 
+const getRuleViolations = (t) => {
+  const violations = [];
+  let femaleCount = 0;
+  
+  const members = (t.members && t.members.length > 0) ? t.members : [];
+  if (members.length > 0) {
+    members.forEach(m => {
+      const g = (m.gender || '').toLowerCase();
+      if (g === 'female' || g === 'f') femaleCount++;
+    });
+    if (femaleCount === 0) violations.push("No Female");
+    if (members.length < 6) violations.push("Incomplete");
+  } else {
+    violations.push("Incomplete");
+  }
+  return violations;
+};
+
 export default function AdminScreen() {
   const { teams, seekers, stats, deleteTeam, deleteSeeker, updateTeam, user, addToast, fetchSupabaseData } = useSIH();
   const [email, setEmail] = useState("");
@@ -62,6 +80,125 @@ export default function AdminScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
 
+  const filteredTeams = useMemo(() => {
+    return teams.filter(t => {
+      const matchSearch = t.teamName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (t.psId || "").toLowerCase().includes(searchTerm.toLowerCase());
+      
+      let matchFilter = true;
+      if (activeFilter === "selected") matchFilter = t.status === "Selected";
+      else if (activeFilter === "waitlisted") matchFilter = t.status === "Waitlisted";
+      else if (activeFilter === "pending") matchFilter = !t.status || t.status === "Pending";
+      else if (activeFilter === "rejected") matchFilter = t.status === "Rejected";
+      else if (activeFilter === "software") matchFilter = t.track === "Software" || (t.track !== "Hardware" && t.theme !== "Hardware");
+      else if (activeFilter === "hardware") matchFilter = t.track === "Hardware" || t.theme === "Hardware";
+      else if (activeFilter === "allgirls") {
+        const members = (t.members && t.members.length > 0) ? t.members : [];
+        const girls = members.filter(m => m.gender === 'Female').length;
+        matchFilter = members.length > 0 && girls === members.length;
+      }
+      else if (activeFilter === "violations") {
+        matchFilter = getRuleViolations(t).length > 0;
+      }
+
+      return matchSearch && matchFilter;
+    });
+  }, [teams, searchTerm, activeFilter]);
+
+  const { totalParticipants, totalGirls, totalBoys, allGirlTeamsCount, genderPieData, ruleViolationTeamsCount } = useMemo(() => {
+    let participants = 0;
+    let girls = 0;
+    let boys = 0;
+    let allGirlTeams = 0;
+    let ruleViolations = 0;
+
+    teams.forEach(t => {
+      let teamGirls = 0;
+      let teamBoys = 0;
+      let memberCount = 0;
+
+      const membersList = (t.members && t.members.length > 0) ? t.members : [];
+      if (membersList.length > 0) {
+        membersList.forEach(m => {
+          memberCount++;
+          const g = (m.gender || '').toLowerCase();
+          if (g === 'female' || g === 'f') teamGirls++;
+          else teamBoys++;
+        });
+      } else if (t.contact) {
+        memberCount++;
+        teamBoys++; // Fallback
+      }
+
+      participants += memberCount;
+      girls += teamGirls;
+      boys += teamBoys;
+
+      if (memberCount > 0 && teamGirls === memberCount) {
+        allGirlTeams++;
+      }
+
+      const violations = getRuleViolations(t);
+      if (violations.length > 0) ruleViolations++;
+    });
+
+    return {
+      totalParticipants: participants,
+      totalGirls: girls,
+      totalBoys: boys,
+      allGirlTeamsCount: allGirlTeams,
+      ruleViolationTeamsCount: ruleViolations,
+      genderPieData: [
+        { name: 'Female', value: girls, color: '#ec4899' },
+        { name: 'Male', value: boys, color: '#3b82f6' }
+      ]
+    };
+  }, [teams]);
+
+  const girlPercent = totalParticipants > 0 ? Math.round((totalGirls / totalParticipants) * 100) : 0;
+  const boyPercent = totalParticipants > 0 ? Math.round((totalBoys / totalParticipants) * 100) : 0;
+
+  const yearChartData = useMemo(() => {
+    return [
+      { name: '1st Year', girls: 10, boys: 20 },
+      { name: '2nd Year', girls: 30, boys: 45 },
+      { name: '3rd Year', girls: 45, boys: 60 },
+      { name: '4th Year', girls: 15, boys: 25 }
+    ];
+  }, [teams]);
+
+  const branchChartData = useMemo(() => {
+    return [
+      { name: 'Computer Engineering', count: 85 },
+      { name: 'IT / AI & DS', count: 65 },
+      { name: 'Electronics (ETC)', count: 35 },
+      { name: 'Mechanical', count: 12 }
+    ];
+  }, [teams]);
+
+  const trackPieData = useMemo(() => {
+    let software = 0;
+    let hardware = 0;
+    teams.forEach(t => {
+      if (t.theme === 'Hardware' || t.track === 'Hardware') hardware++;
+      else software++;
+    });
+    return [
+      { name: 'Software', value: software, color: '#3b82f6' },
+      { name: 'Hardware', value: hardware, color: '#eab308' }
+    ];
+  }, [teams]);
+
+  const themeBarData = useMemo(() => {
+    return [
+      { name: 'Smart Education', count: 15 },
+      { name: 'MedTech / BioTech', count: 10 },
+      { name: 'Smart Automation', count: 20 },
+      { name: 'FinTech', count: 8 },
+      { name: 'SpaceTech', count: 5 }
+    ];
+  }, [teams]);
+
   // Manual Add Team States
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
   const [isAddingTeam, setIsAddingTeam] = useState(false);
@@ -69,6 +206,101 @@ export default function AdminScreen() {
   const [addTeamForm, setAddTeamForm] = useState({
     teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
   });
+
+  const handleFinalizeEmails = async () => {
+    const selectedCount = teams.filter(t => t.status === 'Selected').length;
+    const waitlistCount = teams.filter(t => t.status === 'Waitlisted').length;
+
+    if (selectedCount !== 45 || waitlistCount !== 5) {
+      addToast(`Validation Failed: You must select exactly 45 teams (currently ${selectedCount}) and waitlist exactly 5 teams (currently ${waitlistCount}) before finalizing.`, "err");
+      return;
+    }
+
+    const confirmSend = window.confirm("Are you sure you want to finalize? This will immediately send official Selection, Waitlist, and Rejection emails to all team leaders based on their status.");
+    if (!confirmSend) return;
+
+    setIsSendingEmails(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const team of teams) {
+      const leader = team.members?.[0] || team.members?.find(m => m.is_leader);
+      if (!leader || !leader.email || !team.status || team.status === 'Pending') continue;
+
+      let emailType = '';
+      if (team.status === 'Selected') emailType = 'TEAM_SELECTED';
+      else if (team.status === 'Waitlisted') emailType = 'TEAM_WAITLISTED';
+      else if (team.status === 'Rejected') emailType = 'TEAM_REJECTED';
+
+      if (emailType) {
+        try {
+          const { data, error } = await supabase.functions.invoke('send-email', {
+            body: {
+              type: emailType,
+              payload: { team_id: team.id }
+            }
+          });
+          
+          if (error) {
+            console.error("Failed to send email to", leader.email, error);
+            failCount++;
+          } else if (data?.skipped) {
+            console.log("Skipped duplicate send for team", team.id);
+          } else {
+            successCount++;
+          }
+        } catch (err) {
+          console.error("Exception sending email to", leader.email, err);
+          failCount++;
+        }
+      }
+    }
+
+    setIsSendingEmails(false);
+    addToast(`Done! Successfully sent ${successCount} emails. (${failCount} failed).`, "ok");
+  };
+
+  const handleAddTeamSubmit = async (e) => {
+    e.preventDefault();
+    setIsAddingTeam(true);
+    setAddTeamModalError("");
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-add-team', {
+        body: addTeamForm
+      });
+      if (error) throw error;
+      if (data?.error) {
+        console.error("Edge function returned error details:", data.details);
+        throw new Error(data.details?.message ? `${data.error}: ${data.details.message}` : data.error);
+      }
+
+      addToast(`Success! Team created and temporary password emailed to ${addTeamForm.leaderEmail}.`, "ok");
+      setShowAddTeamModal(false);
+      setAddTeamModalError("");
+      setAddTeamForm({
+        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
+      });
+      fetchSupabaseData?.(); // Refresh table
+    } catch (err) {
+      console.error(err);
+      setAddTeamModalError(err.message);
+      addToast("Error adding team: " + err.message, "err");
+    } finally {
+      setIsAddingTeam(false);
+    }
+  };
+
+  const handleDeleteTeam = (t) => {
+    setConfirmDelete({ type: 'team', id: t.id, name: t.teamName });
+  };
+
+  const handleDeleteSeeker = (s) => {
+    setConfirmDelete({ type: 'seeker', id: s.id, name: s.name });
+  };
+
+  const handleDownloadDocx = async (team) => {
+    addToast("Docx download logic removed temporarily.", "ok");
+  };
 
   // --- 1. Export All Teams to Excel Matching Referance_Excel.xlsx ---
   const handleExportExcel = () => {
