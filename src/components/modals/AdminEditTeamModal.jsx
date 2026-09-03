@@ -20,6 +20,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
       if (cat && !KNOWN_CATEGORIES.includes(cat)) {
         customCat = cat;
         cat = "Other";
+      }
       return { ...m, category: cat, customCategory: customCat, pwd: m.pwd || "Not Applicable" };
     });
   });
