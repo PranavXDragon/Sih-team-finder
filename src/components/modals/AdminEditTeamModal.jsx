@@ -12,16 +12,14 @@ export default function AdminEditTeamModal({ team, onClose }) {
   const [psId, setPsId] = useState(team.psId || "");
   const [psTitle, setPsTitle] = useState(team.psTitle || "");
   const [pitch, setPitch] = useState(team.pitch || "");
-  const KNOWN_CATEGORIES = ["Unreserved(UR)", "OBC", "SC", "ST", "EWS", "Other"];
+  const KNOWN_CATEGORIES = ["Unreserved(UR)", "OBC", "SC", "ST", "EWS"];
   const [members, setMembers] = useState(() => {
     return (team.members || []).map(m => {
       let cat = m.category || "";
-      let customCat = "";
       if (cat && !KNOWN_CATEGORIES.includes(cat)) {
-        customCat = cat;
-        cat = "Other";
+        cat = "Unreserved(UR)";
       }
-      return { ...m, category: cat, customCategory: customCat, pwd: m.pwd || "Not Applicable" };
+      return { ...m, category: cat, pwd: m.pwd || "Not Applicable" };
     });
   });
   const [loading, setLoading] = useState(false);
@@ -36,7 +34,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
       const normalizedMembers = members.map(m => ({
         ...m,
         phone: m.phone ? String(m.phone).replace(/\D/g, '') : '',
-        category: m.category === "Other" ? (m.customCategory || "").trim() : (m.category || "")
+        category: m.category || ""
       }));
 
       await updateTeam(team.id, {
@@ -226,7 +224,6 @@ export default function AdminEditTeamModal({ team, onClose }) {
                       <option value="SC">SC</option>
                       <option value="ST">ST</option>
                       <option value="EWS">EWS</option>
-                      <option value="Other">Other</option>
                     </select>
                     <select
                       value={m.pwd || "Not Applicable"}
@@ -239,17 +236,6 @@ export default function AdminEditTeamModal({ team, onClose }) {
                       <option value="Hearing Impaired(HI)">Hearing Impaired(HI)</option>
                     </select>
                   </div>
-                  {m.category === "Other" && (
-                    <div style={{ marginTop: 8 }}>
-                      <input
-                        type="text"
-                        placeholder="Specify Category"
-                        value={m.customCategory || ""}
-                        onChange={(e) => { const newM = [...members]; newM[idx].customCategory = e.target.value; setMembers(newM); }}
-                        style={{ padding: 6, fontSize: 13, width: '100%' }}
-                      />
-                    </div>
-                  )}
                 </div>
               ))}
               {members.length === 0 && <p style={{ color: 'var(--dim)', fontSize: 13 }}>No members added.</p>}

@@ -266,9 +266,6 @@ export default function AdminScreen() {
     setAddTeamModalError("");
     try {
       const payload = { ...addTeamForm };
-      if (payload.leaderCategory === "Other") {
-        payload.leaderCategory = (payload.leaderCustomCategory || "").trim();
-      }
       const { data, error } = await supabase.functions.invoke('admin-add-team', {
         body: payload
       });
@@ -1247,21 +1244,9 @@ export default function AdminScreen() {
                       <option value="SC">SC</option>
                       <option value="ST">ST</option>
                       <option value="EWS">EWS</option>
-                      <option value="Other">Other</option>
                     </select>
                   </div>
                 </div>
-                {addTeamForm.leaderCategory === "Other" && (
-                  <div className="fld">
-                    <input 
-                      type="text" 
-                      placeholder="Specify Category" 
-                      value={addTeamForm.leaderCustomCategory || ""} 
-                      onChange={e => setAddTeamForm({...addTeamForm, leaderCustomCategory: e.target.value})} 
-                      disabled={isAddingTeam} 
-                    />
-                  </div>
-                )}
                 
                 <div className="fld">
                   <label>Pwd</label>

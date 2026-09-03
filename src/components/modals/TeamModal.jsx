@@ -7,15 +7,14 @@ import CustomSelect from "../CustomSelect";
 
 const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Unreserved(UR)", customCategory: "", pwd: "Not Applicable" };
 
-const KNOWN_CATEGORIES = ["Unreserved(UR)", "OBC", "SC", "ST", "EWS", "Other"];
+const KNOWN_CATEGORIES = ["Unreserved(UR)", "OBC", "SC", "ST", "EWS"];
 
 const CATEGORY_OPTIONS = [
   { value: "Unreserved(UR)", label: "Unreserved(UR)" },
   { value: "OBC", label: "OBC" },
   { value: "SC", label: "SC" },
   { value: "ST", label: "ST" },
-  { value: "EWS", label: "EWS" },
-  { value: "Other", label: "Other" }
+  { value: "EWS", label: "EWS" }
 ];
 
 const PWD_OPTIONS = [
@@ -49,10 +48,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
   if (initialData?.members && initialData.members.length > 1) {
     const others = initialData.members.slice(1).map(m => {
       let cat = m.category || "Unreserved(UR)";
-      let cCat = "";
       if (cat && !KNOWN_CATEGORIES.includes(cat)) {
-        cCat = cat;
-        cat = "Other";
+        cat = "Unreserved(UR)";
       }
       return {
         name: m.name || "",
@@ -63,8 +60,6 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
         year: m.year || "3rd Year",
         gender: m.gender || "na",
         category: cat,
-        category: cat,
-        customCategory: cCat,
         pwd: m.pwd || "Not Applicable",
         skills: m.skills || "",
         user_id: m.user_id
@@ -94,10 +89,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
   }
 
   let initLeaderCategory = leader.category || "Unreserved(UR)";
-  let initLeaderCustomCategory = "";
   if (initLeaderCategory && !KNOWN_CATEGORIES.includes(initLeaderCategory)) {
-    initLeaderCustomCategory = initLeaderCategory;
-    initLeaderCategory = "Other";
+    initLeaderCategory = "Unreserved(UR)";
   }
 
   const [form, setForm] = useState({
@@ -228,7 +221,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           dept: form.leaderBranch,
           year: form.leaderYear,
           gender: form.leaderGender,
-          category: form.leaderCategory === "Other" ? (form.leaderCustomCategory || "").trim() : form.leaderCategory,
+          category: form.leaderCategory,
           pwd: form.leaderPwd,
           skills: (form.leaderSkills || "").trim(),
           email: (form.email || "").trim(),
@@ -242,7 +235,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           dept: m.branch,
           year: m.year,
           gender: m.gender,
-          category: m.category === "Other" ? (m.customCategory || "").trim() : m.category,
+          category: m.category,
           pwd: m.pwd,
           skills: (m.skills || "").trim(),
           user_id: m.user_id
@@ -424,16 +417,6 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                 />
               </div>
             </div>
-            {form.leaderCategory === "Other" && (
-              <div className="fld" style={{ marginTop: 12 }}>
-                <input
-                  type="text"
-                  placeholder="Specify Category"
-                  value={form.leaderCustomCategory}
-                  onChange={(e) => set("leaderCustomCategory", e.target.value)}
-                />
-              </div>
-            )}
             <div className="fld" style={{ marginTop: 12 }}>
               <label>Your main skills</label>
               <input maxLength={80} placeholder="e.g. firmware, PCB"
@@ -539,17 +522,6 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                       disabled={!m.name}
                     />
                   </div>
-                  {m.category === "Other" && (
-                    <div className="fld" style={{ marginTop: 12 }}>
-                      <input
-                        type="text"
-                        placeholder="Specify Category"
-                        value={m.customCategory || ""}
-                        onChange={(e) => updateMember(i, "customCategory", e.target.value)}
-                        disabled={!m.name}
-                      />
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
