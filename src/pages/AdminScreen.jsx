@@ -204,7 +204,7 @@ export default function AdminScreen() {
   const [isAddingTeam, setIsAddingTeam] = useState(false);
   const [addTeamModalError, setAddTeamModalError] = useState("");
   const [addTeamForm, setAddTeamForm] = useState({
-    teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: ''
+    teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: '', leaderCustomCategory: ''
   });
 
   const handleFinalizeEmails = async () => {
@@ -265,8 +265,12 @@ export default function AdminScreen() {
     setIsAddingTeam(true);
     setAddTeamModalError("");
     try {
+      const payload = { ...addTeamForm };
+      if (payload.leaderCategory === "Other") {
+        payload.leaderCategory = (payload.leaderCustomCategory || "").trim();
+      }
       const { data, error } = await supabase.functions.invoke('admin-add-team', {
-        body: addTeamForm
+        body: payload
       });
       if (error) throw error;
       if (data?.error) {
@@ -278,7 +282,7 @@ export default function AdminScreen() {
       setShowAddTeamModal(false);
       setAddTeamModalError("");
       setAddTeamForm({
-        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: ''
+        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: '', leaderCustomCategory: ''
       });
       fetchSupabaseData?.(); // Refresh table
     } catch (err) {
@@ -399,6 +403,95 @@ export default function AdminScreen() {
 
     const blob = await Packer.toBlob(doc);
     saveAs(blob, `SIH_Nomination_${team.teamName || "Team"}.docx`);
+  };
+
+  const handleDownloadDetailsDocx = async (team) => {
+    const members = [...(team.members || [])];
+    const seats = team.totalSeats || 6;
+    
+    // Fallback if no members are populated but we have a contact string
+    if (members.length === 0 && team.contact) {
+      const leaderName = team.contact.split('|')[0]?.trim();
+      const leaderEmail = team.contact.split('|')[1]?.trim();
+      members.push({ name: leaderName, email: leaderEmail, gender: "Male" });
+    }
+
+    // Pad members array to ensure exactly `seats` rows (usually 6)
+    while (members.length < seats) {
+      members.push({});
+    }
+
+    const colWidths = [15, 15, 11, 8, 10, 7, 9, 13, 12]; // Percentages
+
+    const tableRows = [
+      new TableRow({
+        children: [
+          "Student Full Name\nMax 200 CHARACTERS", 
+          "Email", 
+          "Mobile", 
+          "Gender", 
+          "Category", 
+          "Pwd", 
+          "Nationality", 
+          "Stream", 
+          "Academic Year"
+        ].map(
+          (text, idx) => new TableCell({
+            children: text.split('\n').map((line, lidx) => new Paragraph({ 
+              children: [new TextRun({ text: line, bold: lidx === 0, size: lidx === 0 ? 16 : 12, color: lidx === 1 ? "FF0000" : undefined })], 
+              alignment: AlignmentType.CENTER 
+            })),
+            width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
+            margins: { top: 100, bottom: 100, left: 100, right: 100 },
+          })
+        ),
+      }),
+      ...members.map((m, i) => {
+        let genderStr = "";
+        if (m.name) {
+          const g = (m.gender || '').toLowerCase();
+          if (g === 'f' || g === 'female') genderStr = "Female";
+          else if (g === 'm' || g === 'male') genderStr = "Male";
+          else genderStr = "Other";
+        }
+        
+        const catStr = m.category || (m.name ? "Open" : "");
+        const pwdStr = m.name ? "Not Applicable" : "";
+        const natStr = m.name ? "Indian" : "";
+        const streamStr = m.dept || m.branch || (m.name ? "Computer Engineering" : "");
+        const yearStr = m.year || (m.name ? "3rd Year" : "");
+
+        return new TableRow({
+          children: [m.name || "", m.email || "", m.phone || m.mobile || "", genderStr, catStr, pwdStr, natStr, streamStr, yearStr].map(
+            (text, idx) => new TableCell({
+              children: [new Paragraph({ children: [new TextRun({ text, size: 16 })], alignment: AlignmentType.CENTER })],
+              width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
+              margins: { top: 100, bottom: 100, left: 100, right: 100 },
+            })
+          ),
+        });
+      })
+    ];
+
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: [
+          new Paragraph({
+            children: [new TextRun({ text: `Portal Details: ${team.teamName || ""}`, bold: true, size: 24 })],
+            spacing: { after: 400 },
+            alignment: AlignmentType.CENTER
+          }),
+          new Table({
+            rows: tableRows,
+            width: { size: 100, type: WidthType.PERCENTAGE },
+          }),
+        ],
+      }],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `SIH_Portal_Details_${team.teamName || "Team"}.docx`);
   };
 
   // --- 1. Export All Teams to Excel Matching Referance_Excel.xlsx ---
@@ -984,7 +1077,8 @@ export default function AdminScreen() {
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       <button className="btn sm" onClick={() => setViewingTeam(t)}>View</button>
                       <button className="btn sm sec" onClick={() => setEditingTeam(t)}>Edit</button>
-                      <button className="btn sm" style={{ background: '#3b82f6', color: '#fff', border: 'none' }} onClick={() => handleDownloadDocx(t)}>Docx</button>
+                      <button className="btn sm" style={{ background: '#3b82f6', color: '#fff', border: 'none' }} onClick={() => handleDownloadDocx(t)}>Nomination Docx</button>
+                      <button className="btn sm" style={{ background: '#6366f1', color: '#fff', border: 'none' }} onClick={() => handleDownloadDetailsDocx(t)}>Portal Docx</button>
                       <button className="btn sm danger" onClick={() => handleDeleteTeam(t)}>Delete</button>
                     </div>
                   </td>
@@ -1157,6 +1251,17 @@ export default function AdminScreen() {
                     </select>
                   </div>
                 </div>
+                {addTeamForm.leaderCategory === "Other" && (
+                  <div className="fld">
+                    <input 
+                      type="text" 
+                      placeholder="Specify Category" 
+                      value={addTeamForm.leaderCustomCategory || ""} 
+                      onChange={e => setAddTeamForm({...addTeamForm, leaderCustomCategory: e.target.value})} 
+                      disabled={isAddingTeam} 
+                    />
+                  </div>
+                )}
 
                 {addTeamModalError && (
                   <div style={{

@@ -12,8 +12,18 @@ export default function AdminEditTeamModal({ team, onClose }) {
   const [psId, setPsId] = useState(team.psId || "");
   const [psTitle, setPsTitle] = useState(team.psTitle || "");
   const [pitch, setPitch] = useState(team.pitch || "");
-  const [members, setMembers] = useState(team.members || []);
-
+  const KNOWN_CATEGORIES = ["Open", "OBC", "SC", "ST", "EWS", "Other"];
+  const [members, setMembers] = useState(() => {
+    return (team.members || []).map(m => {
+      let cat = m.category || "";
+      let customCat = "";
+      if (cat && !KNOWN_CATEGORIES.includes(cat)) {
+        customCat = cat;
+        cat = "Other";
+      }
+      return { ...m, category: cat, customCategory: customCat };
+    });
+  });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -25,7 +35,8 @@ export default function AdminEditTeamModal({ team, onClose }) {
     try {
       const normalizedMembers = members.map(m => ({
         ...m,
-        phone: m.phone ? String(m.phone).replace(/\D/g, '') : ''
+        phone: m.phone ? String(m.phone).replace(/\D/g, '') : '',
+        category: m.category === "Other" ? (m.customCategory || "").trim() : (m.category || "")
       }));
 
       await updateTeam(team.id, {
@@ -218,6 +229,17 @@ export default function AdminEditTeamModal({ team, onClose }) {
                       <option value="Other">Other</option>
                     </select>
                   </div>
+                  {m.category === "Other" && (
+                    <div style={{ marginTop: 8 }}>
+                      <input
+                        type="text"
+                        placeholder="Specify Category"
+                        value={m.customCategory || ""}
+                        onChange={(e) => { const newM = [...members]; newM[idx].customCategory = e.target.value; setMembers(newM); }}
+                        style={{ padding: 6, fontSize: 13, width: '100%' }}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
               {members.length === 0 && <p style={{ color: 'var(--dim)', fontSize: 13 }}>No members added.</p>}

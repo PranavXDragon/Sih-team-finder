@@ -5,7 +5,9 @@ import { SIH_THEMES, SKILLS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 
 import CustomSelect from "../CustomSelect";
 
-const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Open" };
+const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Open", customCategory: "" };
+
+const KNOWN_CATEGORIES = ["Open", "OBC", "SC", "ST", "EWS", "Other"];
 
 const CATEGORY_OPTIONS = [
   { value: "Open", label: "Open" },
@@ -38,18 +40,27 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
 
   let initialMembers = emptyMembers;
   if (initialData?.members && initialData.members.length > 1) {
-    const others = initialData.members.slice(1).map(m => ({
-      name: m.name || "",
-      email: m.email || "",
-      phone: m.phone || "",
-      program: m.program || "UG",
-      branch: m.dept || "Computer Engineering",
-      year: m.year || "3rd Year",
-      gender: m.gender || "na",
-      category: m.category || "Open",
-      skills: m.skills || "",
-      user_id: m.user_id
-    }));
+    const others = initialData.members.slice(1).map(m => {
+      let cat = m.category || "Open";
+      let cCat = "";
+      if (cat && !KNOWN_CATEGORIES.includes(cat)) {
+        cCat = cat;
+        cat = "Other";
+      }
+      return {
+        name: m.name || "",
+        email: m.email || "",
+        phone: m.phone || "",
+        program: m.program || "UG",
+        branch: m.dept || "Computer Engineering",
+        year: m.year || "3rd Year",
+        gender: m.gender || "na",
+        category: cat,
+        customCategory: cCat,
+        skills: m.skills || "",
+        user_id: m.user_id
+      };
+    });
     initialMembers = others.concat(emptyMembers).slice(0, 5);
   }
 
@@ -73,6 +84,13 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     }
   }
 
+  let initLeaderCategory = leader.category || "Open";
+  let initLeaderCustomCategory = "";
+  if (initLeaderCategory && !KNOWN_CATEGORIES.includes(initLeaderCategory)) {
+    initLeaderCustomCategory = initLeaderCategory;
+    initLeaderCategory = "Other";
+  }
+
   const [form, setForm] = useState({
     teamName: initialData?.teamName || "",
     college: initialData?.college || college || "Suryodaya College of Engineering and Technology",
@@ -87,7 +105,8 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     leaderBranch: leader.dept || "Computer Engineering",
     leaderYear: leader.year || "3rd Year",
     leaderGender: leader.gender || "na",
-    leaderCategory: leader.category || "Open",
+    leaderCategory: initLeaderCategory,
+    leaderCustomCategory: initLeaderCustomCategory,
     leaderSkills: leader.skills || "",
     members: initialMembers,
     wantsSkills: initWantsSkills,
@@ -199,7 +218,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           dept: form.leaderBranch,
           year: form.leaderYear,
           gender: form.leaderGender,
-          category: form.leaderCategory,
+          category: form.leaderCategory === "Other" ? (form.leaderCustomCategory || "").trim() : form.leaderCategory,
           skills: (form.leaderSkills || "").trim(),
           email: (form.email || "").trim(),
           phone: String(form.phone || "").replace(/\D/g, '')
@@ -212,7 +231,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           dept: m.branch,
           year: m.year,
           gender: m.gender,
-          category: m.category,
+          category: m.category === "Other" ? (m.customCategory || "").trim() : m.category,
           skills: (m.skills || "").trim(),
           user_id: m.user_id
         })),
@@ -385,6 +404,16 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                 />
               </div>
             </div>
+            {form.leaderCategory === "Other" && (
+              <div className="fld" style={{ marginTop: 12 }}>
+                <input
+                  type="text"
+                  placeholder="Specify Category"
+                  value={form.leaderCustomCategory}
+                  onChange={(e) => set("leaderCustomCategory", e.target.value)}
+                />
+              </div>
+            )}
             <div className="fld" style={{ marginTop: 12 }}>
               <label>Your main skills</label>
               <input maxLength={80} placeholder="e.g. firmware, PCB"
@@ -480,6 +509,17 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                       disabled={!m.name}
                     />
                   </div>
+                  {m.category === "Other" && (
+                    <div className="fld" style={{ marginTop: 12 }}>
+                      <input
+                        type="text"
+                        placeholder="Specify Category"
+                        value={m.customCategory || ""}
+                        onChange={(e) => updateMember(i, "customCategory", e.target.value)}
+                        disabled={!m.name}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
