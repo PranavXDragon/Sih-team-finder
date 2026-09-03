@@ -1,4 +1,4 @@
-import './AdminScreen.css';
+﻿import './AdminScreen.css';
 import { useState, useMemo } from 'react';
 import { useSIH } from "../hooks/useSIH";
 import { supabase } from "../lib/supabase";
@@ -204,7 +204,7 @@ export default function AdminScreen() {
   const [isAddingTeam, setIsAddingTeam] = useState(false);
   const [addTeamModalError, setAddTeamModalError] = useState("");
   const [addTeamForm, setAddTeamForm] = useState({
-    teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: ''
+    teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
   });
 
   const handleFinalizeEmails = async () => {
@@ -278,7 +278,7 @@ export default function AdminScreen() {
       setShowAddTeamModal(false);
       setAddTeamModalError("");
       setAddTeamForm({
-        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: ''
+        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year'
       });
       fetchSupabaseData?.(); // Refresh table
     } catch (err) {
@@ -299,106 +299,7 @@ export default function AdminScreen() {
   };
 
   const handleDownloadDocx = async (team) => {
-    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const topSpacing = [new Paragraph({ text: "" }), new Paragraph({ text: "" })];
-    
-    const members = [...(team.members || [])];
-    const seats = team.totalSeats || 6;
-    
-    // Fallback if no members are populated but we have a contact string
-    if (members.length === 0 && team.contact) {
-      const leaderName = team.contact.split('|')[0]?.trim();
-      const leaderEmail = team.contact.split('|')[1]?.trim();
-      members.push({ name: leaderName, email: leaderEmail, gender: "Male" });
-    }
-
-    // Pad members array to ensure exactly `seats` rows (usually 6)
-    while (members.length < seats) {
-      members.push({});
-    }
-
-    const colWidths = [10, 16, 8, 24, 12, 18, 12]; // Percentages
-
-    const tableRows = [
-      new TableRow({
-        children: ["", "Name", "Gender", "Email id", "Mobile no.", "Stream", "Academic Year"].map(
-          (text, idx) => new TableCell({
-            children: [new Paragraph({ children: [new TextRun({ text, bold: true, size: 18 })], alignment: AlignmentType.CENTER })],
-            width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
-            margins: { top: 100, bottom: 100, left: 100, right: 100 },
-          })
-        ),
-      }),
-      ...members.map((m, i) => {
-        const role = i === 0 ? "Team Leader" : "Team Member";
-        
-        let genderStr = "";
-        if (m.name) {
-          const g = (m.gender || '').toLowerCase();
-          if (g === 'f' || g === 'female') genderStr = "Female";
-          else if (g === 'm' || g === 'male') genderStr = "Male";
-          else genderStr = "N/A";
-        }
-
-        const streamStr = m.dept || m.branch || (m.name ? "Computer Engineering" : "");
-        const yearStr = m.year || (m.name ? "3rd Year" : "");
-
-        return new TableRow({
-          children: [role, m.name || "", genderStr, m.email || "", m.phone || m.mobile || "", streamStr, yearStr].map(
-            (text, idx) => new TableCell({
-              children: [new Paragraph({ children: [new TextRun({ text, size: 18 })], alignment: idx === 0 || idx === 2 || idx === 4 || idx === 6 ? AlignmentType.CENTER : AlignmentType.LEFT })],
-              width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
-              margins: { top: 100, bottom: 100, left: 100, right: 100 },
-            })
-          ),
-        });
-      })
-    ];
-
-    const doc = new Document({
-      sections: [{
-        properties: {},
-        children: [
-          ...topSpacing,
-          new Paragraph({
-            children: [new TextRun({ text: `Date: ${today}`, size: 24 })],
-            spacing: { after: 400 },
-          }),
-          new Paragraph({
-            children: [new TextRun({ text: "Sub: Smart India Hackathon 2026 \u2013 Nomination", bold: true, size: 24 })],
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 400 },
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: "I am pleased to nominate the below team from our college to participate in Smart India Hackathon 2026. AICTE Application No. for our college is West/1-6595181/2010/.",
-                size: 24,
-              }),
-            ],
-            spacing: { after: 600 },
-          }),
-          new Paragraph({
-            children: [new TextRun({ text: `Team 1: ${team.teamName || ""}`, bold: true, size: 24 })],
-          }),
-          new Paragraph({
-            children: [new TextRun({ text: `Problem Statement ID: ${formatPsId(team.psId)} (${team.psTitle || ""})`, bold: true, size: 24 })],
-            spacing: { after: 400 },
-          }),
-          new Table({
-            rows: tableRows,
-            width: { size: 100, type: WidthType.PERCENTAGE },
-          }),
-          new Paragraph({ text: "", spacing: { before: 1200 } }),
-          new Paragraph({ children: [new TextRun({ text: "Sincerely,", size: 24 })], spacing: { after: 800 } }),
-          new Paragraph({ children: [new TextRun({ text: "Dr. V. G. Araipure", bold: true, size: 24 })] }),
-          new Paragraph({ children: [new TextRun({ text: "Principal SCET, Nagpur", bold: true, size: 24 })] }),
-        ],
-      }],
-    });
-
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, `SIH_Nomination_${team.teamName || "Team"}.docx`);
+    addToast("Docx download logic removed temporarily.", "ok");
   };
 
   // --- 1. Export All Teams to Excel Matching Referance_Excel.xlsx ---
@@ -525,7 +426,7 @@ export default function AdminScreen() {
             spacing: { after: 400 },
           }),
           new Paragraph({
-            children: [new TextRun({ text: "Sub: Smart India Hackathon 2026 – Nomination", bold: true, size: 24 })],
+            children: [new TextRun({ text: "Sub: Smart India Hackathon 2026 ΓÇô Nomination", bold: true, size: 24 })],
             alignment: AlignmentType.CENTER,
             spacing: { after: 400 },
           }),
@@ -598,7 +499,7 @@ export default function AdminScreen() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó"
                   required
                   style={{ width: '100%', paddingRight: '40px' }}
                 />
@@ -659,7 +560,7 @@ export default function AdminScreen() {
           <h3>{teams.length}</h3>
           <div className="astat-sub">
             <span style={{ color: '#4ade80' }}>Selected: <b>{teams.filter(t => t.status === 'Selected').length}</b></span>
-            <span>•</span>
+            <span>ΓÇó</span>
             <span style={{ color: '#facc15' }}>Waitlisted: <b>{teams.filter(t => t.status === 'Waitlisted').length}</b></span>
           </div>
         </div>
@@ -685,13 +586,13 @@ export default function AdminScreen() {
             </div>
           </div>
           <h3 style={{ fontSize: 22, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ color: '#ec4899' }}>♀ {totalGirls}</span>
+            <span style={{ color: '#ec4899' }}>ΓÖÇ {totalGirls}</span>
             <span style={{ color: 'var(--dim)', fontSize: 16 }}>vs</span>
-            <span style={{ color: '#3b82f6' }}>♂ {totalBoys}</span>
+            <span style={{ color: '#3b82f6' }}>ΓÖé {totalBoys}</span>
           </h3>
           <div className="astat-sub">
             <span style={{ color: '#ec4899' }}><b>{girlPercent}%</b> Female</span>
-            <span>•</span>
+            <span>ΓÇó</span>
             <span style={{ color: '#3b82f6' }}><b>{boyPercent}%</b> Male</span>
           </div>
         </div>
@@ -864,10 +765,10 @@ export default function AdminScreen() {
             Rejected ({teams.filter(t => t.status === 'Rejected').length})
           </button>
           <button className={`admin-tab-btn ${activeFilter === 'allgirls' ? 'active' : ''}`} onClick={() => setActiveFilter('allgirls')}>
-            ♀ All-Girls ({allGirlTeamsCount})
+            ΓÖÇ All-Girls ({allGirlTeamsCount})
           </button>
           <button className={`admin-tab-btn ${activeFilter === 'violations' ? 'active' : ''}`} onClick={() => setActiveFilter('violations')} style={{ color: ruleViolationTeamsCount > 0 ? '#f97316' : 'inherit' }}>
-            ⚠️ Rule Alerts ({ruleViolationTeamsCount})
+            ΓÜá∩╕Å Rule Alerts ({ruleViolationTeamsCount})
           </button>
           <button className={`admin-tab-btn ${activeFilter === 'software' ? 'active' : ''}`} onClick={() => setActiveFilter('software')}>
             Software
@@ -1034,7 +935,7 @@ export default function AdminScreen() {
                     color: (s.gender || '').toLowerCase() === 'f' || (s.gender || '').toLowerCase() === 'female' ? '#ec4899' : '#3b82f6',
                     fontWeight: 600
                   }}>
-                    {(s.gender || '').toLowerCase() === 'f' || (s.gender || '').toLowerCase() === 'female' ? '♀ Female' : (s.gender || '').toLowerCase() === 'm' || (s.gender || '').toLowerCase() === 'male' ? '♂ Male' : 'N/A'}
+                    {(s.gender || '').toLowerCase() === 'f' || (s.gender || '').toLowerCase() === 'female' ? 'ΓÖÇ Female' : (s.gender || '').toLowerCase() === 'm' || (s.gender || '').toLowerCase() === 'male' ? 'ΓÖé Male' : 'N/A'}
                   </span>
                 </td>
                 <td>
@@ -1144,18 +1045,6 @@ export default function AdminScreen() {
                       <option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option>
                     </select>
                   </div>
-                  <div className="fld">
-                    <label>Category</label>
-                    <select value={addTeamForm.leaderCategory || ""} onChange={e => setAddTeamForm({...addTeamForm, leaderCategory: e.target.value})} disabled={isAddingTeam}>
-                      <option value="">Select Category</option>
-                      <option value="Open">Open</option>
-                      <option value="OBC">OBC</option>
-                      <option value="SC">SC</option>
-                      <option value="ST">ST</option>
-                      <option value="EWS">EWS</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
                 </div>
 
                 {addTeamModalError && (
@@ -1195,7 +1084,7 @@ export default function AdminScreen() {
               <div>
                 <h2 style={{ margin: 0 }}>Confirm Deletion</h2>
               </div>
-              <button className="x" onClick={() => setConfirmDelete(null)}>×</button>
+              <button className="x" onClick={() => setConfirmDelete(null)}>├ù</button>
             </div>
             <div className="mbody" style={{ padding: 24 }}>
               <p style={{ margin: "0 0 12px 0" }}>

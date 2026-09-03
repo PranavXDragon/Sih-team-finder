@@ -152,7 +152,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                     <input
                       type="text"
-                      placeholder="Name"
+                      placeholder={idx === 0 ? "Full Team Leader Name" : "Full Name"}
                       value={m.name}
                       onChange={(e) => { const newM = [...members]; newM[idx].name = e.target.value; setMembers(newM); }}
                       style={{ padding: 6, fontSize: 13 }}
@@ -198,6 +198,19 @@ export default function AdminEditTeamModal({ team, onClose }) {
                       <option value="3rd Year">3rd Year</option>
                       <option value="4th Year">4th Year</option>
                       <option value="5th Year">5th Year</option>
+                    </select>
+                    <select
+                      value={m.category || ""}
+                      onChange={(e) => { const newM = [...members]; newM[idx].category = e.target.value; setMembers(newM); }}
+                      style={{ padding: 6, fontSize: 13 }}
+                    >
+                      <option value="">Select Category</option>
+                      <option value="Open">Open</option>
+                      <option value="OBC">OBC</option>
+                      <option value="SC">SC</option>
+                      <option value="ST">ST</option>
+                      <option value="EWS">EWS</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
                 </div>
