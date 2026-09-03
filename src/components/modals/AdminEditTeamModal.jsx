@@ -23,6 +23,11 @@ export default function AdminEditTeamModal({ team, onClose }) {
     setErrorMsg("");
 
     try {
+      const normalizedMembers = members.map(m => ({
+        ...m,
+        phone: m.phone ? String(m.phone).replace(/\D/g, '') : ''
+      }));
+
       await updateTeam(team.id, {
         teamName,
         contact,
@@ -31,8 +36,8 @@ export default function AdminEditTeamModal({ team, onClose }) {
         psId,
         psTitle,
         pitch,
-        members,
-        seatsOpen: Math.max(0, (team.totalSeats || 6) - members.length)
+        members: normalizedMembers,
+        seatsOpen: Math.max(0, (team.totalSeats || 6) - normalizedMembers.length)
       });
       onClose(); // close on success
     } catch (err) {

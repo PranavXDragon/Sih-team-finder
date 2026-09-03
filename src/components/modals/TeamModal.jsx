@@ -187,7 +187,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       psId: (form.psId || "").trim(),
       psTitle: (form.psTitle || "").trim(),
       pitch: (form.pitch || "").trim(),
-      contact: (form.phone || "").trim() + ' | ' + (form.email || "").trim(),
+      contact: String(form.phone || "").replace(/\D/g, '') + ' | ' + (form.email || "").trim(),
       needsFemale: !hasFemale,
       wantsSkills: finalWantsSkills,
       seatsOpen,
@@ -202,12 +202,12 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           category: form.leaderCategory,
           skills: (form.leaderSkills || "").trim(),
           email: (form.email || "").trim(),
-          phone: (form.phone || "").trim()
+          phone: String(form.phone || "").replace(/\D/g, '')
         },
         ...filledMembers.map(m => ({
           name: (m.name || "").trim(),
           email: (m.email || "").trim(),
-          phone: (m.phone || "").trim(),
+          phone: String(m.phone || "").replace(/\D/g, ''),
           program: m.program,
           dept: m.branch,
           year: m.year,
