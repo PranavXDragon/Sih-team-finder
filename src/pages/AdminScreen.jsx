@@ -131,7 +131,7 @@ export default function AdminScreen() {
         matchFilter = getRuleViolations(t).length > 0;
       }
       else if (activeFilter === "incomplete") {
-        matchFilter = getIncompleteFields(t).length > 0;
+        matchFilter = (t.status === 'Selected' || t.status === 'Waitlisted') && getIncompleteFields(t).length > 0;
       }
 
       return matchSearch && matchFilter;
@@ -174,7 +174,7 @@ export default function AdminScreen() {
 
       const violations = getRuleViolations(t);
       if (violations.length > 0) ruleViolations++;
-      if (getIncompleteFields(t).length > 0) incompleteCount++;
+      if (getIncompleteFields(t).length > 0 && (t.status === 'Selected' || t.status === 'Waitlisted')) incompleteCount++;
     });
 
     return {
