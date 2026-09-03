@@ -1074,8 +1074,7 @@ export default function AdminScreen() {
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       <button className="btn sm" onClick={() => setViewingTeam(t)}>View</button>
                       <button className="btn sm sec" onClick={() => setEditingTeam(t)}>Edit</button>
-                      <button className="btn sm" style={{ background: '#3b82f6', color: '#fff', border: 'none' }} onClick={() => handleDownloadDocx(t)}>Nomination Docx</button>
-                      <button className="btn sm" style={{ background: '#6366f1', color: '#fff', border: 'none' }} onClick={() => handleDownloadDetailsDocx(t)}>Portal Docx</button>
+                      <button className="btn sm" style={{ background: '#3b82f6', color: '#fff', border: 'none' }} onClick={() => handleDownloadDocx(t)}>Docx</button>
                       <button className="btn sm danger" onClick={() => handleDeleteTeam(t)}>Delete</button>
                     </div>
                   </td>
