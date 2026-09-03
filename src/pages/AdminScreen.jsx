@@ -65,7 +65,7 @@ const getRuleViolations = (t) => {
 };
 
 export default function AdminScreen() {
-  const { teams, seekers, stats, deleteTeam, deleteSeeker, updateTeam, user, addToast, fetchSupabaseData } = useSIH();
+  const { teams, seekers, deleteTeam, deleteSeeker, updateTeam, user, addToast, fetchSupabaseData } = useSIH();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -165,7 +165,7 @@ export default function AdminScreen() {
       { name: '3rd Year', girls: 45, boys: 60 },
       { name: '4th Year', girls: 15, boys: 25 }
     ];
-  }, [teams]);
+  }, []);
 
   const branchChartData = useMemo(() => {
     return [
@@ -174,7 +174,7 @@ export default function AdminScreen() {
       { name: 'Electronics (ETC)', count: 35 },
       { name: 'Mechanical', count: 12 }
     ];
-  }, [teams]);
+  }, []);
 
   const trackPieData = useMemo(() => {
     let software = 0;
@@ -197,7 +197,7 @@ export default function AdminScreen() {
       { name: 'FinTech', count: 8 },
       { name: 'SpaceTech', count: 5 }
     ];
-  }, [teams]);
+  }, []);
 
   // Manual Add Team States
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
@@ -402,94 +402,6 @@ export default function AdminScreen() {
     saveAs(blob, `SIH_Nomination_${team.teamName || "Team"}.docx`);
   };
 
-  const handleDownloadDetailsDocx = async (team) => {
-    const members = [...(team.members || [])];
-    const seats = team.totalSeats || 6;
-    
-    // Fallback if no members are populated but we have a contact string
-    if (members.length === 0 && team.contact) {
-      const leaderName = team.contact.split('|')[0]?.trim();
-      const leaderEmail = team.contact.split('|')[1]?.trim();
-      members.push({ name: leaderName, email: leaderEmail, gender: "Male" });
-    }
-
-    // Pad members array to ensure exactly `seats` rows (usually 6)
-    while (members.length < seats) {
-      members.push({});
-    }
-
-    const colWidths = [15, 15, 11, 8, 10, 7, 9, 13, 12]; // Percentages
-
-    const tableRows = [
-      new TableRow({
-        children: [
-          "Student Full Name\nMax 200 CHARACTERS", 
-          "Email", 
-          "Mobile", 
-          "Gender", 
-          "Category", 
-          "Pwd", 
-          "Nationality", 
-          "Stream", 
-          "Academic Year"
-        ].map(
-          (text, idx) => new TableCell({
-            children: text.split('\n').map((line, lidx) => new Paragraph({ 
-              children: [new TextRun({ text: line, bold: lidx === 0, size: lidx === 0 ? 16 : 12, color: lidx === 1 ? "FF0000" : undefined })], 
-              alignment: AlignmentType.CENTER 
-            })),
-            width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
-            margins: { top: 100, bottom: 100, left: 100, right: 100 },
-          })
-        ),
-      }),
-      ...members.map((m, i) => {
-        let genderStr = "";
-        if (m.name) {
-          const g = (m.gender || '').toLowerCase();
-          if (g === 'f' || g === 'female') genderStr = "Female";
-          else if (g === 'm' || g === 'male') genderStr = "Male";
-          else genderStr = "Other";
-        }
-        
-        const catStr = m.category || (m.name ? "Unreserved(UR)" : "");
-        const pwdStr = m.pwd || (m.name ? "Not Applicable" : "");
-        const natStr = m.name ? "Indian" : "";
-        const streamStr = m.dept || m.branch || (m.name ? "Computer Engineering" : "");
-        const yearStr = m.year || (m.name ? "3rd Year" : "");
-
-        return new TableRow({
-          children: [m.name || "", m.email || "", m.phone || m.mobile || "", genderStr, catStr, pwdStr, natStr, streamStr, yearStr].map(
-            (text, idx) => new TableCell({
-              children: [new Paragraph({ children: [new TextRun({ text, size: 16 })], alignment: AlignmentType.CENTER })],
-              width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
-              margins: { top: 100, bottom: 100, left: 100, right: 100 },
-            })
-          ),
-        });
-      })
-    ];
-
-    const doc = new Document({
-      sections: [{
-        properties: {},
-        children: [
-          new Paragraph({
-            children: [new TextRun({ text: `Portal Details: ${team.teamName || ""}`, bold: true, size: 24 })],
-            spacing: { after: 400 },
-            alignment: AlignmentType.CENTER
-          }),
-          new Table({
-            rows: tableRows,
-            width: { size: 100, type: WidthType.PERCENTAGE },
-          }),
-        ],
-      }],
-    });
-
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, `SIH_Portal_Details_${team.teamName || "Team"}.docx`);
-  };
 
   // --- 1. Export All Teams to Excel Matching Referance_Excel.xlsx ---
   const handleExportExcel = () => {
@@ -577,79 +489,6 @@ export default function AdminScreen() {
     }
   };
 
-  const handleExportWord = async (team) => {
-    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const topSpacing = [new Paragraph({ text: "" }), new Paragraph({ text: "" })];
-    
-    let membersList = (team.members && team.members.length > 0) ? team.members : [];
-    if (membersList.length === 0) {
-      membersList = [{ name: team.contact?.split('|')[0] || "Team Leader", gender: "Male" }];
-    }
-
-    const tableRows = [
-      new TableRow({
-        children: [
-          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "S. No.", bold: true })] })] }),
-          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Name", bold: true })] })] }),
-          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Gender", bold: true })] })] }),
-        ]
-      }),
-      ...membersList.map((m, idx) => {
-        return new TableRow({
-          children: [
-            new TableCell({ children: [new Paragraph(String(idx + 1))] }),
-            new TableCell({ children: [new Paragraph(m.name || "")] }),
-            new TableCell({ children: [new Paragraph(m.gender || "")] }),
-          ]
-        });
-      })
-    ];
-
-    const doc = new Document({
-      sections: [{
-        properties: {},
-        children: [
-          ...topSpacing,
-          new Paragraph({
-            children: [new TextRun({ text: `Date: ${today}`, size: 24 })],
-            spacing: { after: 400 },
-          }),
-          new Paragraph({
-            children: [new TextRun({ text: "Sub: Smart India Hackathon 2026 – Nomination", bold: true, size: 24 })],
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 400 },
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: "I am pleased to nominate the below team from our college to participate in Smart India Hackathon 2026. AICTE Application No. for our college is West/1-6595181/2010/.",
-                size: 24,
-              }),
-            ],
-            spacing: { after: 600 },
-          }),
-          new Paragraph({
-            children: [new TextRun({ text: `Team 1: ${team.teamName || ""}`, bold: true, size: 24 })],
-          }),
-          new Paragraph({
-            children: [new TextRun({ text: `Problem Statement ID: ${formatPsId(team.psId)} (${team.psTitle || ""})`, bold: true, size: 24 })],
-            spacing: { after: 400 },
-          }),
-          new Table({
-            rows: tableRows,
-            width: { size: 100, type: WidthType.PERCENTAGE },
-          }),
-          new Paragraph({ text: "", spacing: { before: 1200 } }),
-          new Paragraph({ children: [new TextRun({ text: "Sincerely,", size: 24 })], spacing: { after: 800 } }),
-          new Paragraph({ children: [new TextRun({ text: "Dr. V. G. Araipure", bold: true, size: 24 })] }),
-          new Paragraph({ children: [new TextRun({ text: "Principal SCET, Nagpur", bold: true, size: 24 })] }),
-        ],
-      }],
-    });
-
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, `SIH_Nomination_${team.teamName || "Team"}.docx`);
-  };
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
