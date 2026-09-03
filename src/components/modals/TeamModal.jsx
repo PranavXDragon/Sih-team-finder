@@ -5,7 +5,7 @@ import { SIH_THEMES, SKILLS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 
 import CustomSelect from "../CustomSelect";
 
-const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Unreserved(UR)", customCategory: "", pwd: "Not Applicable" };
+const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Unreserved(UR)", pwd: "Not Applicable" };
 
 const KNOWN_CATEGORIES = ["Unreserved(UR)", "OBC", "SC", "ST", "EWS"];
 
@@ -108,7 +108,6 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     leaderYear: leader.year || "3rd Year",
     leaderGender: leader.gender || "na",
     leaderCategory: initLeaderCategory,
-    leaderCustomCategory: initLeaderCustomCategory,
     leaderPwd: leader.pwd || "Not Applicable",
     leaderSkills: leader.skills || "",
     members: initialMembers,
