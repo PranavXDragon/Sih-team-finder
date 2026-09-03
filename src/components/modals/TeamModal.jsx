@@ -5,7 +5,16 @@ import { SIH_THEMES, SKILLS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 
 import CustomSelect from "../CustomSelect";
 
-const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na" };
+const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Open" };
+
+const CATEGORY_OPTIONS = [
+  { value: "Open", label: "Open" },
+  { value: "OBC", label: "OBC" },
+  { value: "SC", label: "SC" },
+  { value: "ST", label: "ST" },
+  { value: "EWS", label: "EWS" },
+  { value: "Other", label: "Other" }
+];
 
 const GENDER_OPTIONS = [
   { value: "na", label: "Prefer not to say" },
@@ -37,6 +46,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
       branch: m.dept || "Computer Engineering",
       year: m.year || "3rd Year",
       gender: m.gender || "na",
+      category: m.category || "Open",
       skills: m.skills || "",
       user_id: m.user_id
     }));
@@ -77,6 +87,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     leaderBranch: leader.dept || "Computer Engineering",
     leaderYear: leader.year || "3rd Year",
     leaderGender: leader.gender || "na",
+    leaderCategory: leader.category || "Open",
     leaderSkills: leader.skills || "",
     members: initialMembers,
     wantsSkills: initWantsSkills,
@@ -188,6 +199,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           dept: form.leaderBranch,
           year: form.leaderYear,
           gender: form.leaderGender,
+          category: form.leaderCategory,
           skills: (form.leaderSkills || "").trim(),
           email: (form.email || "").trim(),
           phone: (form.phone || "").trim()
@@ -200,6 +212,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           dept: m.branch,
           year: m.year,
           gender: m.gender,
+          category: m.category,
           skills: (m.skills || "").trim(),
           user_id: m.user_id
         })),
@@ -364,10 +377,18 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                 />
               </div>
               <div className="fld">
-                <label>Your main skills</label>
-                <input maxLength={80} placeholder="e.g. firmware, PCB"
-                  value={form.leaderSkills} onChange={(e) => set("leaderSkills", e.target.value)} />
+                <label>Category</label>
+                <CustomSelect
+                  value={form.leaderCategory}
+                  onChange={(val) => set("leaderCategory", val)}
+                  options={CATEGORY_OPTIONS}
+                />
               </div>
+            </div>
+            <div className="fld" style={{ marginTop: 12 }}>
+              <label>Your main skills</label>
+              <input maxLength={80} placeholder="e.g. firmware, PCB"
+                value={form.leaderSkills} onChange={(e) => set("leaderSkills", e.target.value)} />
             </div>
           </div>
 
@@ -450,6 +471,12 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                       value={m.gender}
                       onChange={(val) => updateMember(i, "gender", val)}
                       options={MEMBER_GENDER_OPTIONS}
+                      disabled={!m.name}
+                    />
+                    <CustomSelect
+                      value={m.category || "Open"}
+                      onChange={(val) => updateMember(i, "category", val)}
+                      options={CATEGORY_OPTIONS}
                       disabled={!m.name}
                     />
                   </div>
