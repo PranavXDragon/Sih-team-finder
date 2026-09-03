@@ -5,7 +5,7 @@ import { SIH_THEMES, SKILLS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 
 import CustomSelect from "../CustomSelect";
 
-const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Open", customCategory: "" };
+const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Open", customCategory: "", pwd: "Not Applicable" };
 
 const KNOWN_CATEGORIES = ["Open", "OBC", "SC", "ST", "EWS", "Other"];
 
@@ -16,6 +16,13 @@ const CATEGORY_OPTIONS = [
   { value: "ST", label: "ST" },
   { value: "EWS", label: "EWS" },
   { value: "Other", label: "Other" }
+];
+
+const PWD_OPTIONS = [
+  { value: "Not Applicable", label: "Not Applicable" },
+  { value: "Visually Impaired(VI)", label: "Visually Impaired(VI)" },
+  { value: "Locomotor Disability(LD)", label: "Locomotor Disability(LD)" },
+  { value: "Hearing Impaired(HI)", label: "Hearing Impaired(HI)" }
 ];
 
 const GENDER_OPTIONS = [
@@ -56,7 +63,9 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
         year: m.year || "3rd Year",
         gender: m.gender || "na",
         category: cat,
+        category: cat,
         customCategory: cCat,
+        pwd: m.pwd || "Not Applicable",
         skills: m.skills || "",
         user_id: m.user_id
       };
@@ -107,6 +116,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     leaderGender: leader.gender || "na",
     leaderCategory: initLeaderCategory,
     leaderCustomCategory: initLeaderCustomCategory,
+    leaderPwd: leader.pwd || "Not Applicable",
     leaderSkills: leader.skills || "",
     members: initialMembers,
     wantsSkills: initWantsSkills,
@@ -219,6 +229,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           year: form.leaderYear,
           gender: form.leaderGender,
           category: form.leaderCategory === "Other" ? (form.leaderCustomCategory || "").trim() : form.leaderCategory,
+          pwd: form.leaderPwd,
           skills: (form.leaderSkills || "").trim(),
           email: (form.email || "").trim(),
           phone: String(form.phone || "").replace(/\D/g, '')
@@ -232,6 +243,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
           year: m.year,
           gender: m.gender,
           category: m.category === "Other" ? (m.customCategory || "").trim() : m.category,
+          pwd: m.pwd,
           skills: (m.skills || "").trim(),
           user_id: m.user_id
         })),
@@ -403,6 +415,14 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                   options={CATEGORY_OPTIONS}
                 />
               </div>
+              <div className="fld">
+                <label>Pwd</label>
+                <CustomSelect
+                  value={form.leaderPwd}
+                  onChange={(val) => set("leaderPwd", val)}
+                  options={PWD_OPTIONS}
+                />
+              </div>
             </div>
             {form.leaderCategory === "Other" && (
               <div className="fld" style={{ marginTop: 12 }}>
@@ -506,6 +526,14 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                       value={m.category || "Open"}
                       onChange={(val) => updateMember(i, "category", val)}
                       options={CATEGORY_OPTIONS}
+                      disabled={!m.name}
+                    />
+                  </div>
+                  <div className="fld">
+                    <CustomSelect
+                      value={m.pwd || "Not Applicable"}
+                      onChange={(val) => updateMember(i, "pwd", val)}
+                      options={PWD_OPTIONS}
                       disabled={!m.name}
                     />
                   </div>

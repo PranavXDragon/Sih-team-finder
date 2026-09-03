@@ -204,7 +204,7 @@ export default function AdminScreen() {
   const [isAddingTeam, setIsAddingTeam] = useState(false);
   const [addTeamModalError, setAddTeamModalError] = useState("");
   const [addTeamForm, setAddTeamForm] = useState({
-    teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: '', leaderCustomCategory: ''
+    teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: '', leaderCustomCategory: '', leaderPwd: 'Not Applicable'
   });
 
   const handleFinalizeEmails = async () => {
@@ -282,7 +282,7 @@ export default function AdminScreen() {
       setShowAddTeamModal(false);
       setAddTeamModalError("");
       setAddTeamForm({
-        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: '', leaderCustomCategory: ''
+        teamName: '', theme: 'Software', track: '', leaderName: '', leaderEmail: '', leaderPhone: '', leaderGender: 'Male', leaderProgram: 'UG', leaderBranch: PROGRAMS_DATA['UG'][0], leaderYear: '2nd Year', leaderCategory: '', leaderCustomCategory: '', leaderPwd: 'Not Applicable'
       });
       fetchSupabaseData?.(); // Refresh table
     } catch (err) {
@@ -456,7 +456,7 @@ export default function AdminScreen() {
         }
         
         const catStr = m.category || (m.name ? "Open" : "");
-        const pwdStr = m.name ? "Not Applicable" : "";
+        const pwdStr = m.pwd || (m.name ? "Not Applicable" : "");
         const natStr = m.name ? "Indian" : "";
         const streamStr = m.dept || m.branch || (m.name ? "Computer Engineering" : "");
         const yearStr = m.year || (m.name ? "3rd Year" : "");
@@ -1262,6 +1262,16 @@ export default function AdminScreen() {
                     />
                   </div>
                 )}
+                
+                <div className="fld">
+                  <label>Pwd</label>
+                  <select value={addTeamForm.leaderPwd} onChange={e => setAddTeamForm({...addTeamForm, leaderPwd: e.target.value})} disabled={isAddingTeam}>
+                    <option value="Not Applicable">Not Applicable</option>
+                    <option value="Visually Impaired(VI)">Visually Impaired(VI)</option>
+                    <option value="Locomotor Disability(LD)">Locomotor Disability(LD)</option>
+                    <option value="Hearing Impaired(HI)">Hearing Impaired(HI)</option>
+                  </select>
+                </div>
 
                 {addTeamModalError && (
                   <div style={{

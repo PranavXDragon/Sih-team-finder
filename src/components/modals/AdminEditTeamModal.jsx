@@ -20,8 +20,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
       if (cat && !KNOWN_CATEGORIES.includes(cat)) {
         customCat = cat;
         cat = "Other";
-      }
-      return { ...m, category: cat, customCategory: customCat };
+      return { ...m, category: cat, customCategory: customCat, pwd: m.pwd || "Not Applicable" };
     });
   });
   const [loading, setLoading] = useState(false);
@@ -227,6 +226,16 @@ export default function AdminEditTeamModal({ team, onClose }) {
                       <option value="ST">ST</option>
                       <option value="EWS">EWS</option>
                       <option value="Other">Other</option>
+                    </select>
+                    <select
+                      value={m.pwd || "Not Applicable"}
+                      onChange={(e) => { const newM = [...members]; newM[idx].pwd = e.target.value; setMembers(newM); }}
+                      style={{ padding: 6, fontSize: 13 }}
+                    >
+                      <option value="Not Applicable">Not Applicable</option>
+                      <option value="Visually Impaired(VI)">Visually Impaired(VI)</option>
+                      <option value="Locomotor Disability(LD)">Locomotor Disability(LD)</option>
+                      <option value="Hearing Impaired(HI)">Hearing Impaired(HI)</option>
                     </select>
                   </div>
                   {m.category === "Other" && (
