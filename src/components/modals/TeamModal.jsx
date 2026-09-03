@@ -439,7 +439,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                       <input placeholder="Email" type="email" value={m.email} onChange={(e) => updateMember(i, "email", e.target.value)} disabled={!m.name} />
                     </div>
                     <div className="fld">
-                      <input placeholder="Mobile Number" type="tel" value={m.phone} onChange={(e) => updateMember(i, "phone", e.target.value)} disabled={!m.name} />
+                      <input placeholder="Mobile Number" type="tel" value={m.phone} onChange={(e) => updateMember(i, "phone", e.target.value.replace(/\D/g, ''))} disabled={!m.name} />
                     </div>
                   </div>
                   <div className="mrow-dropdowns">
@@ -528,7 +528,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
               <div className={`fld${errs.phone ? " bad" : ""}`}>
                 <label htmlFor="tPhone">Team Leader WhatsApp number<em>*</em></label>
                 <input id="tPhone" inputMode="tel" maxLength={18} placeholder="10 digit number"
-                  value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+                  value={form.phone} onChange={(e) => set("phone", e.target.value.replace(/\D/g, ''))} />
                 <p className="err">Enter a valid number.</p>
               </div>
               <div className="fld">

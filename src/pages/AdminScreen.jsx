@@ -1106,7 +1106,7 @@ export default function AdminScreen() {
                   </div>
                   <div className="fld">
                     <label>Leader Phone</label>
-                    <input type="text" value={addTeamForm.leaderPhone} onChange={e => setAddTeamForm({...addTeamForm, leaderPhone: e.target.value})} disabled={isAddingTeam} />
+                    <input type="text" value={addTeamForm.leaderPhone} onChange={e => setAddTeamForm({...addTeamForm, leaderPhone: e.target.value.replace(/\D/g, '')})} disabled={isAddingTeam} />
                   </div>
                   <div className="fld">
                     <label>Gender</label>

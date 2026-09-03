@@ -168,7 +168,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
                       type="text"
                       placeholder="Phone"
                       value={m.phone}
-                      onChange={(e) => { const newM = [...members]; newM[idx].phone = e.target.value; setMembers(newM); }}
+                      onChange={(e) => { const newM = [...members]; newM[idx].phone = e.target.value.replace(/\D/g, ''); setMembers(newM); }}
                       style={{ padding: 6, fontSize: 13 }}
                     />
                     <input
