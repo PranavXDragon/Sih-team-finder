@@ -455,7 +455,7 @@ export default function AdminScreen() {
           else genderStr = "Other";
         }
         
-        const catStr = m.category || (m.name ? "Open" : "");
+        const catStr = m.category || (m.name ? "Unreserved(UR)" : "");
         const pwdStr = m.pwd || (m.name ? "Not Applicable" : "");
         const natStr = m.name ? "Indian" : "";
         const streamStr = m.dept || m.branch || (m.name ? "Computer Engineering" : "");
@@ -1242,7 +1242,7 @@ export default function AdminScreen() {
                     <label>Category</label>
                     <select value={addTeamForm.leaderCategory || ""} onChange={e => setAddTeamForm({...addTeamForm, leaderCategory: e.target.value})} disabled={isAddingTeam}>
                       <option value="">Select Category</option>
-                      <option value="Open">Open</option>
+                      <option value="Unreserved(UR)">Unreserved(UR)</option>
                       <option value="OBC">OBC</option>
                       <option value="SC">SC</option>
                       <option value="ST">ST</option>

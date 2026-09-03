@@ -12,7 +12,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
   const [psId, setPsId] = useState(team.psId || "");
   const [psTitle, setPsTitle] = useState(team.psTitle || "");
   const [pitch, setPitch] = useState(team.pitch || "");
-  const KNOWN_CATEGORIES = ["Open", "OBC", "SC", "ST", "EWS", "Other"];
+  const KNOWN_CATEGORIES = ["Unreserved(UR)", "OBC", "SC", "ST", "EWS", "Other"];
   const [members, setMembers] = useState(() => {
     return (team.members || []).map(m => {
       let cat = m.category || "";
@@ -221,7 +221,7 @@ export default function AdminEditTeamModal({ team, onClose }) {
                       style={{ padding: 6, fontSize: 13 }}
                     >
                       <option value="">Select Category</option>
-                      <option value="Open">Open</option>
+                      <option value="Unreserved(UR)">Unreserved(UR)</option>
                       <option value="OBC">OBC</option>
                       <option value="SC">SC</option>
                       <option value="ST">ST</option>

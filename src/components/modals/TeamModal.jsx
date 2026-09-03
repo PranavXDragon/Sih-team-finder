@@ -5,12 +5,12 @@ import { SIH_THEMES, SKILLS, YEARS, PROGRAMS_DATA } from "../../data/constants";
 
 import CustomSelect from "../CustomSelect";
 
-const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Open", customCategory: "", pwd: "Not Applicable" };
+const EMPTY_MEMBER = { name: "", email: "", phone: "", program: "UG", branch: "Computer Engineering", year: "3rd Year", gender: "na", category: "Unreserved(UR)", customCategory: "", pwd: "Not Applicable" };
 
-const KNOWN_CATEGORIES = ["Open", "OBC", "SC", "ST", "EWS", "Other"];
+const KNOWN_CATEGORIES = ["Unreserved(UR)", "OBC", "SC", "ST", "EWS", "Other"];
 
 const CATEGORY_OPTIONS = [
-  { value: "Open", label: "Open" },
+  { value: "Unreserved(UR)", label: "Unreserved(UR)" },
   { value: "OBC", label: "OBC" },
   { value: "SC", label: "SC" },
   { value: "ST", label: "ST" },
@@ -48,7 +48,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
   let initialMembers = emptyMembers;
   if (initialData?.members && initialData.members.length > 1) {
     const others = initialData.members.slice(1).map(m => {
-      let cat = m.category || "Open";
+      let cat = m.category || "Unreserved(UR)";
       let cCat = "";
       if (cat && !KNOWN_CATEGORIES.includes(cat)) {
         cCat = cat;
@@ -93,7 +93,7 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
     }
   }
 
-  let initLeaderCategory = leader.category || "Open";
+  let initLeaderCategory = leader.category || "Unreserved(UR)";
   let initLeaderCustomCategory = "";
   if (initLeaderCategory && !KNOWN_CATEGORIES.includes(initLeaderCategory)) {
     initLeaderCustomCategory = initLeaderCategory;
@@ -522,12 +522,14 @@ export default function TeamModal({ onClose, initialData, onSuccess }) {
                       options={MEMBER_GENDER_OPTIONS}
                       disabled={!m.name}
                     />
-                    <CustomSelect
-                      value={m.category || "Open"}
-                      onChange={(val) => updateMember(i, "category", val)}
-                      options={CATEGORY_OPTIONS}
-                      disabled={!m.name}
-                    />
+                    <div className="fld">
+                      <CustomSelect
+                        value={m.category || "Unreserved(UR)"}
+                        onChange={(val) => updateMember(i, "category", val)}
+                        options={CATEGORY_OPTIONS}
+                        disabled={!m.name}
+                      />
+                    </div>
                   </div>
                   <div className="fld">
                     <CustomSelect
