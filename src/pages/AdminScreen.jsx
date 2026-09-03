@@ -438,6 +438,119 @@ export default function AdminScreen() {
     saveAs(blob, `SIH_Nomination_${team.teamName || "Team"}.docx`);
   };
 
+  const handleDownloadAllDocx = async () => {
+    if (filteredTeams.length === 0) {
+      addToast("No teams to export.", "err");
+      return;
+    }
+
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const colWidths = [10, 16, 8, 24, 12, 18, 12];
+
+    const sections = filteredTeams.map((team, teamIdx) => {
+      const members = [...(team.members || [])];
+      const seats = team.totalSeats || 6;
+
+      if (members.length === 0 && team.contact) {
+        const leaderName = team.contact.split('|')[0]?.trim();
+        const leaderEmail = team.contact.split('|')[1]?.trim();
+        members.push({ name: leaderName, email: leaderEmail, gender: "Male" });
+      }
+      while (members.length < seats) {
+        members.push({});
+      }
+
+      const tableRows = [
+        new TableRow({
+          children: ["", "Name", "Gender", "Email id", "Mobile no.", "Stream", "Academic Year"].map(
+            (text, idx) => new TableCell({
+              children: [new Paragraph({ children: [new TextRun({ text, bold: true, size: 18 })], alignment: AlignmentType.CENTER })],
+              width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
+              margins: { top: 100, bottom: 100, left: 100, right: 100 },
+            })
+          ),
+        }),
+        ...members.map((m, i) => {
+          const role = i === 0 ? "Team Leader" : "Team Member";
+          let genderStr = "";
+          if (m.name) {
+            const g = (m.gender || '').toLowerCase();
+            if (g === 'f' || g === 'female') genderStr = "Female";
+            else if (g === 'm' || g === 'male') genderStr = "Male";
+            else genderStr = "N/A";
+          }
+          const streamStr = m.dept || m.branch || (m.name ? "Computer Engineering" : "");
+          const yearStr = m.year || (m.name ? "3rd Year" : "");
+
+          return new TableRow({
+            children: [role, m.name || "", genderStr, m.email || "", m.phone || m.mobile || "", streamStr, yearStr].map(
+              (text, idx) => new TableCell({
+                children: [new Paragraph({ children: [new TextRun({ text, size: 18 })], alignment: idx === 0 || idx === 2 || idx === 4 || idx === 6 ? AlignmentType.CENTER : AlignmentType.LEFT })],
+                width: { size: colWidths[idx], type: WidthType.PERCENTAGE },
+                margins: { top: 100, bottom: 100, left: 100, right: 100 },
+              })
+            ),
+          });
+        })
+      ];
+
+      return {
+        properties: {
+          page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } },
+        },
+        children: [
+          new Paragraph({ text: "" }),
+          new Paragraph({ text: "" }),
+          new Paragraph({
+            children: [new TextRun({ text: `Date: ${today}`, size: 24 })],
+            spacing: { after: 400 },
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: "Sub: Smart India Hackathon 2026 \u2013 Nomination", bold: true, size: 24 })],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 400 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "I am pleased to nominate the below team from our college to participate in Smart India Hackathon 2026. AICTE Application No. for our college is West/1-6595181/2010/.",
+                size: 24,
+              }),
+            ],
+            spacing: { after: 600 },
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: `Team ${teamIdx + 1}: ${team.teamName || ""}`, bold: true, size: 24 })],
+          }),
+          new Paragraph({
+            children: [new TextRun({ text: `Problem Statement ID: ${formatPsId(team.psId)} (${team.psTitle || ""})`, bold: true, size: 24 })],
+            spacing: { after: 400 },
+          }),
+          new Table({
+            rows: tableRows,
+            width: { size: 100, type: WidthType.PERCENTAGE },
+          }),
+          new Paragraph({ text: "", spacing: { before: 1200 } }),
+          new Paragraph({ children: [new TextRun({ text: "Sincerely,", size: 24 })], spacing: { after: 800 } }),
+          new Paragraph({ children: [new TextRun({ text: "Dr. V. G. Araipure", bold: true, size: 24 })] }),
+          new Paragraph({ children: [new TextRun({ text: "Principal SCET, Nagpur", bold: true, size: 24 })] }),
+        ],
+      };
+    });
+
+    const doc = new Document({ sections });
+    const blob = await Packer.toBlob(doc);
+
+    const filterLabel = activeFilter === "all" ? "All" 
+      : activeFilter === "selected" ? "Selected"
+      : activeFilter === "waitlisted" ? "Waitlisted"
+      : activeFilter === "pending" ? "Pending"
+      : activeFilter === "rejected" ? "Rejected"
+      : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1);
+
+    saveAs(blob, `SIH_Nomination_${filterLabel}_Teams.docx`);
+    addToast(`Downloaded ${filteredTeams.length} teams as Docx.`, "ok");
+  };
 
   // --- 1. Export All Teams to Excel Matching Referance_Excel.xlsx ---
   const handleExportExcel = () => {
@@ -798,6 +911,14 @@ export default function AdminScreen() {
           >
             <Download size={16} />
             Export Excel (.xlsx)
+          </button>
+          <button 
+            className="btn" 
+            onClick={handleDownloadAllDocx}
+            style={{ background: '#3b82f6', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+          >
+            <Download size={16} />
+            Download All Docx ({filteredTeams.length})
           </button>
           <button 
             className="btn" 
