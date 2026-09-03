@@ -64,6 +64,36 @@ const getRuleViolations = (t) => {
   return violations;
 };
 
+const REQUIRED_MEMBER_FIELDS = [
+  { key: 'name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'gender', label: 'Gender' },
+  { key: 'category', label: 'Category' },
+  { key: 'pwd', label: 'Pwd' },
+];
+
+const getIncompleteFields = (t) => {
+  const members = (t.members && t.members.length > 0) ? t.members : [];
+  if (members.length === 0) return ['No Members'];
+  const missing = new Set();
+  members.forEach((m, idx) => {
+    REQUIRED_MEMBER_FIELDS.forEach(f => {
+      const val = (m[f.key] || '').toString().trim();
+      if (!val || val === 'na' || val === 'Not Applicable' && f.key === 'pwd') {
+        // pwd "Not Applicable" is valid, skip it
+        if (f.key === 'pwd' && val === 'Not Applicable') return;
+        if (f.key === 'gender' && val === 'na') {
+          missing.add(`M${idx + 1}: ${f.label}`);
+        } else if (!val) {
+          missing.add(`M${idx + 1}: ${f.label}`);
+        }
+      }
+    });
+  });
+  return Array.from(missing);
+};
+
 export default function AdminScreen() {
   const { teams, seekers, deleteTeam, deleteSeeker, updateTeam, user, addToast, fetchSupabaseData } = useSIH();
   const [email, setEmail] = useState("");
@@ -100,17 +130,21 @@ export default function AdminScreen() {
       else if (activeFilter === "violations") {
         matchFilter = getRuleViolations(t).length > 0;
       }
+      else if (activeFilter === "incomplete") {
+        matchFilter = getIncompleteFields(t).length > 0;
+      }
 
       return matchSearch && matchFilter;
     });
   }, [teams, searchTerm, activeFilter]);
 
-  const { totalParticipants, totalGirls, totalBoys, allGirlTeamsCount, genderPieData, ruleViolationTeamsCount } = useMemo(() => {
+  const { totalParticipants, totalGirls, totalBoys, allGirlTeamsCount, genderPieData, ruleViolationTeamsCount, incompleteTeamsCount } = useMemo(() => {
     let participants = 0;
     let girls = 0;
     let boys = 0;
     let allGirlTeams = 0;
     let ruleViolations = 0;
+    let incompleteCount = 0;
 
     teams.forEach(t => {
       let teamGirls = 0;
@@ -140,6 +174,7 @@ export default function AdminScreen() {
 
       const violations = getRuleViolations(t);
       if (violations.length > 0) ruleViolations++;
+      if (getIncompleteFields(t).length > 0) incompleteCount++;
     });
 
     return {
@@ -148,6 +183,7 @@ export default function AdminScreen() {
       totalBoys: boys,
       allGirlTeamsCount: allGirlTeams,
       ruleViolationTeamsCount: ruleViolations,
+      incompleteTeamsCount: incompleteCount,
       genderPieData: [
         { name: 'Female', value: girls, color: '#ec4899' },
         { name: 'Male', value: boys, color: '#3b82f6' }
@@ -804,6 +840,9 @@ export default function AdminScreen() {
           <button className={`admin-tab-btn ${activeFilter === 'hardware' ? 'active' : ''}`} onClick={() => setActiveFilter('hardware')}>
             Hardware
           </button>
+          <button className={`admin-tab-btn ${activeFilter === 'incomplete' ? 'active' : ''}`} onClick={() => setActiveFilter('incomplete')} style={{ color: incompleteTeamsCount > 0 ? '#ef4444' : 'inherit' }}>
+            📋 Incomplete ({incompleteTeamsCount})
+          </button>
         </div>
 
         <input 
@@ -857,6 +896,18 @@ export default function AdminScreen() {
                           ))}
                         </div>
                       )}
+                      {activeFilter === 'incomplete' && (() => {
+                        const incFields = getIncompleteFields(t);
+                        return incFields.length > 0 ? (
+                          <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: 4 }}>
+                            {incFields.map((f, idx) => (
+                              <span key={idx} style={{ fontSize: '9px', background: '#fef3c7', color: '#92400e', padding: '1px 5px', borderRadius: '3px', fontWeight: 600 }}>
+                                {f}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
                   </td>
                   <td>
