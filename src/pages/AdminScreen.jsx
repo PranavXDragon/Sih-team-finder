@@ -2,7 +2,7 @@ import './AdminScreen.css';
 import { useState, useMemo } from 'react';
 import { useSIH } from "../hooks/useSIH";
 import { supabase } from "../lib/supabase";
-import { Eye, EyeOff, FileSpreadsheet, Download, Users, Sparkles, Award, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, FileSpreadsheet, Download, Users, Sparkles, Award, AlertTriangle, FileJson } from "lucide-react";
 import AdminEditTeamModal from "../components/modals/AdminEditTeamModal";
 import AdminViewTeamModal from "../components/modals/AdminViewTeamModal";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
@@ -638,6 +638,71 @@ export default function AdminScreen() {
     }
   };
 
+  // --- Export Selected/Filtered Teams as JSON ---
+  const handleExportJSON = () => {
+    try {
+      if (filteredTeams.length === 0) {
+        addToast("No teams to export.", "err");
+        return;
+      }
+
+      const exportData = filteredTeams.map(t => {
+        const members = (t.members && t.members.length > 0)
+          ? t.members.map(m => ({
+              name: m.name || "",
+              email: m.email || "",
+              phone: m.phone || m.mobile || "",
+              gender: m.gender || "",
+              department: m.dept || m.branch || "",
+              year: m.year || "",
+              category: m.category || "",
+              pwd: m.pwd || "",
+              is_leader: m.is_leader || false,
+            }))
+          : [];
+
+        return {
+          teamName: t.teamName || "",
+          psId: formatPsId(t.psId),
+          psTitle: t.psTitle || "",
+          theme: t.theme || "",
+          track: t.track || (t.theme === "Hardware" ? "Hardware" : "Software"),
+          status: t.status || "Pending",
+          pitch: t.pitch || "",
+          totalSeats: t.totalSeats || 6,
+          seatsOpen: t.seatsOpen ?? 0,
+          needsFemale: t.needsFemale || false,
+          hasMentor: t.hasMentor || false,
+          wantsSkills: t.wantsSkills || [],
+          members,
+        };
+      });
+
+      const jsonStr = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      const filterLabel = activeFilter === "all" ? "All"
+        : activeFilter === "selected" ? "Selected"
+        : activeFilter === "waitlisted" ? "Waitlisted"
+        : activeFilter === "pending" ? "Pending"
+        : activeFilter === "rejected" ? "Rejected"
+        : activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1);
+
+      a.href = url;
+      a.download = `SIH_${filterLabel}_Teams.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      addToast(`Downloaded ${filteredTeams.length} teams as JSON.`, "ok");
+    } catch (err) {
+      console.error(err);
+      addToast("Failed to export JSON.", "err");
+    }
+  };
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -718,6 +783,14 @@ export default function AdminScreen() {
           >
             <FileSpreadsheet size={18} />
             Download Teams Excel
+          </button>
+          <button 
+            className="btn" 
+            onClick={handleExportJSON}
+            style={{ background: '#f59e0b', color: '#000', border: 'none', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, margin: 0 }}
+          >
+            <FileJson size={18} />
+            Download JSON
           </button>
           <button className="btn pri" onClick={() => setShowAddTeamModal(true)} style={{ margin: 0 }}>
             + Add Team & Leader
@@ -911,6 +984,14 @@ export default function AdminScreen() {
           >
             <Download size={16} />
             Export Excel (.xlsx)
+          </button>
+          <button 
+            className="btn" 
+            onClick={handleExportJSON}
+            style={{ background: '#f59e0b', color: '#000', border: 'none', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+          >
+            <FileJson size={16} />
+            Export JSON ({filteredTeams.length})
           </button>
           <button 
             className="btn" 
